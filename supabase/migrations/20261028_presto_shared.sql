@@ -22,6 +22,12 @@ create table if not exists public.presto_drivers (
   masrvi boolean not null default false,
   sedad boolean not null default false,
   click boolean not null default false,
+  bankily_account text not null default '' check (char_length(bankily_account)<=80),
+  masrvi_account text not null default '' check (char_length(masrvi_account)<=80),
+  sedad_account text not null default '' check (char_length(sedad_account)<=80),
+  click_account text not null default '' check (char_length(click_account)<=80),
+  delivery_date text not null default '' check (char_length(delivery_date)<=30),
+  observations text not null default '' check (char_length(observations)<=1000),
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
