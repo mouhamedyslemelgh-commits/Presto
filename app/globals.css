@@ -65,3 +65,99 @@ html[dir="rtl"] th:first-child{border-radius:0 9px 9px 0}
 html[dir="rtl"] th:last-child{border-radius:9px 0 0 9px}
 html[dir="rtl"] .settingsIcon,html[dir="rtl"] .excelModalHeader h2{flex-shrink:0}
 @media(max-width:700px){html[dir="rtl"] .sidebar{left:auto;right:-235px;transition:right .2s}html[dir="rtl"] .sidebar.open{left:auto;right:0}.topbar{gap:8px}.topRight{gap:8px}.prestoLanguagePicker button{padding:6px 8px;font-size:11px}.settingsLanguageCard{flex-direction:column;align-items:flex-start;padding:16px}}
+
+/* Premium driver record and separately managed mobile-money account numbers */
+.driverNameButton{display:inline-flex;align-items:center;justify-content:flex-start;gap:8px;color:#243b4e;background:transparent;border:0;font-weight:800;font-size:12px;min-width:0;padding:5px 2px;text-align:start;transition:color .2s}
+.driverNameButton svg{opacity:0;transform:translate(-2px,2px);transition:.2s;color:#ec6535}
+.driverNameButton:hover,.driverNameButton:focus-visible{color:#ed5b2b}
+.driverNameButton:hover svg,.driverNameButton:focus-visible svg{opacity:1;transform:none}
+.driverProfileOverlay{position:fixed;inset:0;z-index:180;background:rgba(10,20,32,.74);backdrop-filter:blur(9px);display:flex;align-items:center;justify-content:center;padding:22px;overflow-y:auto}
+.driverProfileDialog{width:min(100%,940px);max-height:min(95vh,1090px);overflow-y:auto;overscroll-behavior:contain;background:#f8fafc;box-shadow:0 38px 120px #07111e85;border-radius:24px;scrollbar-width:thin;animation:profileOpen .22s ease both}
+@keyframes profileOpen{from{opacity:0;transform:translateY(12px) scale(.988)}to{opacity:1;transform:translateY(0) scale(1)}}
+.driverProfileHero{background:linear-gradient(120deg,#101d2b 0%,#23384c 100%);position:relative;overflow:hidden;color:white;padding:29px 34px 26px}
+.driverProfileHero::before{content:"";position:absolute;inset:0 0 auto 0;height:5px;background:linear-gradient(90deg,#e65b2c,#f9aa65,#ed612e)}
+.driverProfileHeroGlow{position:absolute;pointer-events:none;width:450px;height:450px;border-radius:50%;background:radial-gradient(circle,#e95d2d42,transparent 65%);right:-160px;top:-200px}
+.driverProfileHeroTop,.driverProfileHeroMain,.driverProfileHeroStats{display:flex;position:relative}
+.driverProfileHeroTop{align-items:center;justify-content:space-between;gap:16px}
+.driverProfileEyebrow{color:#c2d2de;font-size:11px;letter-spacing:1.4px;display:flex;align-items:center;gap:8px;font-weight:750}
+.driverProfileClose{display:grid;place-items:center;background:#ffffff17;color:white;border:1px solid #ffffff27;border-radius:11px;width:38px;height:38px;transition:.2s}
+.driverProfileClose:hover{background:#ffffff30}
+.driverProfileHeroMain{gap:20px;align-items:center;margin-top:18px}
+.driverProfileAvatar{flex:0 0 94px;width:94px;height:94px;background:linear-gradient(145deg,#f9ad67,#e75c2e);border-radius:24px;display:grid;place-items:center;font-weight:800;font-size:33px;color:white;border:3px solid #fff3;box-shadow:0 10px 30px #050e1790;letter-spacing:-.5px}
+.driverProfileHeroText{min-width:0}
+.driverProfileCode{font-size:11px;color:#c1d1db;display:flex;align-items:center;gap:5px;font-weight:700;letter-spacing:1px}
+.driverProfileHeroText h2{font-size:clamp(23px,3vw,35px);margin:8px 0 12px;font-weight:850;letter-spacing:-.5px;line-height:1.25;overflow-wrap:anywhere}
+.driverProfileState{padding:7px 11px;border-radius:99px;font-size:12px;font-weight:750;display:inline-flex;align-items:center;gap:7px}
+.driverProfileState.complete{background:#20865c38;color:#8defbd}
+.driverProfileState.pending{background:#f0a06c30;color:#ffcaaf}
+.driverProfileDot{width:7px;height:7px;border-radius:100%;background:currentColor}
+.driverProfileHeroStats{margin-top:24px;padding-top:21px;border-top:1px solid #ffffff27;gap:22px;flex-wrap:wrap}
+.driverProfileHeroStats>span{display:flex;align-items:center;gap:8px;font-size:12px;color:#d7e3ec}
+.driverProfileHeroStats strong{font-weight:800;color:white;margin-inline-start:3px}
+.driverProfileBody{padding:28px 32px 32px}
+.driverProfileToolbar,.driverProfileSectionTitle{display:flex;align-items:center;gap:13px}
+.driverProfileToolbar{justify-content:space-between;margin-bottom:19px;flex-wrap:wrap}
+.driverProfileSectionOverline{font-size:10px;color:#ed693b;letter-spacing:1px;font-weight:800}
+.driverProfileToolbar h3,.driverProfileSectionTitle h3{font-size:18px;color:#17283a;margin:5px 0 0}
+.driverProfileEdit,.driverProfileCancel{display:flex;align-items:center;justify-content:center;gap:9px;border-radius:11px;padding:12px 17px;font-size:12px;font-weight:800}
+.driverProfileEdit{border:1px solid #f4d4c5;color:#df5c30;background:#fff5f0}
+.driverProfileCancel{border:1px solid #dfe7ed;color:#596e81;background:white}
+.driverProfileEdit:hover{background:#ffe8dc}
+.driverProfileInfoGrid,.driverProfileFields{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.driverProfileInfo{background:white;border:1px solid #e7edf2;border-radius:14px;padding:15px 16px;display:grid;gap:8px;min-height:86px}
+.driverProfileInfo>span{font-size:11px;font-weight:700;color:#92a0ac}
+.driverProfileInfo>strong{font-size:14px;line-height:1.4;color:#172b40;overflow-wrap:anywhere}
+.driverProfileFields label{display:grid;gap:7px;font-size:11px;font-weight:750;color:#687b8c}
+.driverProfileFields input,.driverProfilePayEdit input,.driverProfileNotesInput{border-radius:11px;border:1px solid #d7e2e9;background:#fff;color:#172d42;padding:12px 13px;width:100%;min-width:0;outline:0;font-size:13px}
+.driverProfileFields input:focus,.driverProfilePayEdit input:focus,.driverProfileNotesInput:focus{border-color:#f17b4d;box-shadow:0 0 0 3px #f4784b20}
+.driverProfileSectionTitle{margin:28px 0 16px}
+.driverProfileMiniIcon{width:43px;height:43px;flex:0 0 43px;background:#fff0e9;color:#eb6536;border-radius:13px;display:grid;place-items:center}
+.driverProfileSectionTitle h3{font-size:16px;margin:0 0 5px}
+.driverProfileSectionTitle p{font-size:11px;color:#93a1af;margin:0;line-height:1.5}
+.driverProfileCount{margin-inline-start:auto;border-radius:99px;background:#e7f5ed;color:#177959;font-size:12px;font-weight:800;padding:8px 12px;white-space:nowrap}
+.driverProfileEquipment{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px}
+.driverProfileEquipmentCard{border-radius:14px;border:1px solid #e7edf1;background:#fff;display:flex;align-items:center;gap:9px;padding:15px 13px;min-width:0}
+.driverProfileEquipmentCard svg{flex:0 0 auto;color:#b1bfc9}
+.driverProfileEquipmentCard.isYes svg{color:#228b66}
+.driverProfileEquipmentCard>span{font-size:12px;color:#516375;font-weight:750;flex:1}
+.driverProfileEquipmentCard strong{font-size:10px;color:#a77759;background:#fff0e5;padding:7px 9px;border-radius:20px;white-space:nowrap}
+.driverProfileEquipmentCard.isYes strong{color:#16845c;background:#e6f6ee}
+.driverProfileEquipmentCard input{width:18px;height:18px;accent-color:#24966c}
+.driverProfilePayments{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
+.driverProfilePaymentCard{border:1px solid #e7eaf0;border-top:3px solid var(--pay-color);background:white;border-radius:15px;padding:17px 17px 15px;min-width:0;box-shadow:0 3px 12px #17263607}
+.driverProfilePaymentCard.enabled{box-shadow:0 5px 18px #1832490c}
+.driverProfilePayHead{display:flex;align-items:center;gap:11px}
+.driverProfilePayLogo{background:white;width:53px;height:53px;flex:0 0 53px;border-radius:12px;display:grid;place-items:center;border:1px solid #e9edf0;overflow:hidden}
+.driverProfilePayLogo img{height:100%;width:100%;object-fit:contain;padding:3px}
+.driverProfilePayHead>div{display:grid;gap:5px;min-width:0}
+.driverProfilePayHead strong{font-size:15px;color:#22384c}
+.driverProfilePayHead small{font-size:10px;color:#93a1af}
+.driverProfilePayTag{margin-inline-start:auto;border-radius:99px;padding:6px 10px;white-space:nowrap;font-size:10px;font-weight:800}
+.driverProfilePayTag.on{background:#e7f6ed;color:#248357}
+.driverProfilePayTag.off{background:#f2f3f5;color:#8998a5}
+.driverProfilePayValue{margin-top:15px;background:#f7f9fb;padding:12px 13px;border-radius:10px;display:grid;gap:7px}
+.driverProfilePayValue span{font-size:10px;color:#8594a2;font-weight:750}
+.driverProfilePayValue strong{font-family:Arial,sans-serif;font-size:14px;color:#24384d;font-weight:800;overflow-wrap:anywhere;text-align:start}
+.driverProfilePayEdit{margin-top:14px;display:grid;gap:12px}
+.driverProfilePayEdit>label:first-child{font-size:11px;font-weight:750;color:#728296;display:grid;gap:7px}
+.driverProfilePayCheck{display:flex;align-items:center;gap:8px;font-size:11px;color:#64778a;font-weight:700}
+.driverProfilePayCheck input{width:17px;height:17px;accent-color:#e96839}
+.driverProfileNotes{border-radius:13px;background:white;border:1px solid #e7edf1;min-height:60px;padding:17px;color:#75869a;font-size:12px;line-height:1.75;white-space:pre-wrap;overflow-wrap:anywhere}
+.driverProfileNotesInput{resize:vertical;font-size:13px;line-height:1.6}
+.driverProfileError{color:#bb4d2b;font-size:12px;background:#fff1eb;border-radius:10px;padding:10px 13px}
+.driverProfileFooter{border-top:1px solid #e7ecf0;background:white;padding:18px 30px;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.driverProfileFooter>span{display:inline-flex;align-items:center;gap:7px;color:#93a0ae;font-weight:650;font-size:10px}
+.driverProfileFooter>div{display:flex;gap:10px;flex-wrap:wrap}
+.driverProfileDone,.driverProfileSave{border-radius:10px;padding:12px 18px;font-size:12px;font-weight:800;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.driverProfileDone{background:#eff2f5;border:1px solid #e4e8ee;color:#526577}
+.driverProfileSave{background:#f06230;border:0;color:#fff;box-shadow:0 7px 14px #f0623025}
+.driverProfileSave:hover{background:#da552a}
+.quickAccountGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px;margin-top:13px}
+.quickAccountGrid label{font-weight:750;font-size:11px;color:#6b7788;display:grid;gap:7px;min-width:0}
+.quickAccountGrid input{width:100%;padding:11px;border-radius:9px;border:1px solid #d9e0e7;outline:0}
+html[dir="rtl"] .driverNameButton{font-family:Tahoma,Arial,sans-serif}
+html[dir="rtl"] .driverNameButton svg{transform:rotate(180deg)}
+html[dir="rtl"] .driverProfileEyebrow{letter-spacing:0}
+html[dir="rtl"] .driverProfilePayValue strong{direction:ltr;text-align:right;unicode-bidi:plaintext}
+@media(max-width:740px){.driverProfileDialog{max-height:96vh;border-radius:17px}.driverProfileOverlay{padding:9px}.driverProfileHero{padding:23px 20px}.driverProfileAvatar{width:71px;height:71px;flex-basis:71px;border-radius:18px;font-size:26px}.driverProfileHeroMain{gap:14px}.driverProfileHeroText h2{font-size:24px}.driverProfileBody{padding:21px 17px}.driverProfileInfoGrid,.driverProfileFields{grid-template-columns:repeat(2,minmax(0,1fr))}.driverProfileEquipment{grid-template-columns:1fr}.driverProfilePayments{grid-template-columns:1fr 1fr;gap:10px}.driverProfilePaymentCard{padding:13px}.driverProfilePayLogo{width:39px;height:39px;flex-basis:39px}.driverProfilePayHead{gap:6px;flex-wrap:wrap}.driverProfilePayHead>div strong{font-size:13px}.driverProfilePayTag{font-size:9px}.driverProfileFooter{padding:15px}.driverProfileFooter>span{display:none}.driverProfileFooter>div{width:100%;justify-content:flex-end}}
+@media(max-width:530px){.driverProfilePayments{grid-template-columns:1fr}.driverProfileHeroStats{gap:10px}.driverProfileHeroStats>span{font-size:11px}.driverProfileInfoGrid,.driverProfileFields{grid-template-columns:1fr}.quickAccountGrid{grid-template-columns:1fr}.driverProfileHeroText h2{font-size:22px}}
