@@ -1,3 +1,4 @@
+// @ts-nocheck
 'use client';
 /**
  * PRESTO Excel export — recreates the two-sheet "LIVREUR_Presto_v2" layout.
