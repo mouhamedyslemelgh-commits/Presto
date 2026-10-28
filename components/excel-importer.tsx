@@ -5,7 +5,7 @@ import {useLanguage} from './presto-language';
 import {FileSpreadsheet,Upload,X,CheckCircle2,AlertTriangle} from 'lucide-react';
 import {parsePrestoSheet,type ImportedDriver,type ImportMode,type SheetData,type ParsedImport} from '../lib/presto-excel';
 type Result={added:number;updated:number;skipped:number};
-type Props={onImport:(drivers:ImportedDriver[],mode:ImportMode)=>{t("Promise")}<Result>;disabled?:boolean;publicSite?:boolean};
+type Props={onImport:(drivers:ImportedDriver[],mode:ImportMode)=>Promise<Result>;disabled?:boolean;publicSite?:boolean};
 export default function ExcelImporter({onImport,disabled=false,publicSite=false}:Props){
  const {t}=useLanguage();
  const fileRef=useRef<HTMLInputElement>(null);
