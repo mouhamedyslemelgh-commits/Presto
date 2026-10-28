@@ -56,7 +56,7 @@ export default function ExcelImporter({onImport,disabled=false,publicSite=false}
  {sheets.length>1&&<label className="excelSheetSelector">{t("Feuille à importer")} <select value={index} disabled={working} onChange={e=>selectSheet(sheets,Number(e.target.value))}>{sheets.map((s,i)=><option value={i} key={i}>{s.sheet}</option>)}</select></label>}
  {preview&&<>
   <div className="excelStats"><div><strong>{preview.items.length}</strong><span>{t("Livreurs détectés")}</span></div><div><strong>{preview.skipped}</strong><span>{t("Lignes ignorées")}</span></div><div><strong>{preview.headerRow}</strong><span>{t("Ligne d’en-tête")}</span></div></div>
-  <p className="excelDetected">Colonnes reconnues : {preview.columns.join(' · ')}</p>
+  <p className="excelDetected">{t('Colonnes reconnues')} : {preview.columns.join(' · ')}</p>
   <div className="tableOverflow"><table><thead><tr><th>{t("LIVREUR")}</th><th>{t("TÉLÉPHONE")}</th><th>{t("SAC")}</th><th>{t("CHEMISE")}</th><th>{t("BANKILY")}</th><th>{t("MASRVI")}</th><th>{t("SEDAD")}</th><th>{t("CLICK")}</th></tr></thead><tbody>{preview.items.slice(0,8).map((d,i)=><tr key={i}><td className="name">{d.name}</td><td>{d.phone||'—'}</td><td>{d.bag?t('Oui'):t('Non')}</td><td>{d.shirt?t('Oui'):t('Non')}</td>{(['bankily','masrvi','sedad','click'] as const).map(k=><td key={k}>{d.accounts[k]|| (d.payments[k]?'Oui':'—')}</td>)}</tr>)}</tbody></table></div>
   <p className="excelDetected">Aperçu des 8 premières lignes ; la date de remise et les observations sont également importées.</p>
   <div className="excelMode"><label><input type="radio" name="excel-mode" checked={mode==='add'} onChange={()=>setMode('add')}/> {t("Ajouter seulement les nouveaux livreurs")}</label><label><input type="radio" name="excel-mode" checked={mode==='merge'} onChange={()=>setMode('merge')}/> {t("Mettre à jour aussi les livreurs existants (téléphone ou nom)")}</label></div>
@@ -64,9 +64,9 @@ export default function ExcelImporter({onImport,disabled=false,publicSite=false}
   {publicSite&&<div className="excelWarnings"><AlertTriangle size={17}/><div><p>{t("Attention : les noms, téléphones et numéros de comptes importés pourront être consultés par les personnes ayant accès au site partagé.")}</p></div></div>}
  </>}
  {error&&<div className="excelError" role="alert">{error}</div>}
- {result&&<div className="excelSuccess" role="status"><CheckCircle2 size={19}/> Importation terminée : {result.added} ajouté(s), {result.updated} mis à jour, {result.skipped} ignoré(s).</div>}
+ {result&&<div className="excelSuccess" role="status"><CheckCircle2 size={19}/> {t('Importation terminée')} : {result.added} {t('ajoutés')}, {result.updated} {t('mis à jour')}, {result.skipped} {t('ignorés')}.</div>}
  </div>
- <div className="excelModalFooter"><button className="secondary" onClick={()=>setOpen(false)} disabled={working}>{t("Fermer")}</button><button className="primary" disabled={working||!preview?.items.length||Boolean(result)} onClick={()=>void commit()}><Upload size={16}/> Importer {preview?.items.length??0} livreurs</button></div>
+ <div className="excelModalFooter"><button className="secondary" onClick={()=>setOpen(false)} disabled={working}>{t("Fermer")}</button><button className="primary" disabled={working||!preview?.items.length||Boolean(result)} onClick={()=>void commit()}><Upload size={16}/> {t('Importer')} {preview?.items.length??0} {t('Livreurs')}</button></div>
  </section></div>}
  </>;
 }

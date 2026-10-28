@@ -166,7 +166,16 @@ const ar:Record<string,string>={
   "Français": "الفرنسية",
   "Arabe": "العربية",
   "Importer": "استيراد",
-  "Fichier": "ملف"
+  "Fichier": "ملف",
+  "Modifier un livreur": "تعديل سائق",
+  "Ajouter un livreur": "إضافة سائق",
+  "Colonnes reconnues": "الأعمدة المكتشفة",
+  "Importation terminée": "اكتمل الاستيراد",
+  "ajoutés": "أُضيفوا",
+  "mis à jour": "تم تحديثهم",
+  "ignorés": "تم تجاهلهم",
+  "Supprimer ce livreur ?": "هل تريد حذف هذا السائق؟",
+  "Ajouter": "إضافة"
 };
 const key='presto-ui-language';
 type Context={language:Language;setLanguage:(lang:Language)=>void;t:(text:string)=>string};
