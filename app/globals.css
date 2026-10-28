@@ -45,3 +45,23 @@
 .excelBusy{font-size:13px;color:#40779a}
 .excelModalFooter{padding:17px 25px;border-top:1px solid #e9edf0;display:flex;justify-content:flex-end;gap:10px}
 @media(max-width:700px){.excelModalWrap{padding:8px}.excelModal{max-height:96vh}.excelModalHeader{padding:16px}.excelModalHeader h2{font-size:16px}.excelModalBody{padding:16px}.excelModalFooter{padding:15px}.excelStats{gap:6px}.excelStats>div{padding:10px}.excelStats strong{font-size:22px}.excelStats span{font-size:9px}.excelModalFooter .primary{font-size:12px}.headActions{flex-wrap:wrap}}
+
+/* Language selector: independent of site data and shared across pages */
+.prestoLanguagePicker{display:inline-flex;align-items:center;gap:3px;direction:ltr;background:#eff2f6;border:1px solid #e5e9ee;padding:4px;border-radius:11px;white-space:nowrap;flex:0 0 auto}
+.prestoLanguagePicker button{font-family:Tahoma,Arial,sans-serif;border:0;border-radius:8px;padding:7px 12px;color:#536577;background:transparent;font-size:12px;cursor:pointer;font-weight:750;transition:.15s}
+.prestoLanguagePicker button.active{background:#fff;color:#df5a28;box-shadow:0 2px 8px #172a3718}
+.prestoLanguagePicker button:focus-visible{outline:2px solid #f25c2c;outline-offset:2px}
+.settingsLanguageCard{display:flex;align-items:center;justify-content:space-between;gap:18px;background:white;border:1px solid #e8ecf2;border-radius:16px;padding:20px 25px;margin-bottom:18px}
+.settingsLanguageCard h3{font-size:16px;margin:0 0 6px}.settingsLanguageCard p{font-size:12px;color:#8090a2;margin:0}
+html[dir="rtl"] body{font-family:Tahoma,"Noto Sans Arabic",Arial,sans-serif;letter-spacing:0}
+html[dir="rtl"] .sidebar nav button,html[dir="rtl"] table,html[dir="rtl"] .payment{text-align:right}
+html[dir="rtl"] .sidebar nav button.selected{border-left:0;border-right:3px solid var(--orange);padding-left:15px;padding-right:12px}
+html[dir="rtl"] .paymentHeader strong{margin-left:0;margin-right:auto}
+html[dir="rtl"] .topbar .topRight{gap:10px}
+html[dir="rtl"] .headActions{justify-content:flex-start}
+html[dir="rtl"] .num,html[dir="rtl"] .paymentAccountNumber{direction:ltr;unicode-bidi:isolate}
+html[dir="rtl"] .date,html[dir="rtl"] input[type="tel"],html[dir="rtl"] .paymentHeader strong{direction:ltr}
+html[dir="rtl"] th:first-child{border-radius:0 9px 9px 0}
+html[dir="rtl"] th:last-child{border-radius:9px 0 0 9px}
+html[dir="rtl"] .settingsIcon,html[dir="rtl"] .excelModalHeader h2{flex-shrink:0}
+@media(max-width:700px){html[dir="rtl"] .sidebar{left:auto;right:-235px;transition:right .2s}html[dir="rtl"] .sidebar.open{left:auto;right:0}.topbar{gap:8px}.topRight{gap:8px}.prestoLanguagePicker button{padding:6px 8px;font-size:11px}.settingsLanguageCard{flex-direction:column;align-items:flex-start;padding:16px}}
