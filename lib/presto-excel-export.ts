@@ -116,7 +116,7 @@ export async function downloadPrestoXlsx(drivers:ExportDriver[],company='PRESTO'
  summaryValue(ws,'E7','COUNTIF('+r('K')+',">0")',active,AMBER);
  (['G','H','I','J'] as const).forEach((c,i)=>summaryValue(ws,c+'7','COUNTA('+r(c)+')',bankCounts[i]));
  summaryValue(ws,'K7','COUNTIF('+r('L')+',"✔ Complet")',complete,GREEN);
- summaryValue(ws,'L7','COUNTIF('+r('L')+',"⚠ Mobile money manquant")',count(x=>x.bag&&x.shirt&&!activeAccounts(x)));
+ summaryValue(ws,'L7','COUNTIFS('+r('C')+',"<>",'+r('K')+',0)',count(x=>activeAccounts(x)===0));
  summaryValue(ws,'M7','SUMPRODUCT(('+r('D')+'<>"")*(COUNTIF('+r('D')+','+r('D')+')>1))',duplicates,'666666');
  ws.getRow(8).height=7;paint(ws,8,1,13,{fill:'FFFFFF'});
  ws.mergeCells('A9:M9');ws.getRow(9).height=25;
