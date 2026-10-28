@@ -1,4 +1,6 @@
 'use client';
+import {prestoCloud} from '../lib/presto-cloud';
+import SharedDashboard from './shared-dashboard';
 import {useEffect,useMemo,useRef,useState} from 'react';
 import {LayoutDashboard,Users,Package,Wallet,ChartNoAxesColumn,Settings,ArrowUpRight,Download,Plus,Search,Filter,Edit3,Trash2,Menu,X,Check,AlertTriangle,ChevronDown,RefreshCw,ShieldAlert,CalendarDays,Save,Upload,EyeOff,Building2,MapPin,Database,LockKeyhole} from 'lucide-react';
 type Pay='bankily'|'masrvi'|'sedad'|'click';
@@ -37,7 +39,7 @@ const blank:Driver={id:0,name:'',phone:'',bag:false,shirt:false,verified:false,p
 const hasPay=(x:Driver)=>Object.values(x.payments).some(Boolean);
 const complete=(x:Driver)=>x.bag&&x.shirt&&x.verified&&hasPay(x);
 function saveCSV(rows:Driver[]){const headings=['N°','Livreur','Téléphone','Sac','Chemise','Dossier','Bankily','Masrvi','Sedad','CLICK','Statut'];const data=rows.map(d=>[d.id,d.name,d.phone,d.bag?'Oui':'Non',d.shirt?'Oui':'Non',d.verified?'Oui':'Non',...methods.map(m=>d.payments[m[0]]?'Oui':'Non'),complete(d)?'Complet':'À relancer']);const escaped=(v:unknown)=>'"'+String(v).replace(/"/g,'""')+'"';const text='\uFEFF'+[headings,...data].map(r=>r.map(escaped).join(';')).join('\r\n');const link=document.createElement('a');link.href=URL.createObjectURL(new Blob([text],{type:'text/csv;charset=utf-8'}));link.download='PRESTO_Livreurs.csv';link.click();setTimeout(()=>URL.revokeObjectURL(link.href),2000);}
-export default function Home(){
+function LocalHome(){
 const [rows,setRows]=useState<Driver[]>([]),[ready,setReady]=useState(false),[view,setView]=useState<View>('dashboard'),[filter,setFilter]=useState('all'),[query,setQuery]=useState(''),[menu,setMenu]=useState(false),[editing,setEditing]=useState<Driver|null>(null),[dialog,setDialog]=useState(false);
 const [prefs,setPrefs]=useState<Preferences>(defaultPreferences),[settingsMessage,setSettingsMessage]=useState('');
 const backupFileRef=useRef<HTMLInputElement>(null);
@@ -121,3 +123,4 @@ return <div className="shell"><div className={'sidebar '+(menu?'open':'')}><div 
  <div className="settingsWarning"><ShieldAlert size={20}/><p>PRESTO est actuellement une démonstration sans connexion utilisateur ni base de données sécurisée. N'utilisez pas ce site pour gérer les données privées de vos salariés avant d'ajouter une authentification et un stockage protégé.</p></div>
  </div>}<footer>PRESTO · MODE LOCAL · AUCUN SERVEUR DE STOCKAGE · PROTOTYPE</footer></main></div>{dialog&&editing&&<div className="modalWrap" onClick={e=>{if(e.target===e.currentTarget)setDialog(false)}}><section className="modal"><div className="modalHead"><h2>{rows.some(x=>x.id===editing.id)?'Modifier':'Ajouter'} un livreur</h2><button onClick={()=>setDialog(false)}><X size={20}/></button></div><div className="modalBody"><label>Nom du livreur<input autoFocus value={editing.name} onChange={e=>setEditing({...editing,name:e.target.value})}/></label><label>Téléphone (démo uniquement)<input value={editing.phone} onChange={e=>setEditing({...editing,phone:e.target.value})}/></label><div className="checks">{[['bag','Sac remis'],['shirt','Chemise remise'],['verified','Dossier vérifié']].map(([k,label])=><label key={k}><input type="checkbox" checked={Boolean(editing[k as 'bag'|'shirt'|'verified'])} onChange={e=>setEditing({...editing,[k]:e.target.checked})}/>{label}</label>)}</div><h3>Mobile Money</h3><div className="checks">{methods.map(([k,label])=><label key={k}><input type="checkbox" checked={editing.payments[k]} onChange={e=>setEditing({...editing,payments:{...editing.payments,[k]:e.target.checked}})}/>{label}</label>)}</div></div><div className="modalActions"><button className="secondary" onClick={()=>setDialog(false)}>Annuler</button><button className="primary" disabled={!editing.name.trim()} onClick={save}><Check size={17}/> Enregistrer</button></div></section></div>}</div>;
 }
+export default function Home(){return prestoCloud ? <SharedDashboard/> : <LocalHome/>;}
