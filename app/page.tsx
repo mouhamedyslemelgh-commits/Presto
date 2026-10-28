@@ -85,7 +85,7 @@ const resetDrivers=()=>{
  if(!window.confirm('Supprimer définitivement tous les livreurs enregistrés dans ce navigateur ? Cette action est irréversible sans sauvegarde.'))return;
  setRows([]);setSettingsMessage('Le registre a été vidé. Tous les compteurs affichent 0.');
 };
-const n=useMemo(()=>({all:rows.length,bags:rows.filter(x=>x.bag).length,shirts:rows.filter(x=>x.shirt).length,complete:rows.filter(complete).length,missing:rows.filter(x=>!hasPay(x)).length,methods:Object.fromEntries(methods.map(m=>[m[0],rows.filter(x=>{t("x.payments[m[0]]).length])) as Record")}<Pay,number>}),[rows]);
+const n=useMemo(()=>({all:rows.length,bags:rows.filter(x=>x.bag).length,shirts:rows.filter(x=>x.shirt).length,complete:rows.filter(complete).length,missing:rows.filter(x=>!hasPay(x)).length,methods:Object.fromEntries(methods.map(m=>[m[0],rows.filter(x=>x.payments[m[0]]).length])) as Record<Pay,number>}),[rows]);
 const pct=(v:number)=>n.all?Math.round(v/n.all*1000)/10:0;
 const list=useMemo(()=>rows.filter(x=>(filter==='all'||(filter==='complete'?complete(x):!complete(x)))&&[x.id,x.name,x.phone].join(' ').toLowerCase().includes(query.toLowerCase())),[rows,filter,query]);
 const go=(v:View,pending=false)=>{setView(v);setFilter(pending?'pending':'all');setQuery('');setMenu(false)};
