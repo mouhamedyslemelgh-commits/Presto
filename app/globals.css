@@ -205,3 +205,8 @@ html[dir="rtl"] .driverProfilePayValue strong{direction:ltr;text-align:right;uni
 .excelBusy{font-size:13px;color:#40779a}
 .excelModalFooter{padding:17px 25px;border-top:1px solid #e9edf0;display:flex;justify-content:flex-end;gap:10px}
 @media(max-width:700px){.excelModalWrap{padding:8px}.excelModal{max-height:96vh}.excelModalHeader{padding:16px}.excelModalHeader h2{font-size:16px}.excelModalBody{padding:16px}.excelModalFooter{padding:15px}.excelStats{gap:6px}.excelStats>div{padding:10px}.excelStats strong{font-size:22px}.excelStats span{font-size:9px}.excelModalFooter .primary{font-size:12px}.headActions{flex-wrap:wrap}}
+
+/* PRESTO automatic private Excel snapshot status */
+.excelCloudStatus{display:flex;justify-content:space-between;align-items:center;gap:12px;background:#edf8f1;border:1px solid #d5eddd;border-radius:12px;padding:14px 17px;margin:15px 0;color:#196d4a;font-weight:800;font-size:12px}
+.excelCloudStatus small{font-size:11px;font-weight:600;color:#718778}
+@media(max-width:650px){.excelCloudStatus{flex-direction:column;align-items:flex-start}}

@@ -2,6 +2,7 @@
 'use client';
 import {useCallback,useEffect,useState} from 'react';
 import {prestoCloud} from '../lib/presto-cloud';
+import {savePrestoExcelSnapshot,downloadSavedPrestoExcel} from '../lib/presto-excel-cloud';
 import DriverProfile from '../components/driver-profile';
 import {useLanguage,LanguageSwitcher} from '../components/presto-language';
 import ExcelImporter from '../components/excel-importer';
@@ -29,6 +30,8 @@ export default function SharedDashboard(){
  const [selectedId,setSelectedId]=useState<number|null>(null);
  const [loading,setLoading]=useState(true),[msg,setMsg]=useState(''),[search,setSearch]=useState(''),[editing,setEditing]=useState<Row|null>(null);
  const [userId,setUserId]=useState<string|null>(null),[admin,setAdmin]=useState(false);
+ const [excelStatus,setExcelStatus]=useState<'idle'|'saving'|'saved'|'error'>('idle');
+ const [excelSavedAt,setExcelSavedAt]=useState<string|null>(null);
  const [email,setEmail]=useState(''),[password,setPassword]=useState(''),[company,setCompany]=useState('PRESTO'),[city,setCity]=useState('Nouakchott · MR');
  const load=useCallback(async()=>{
   if(!prestoCloud)return;
@@ -57,9 +60,25 @@ export default function SharedDashboard(){
   void prestoCloud.from('presto_admins').select('user_id').eq('user_id',userId).maybeSingle().then(({data,error})=>{if(on)setAdmin(Boolean(data)&&!error)});
   return ()=>{on=false};
  },[userId]);
+ const mirrorExcel=async()=>{
+  setExcelStatus('saving');
+  try{
+   const result=await savePrestoExcelSnapshot(company);
+   setExcelSavedAt(result.timestamp);
+   setExcelStatus('saved');
+  }catch(error){
+   const message=error instanceof Error?error.message:'Erreur inconnue';
+   setExcelStatus('error');
+   setMsg('Les données sont enregistrées dans PRESTO, mais la copie Excel n’est pas à jour : '+message);
+  }
+ };
+ const downloadCloudExcel=async()=>{
+  try{await downloadSavedPrestoExcel();}
+  catch(error){setMsg(error instanceof Error?error.message:'Impossible de télécharger Excel.')}
+ };
  const mutate=async(job:()=>PromiseLike<{error:{message:string}|null}>)=>{
   if(!admin){setMsg('Connexion administrateur obligatoire pour modifier les données.');return;}
-  try{const {error}=await job();if(error){setMsg('Échec de sauvegarde : '+error.message);return;}await load();}catch(e){setMsg('Impossible de contacter la base partagée.')}
+  try{const {error}=await job();if(error){setMsg('Échec de sauvegarde : '+error.message);return;}await load();await mirrorExcel();}catch(e){setMsg('Impossible de contacter la base partagée.')}
  };
  const save=async()=>{
   if(!editing?.name.trim()||!admin||!prestoCloud)return;
@@ -104,6 +123,7 @@ export default function SharedDashboard(){
     added+=batch.length;
    }
    await load();
+   await mirrorExcel();
    return {added,updated,skipped};
   }catch(e){
    await load();
@@ -148,11 +168,16 @@ export default function SharedDashboard(){
   {view==='mobile'&&<section className="panel fullTable"><div className="panelTitle"><div><h2>Comptes Mobile Money</h2><p>Bankily, Masrvi, Sedad et CLICK</p></div></div><div className="tableOverflow"><table><thead><tr><th>LIVREUR</th>{pays.map(([key,label])=><th key={key}>{label.toUpperCase()}</th>)}</tr></thead><tbody>{rows.length===0?<tr><td className="empty" colSpan={5}>Aucun compte enregistré</td></tr>:rows.map(d=><tr key={d.id}><td className="name"><button className="driverNameButton" onClick={()=>setSelectedId(d.id)} type="button" title={language==='ar'?'فتح الملف الشخصي':'Ouvrir la fiche du livreur'}>{d.name}<ArrowUpRight size={13}/></button></td>{pays.map(([key])=><td key={key}><input type="checkbox" disabled={!admin} checked={d[key]} onChange={e=>void setFlag(d.id,key,e.target.checked)} aria-label={key+' '+d.name}/>{d[(key+'_account') as 'bankily_account'|'masrvi_account'|'sedad_account'|'click_account']&&<small className="paymentAccountNumber">{d[(key+'_account') as 'bankily_account'|'masrvi_account'|'sedad_account'|'click_account']}</small>}</td>)}</tr>)}</tbody></table></div></section>}
   {view==='reports'&&<section className="panel report"><h2>Rapports partagés</h2>{[['Sacs remis',totals.bags],['Chemises',totals.shirts],['Dossiers complets',totals.complete],['Mobile Money actif',totals.all-totals.missing]].map(([label,n])=><div className="reportLine" key={label}><div><b>{t(String(label))}</b><span>{pct(Number(n))}%</span></div><div className="track"><div style={{width:pct(Number(n))+'%'}}/></div></div>)}<button className="primary" onClick={()=>downloadCSV(rows)}><Download size={17}/> Exporter le registre</button></section>}
   {view==='settings'&&<div className="settingsPage"><section className="settingsLanguageCard"><div><h3>{t("Langue de l’interface")}</h3><p>{t("Choisissez la langue d'affichage du tableau de bord.")}</p></div><LanguageSwitcher/></section><section className="settingsCard"><div className="settingsCardHead"><span className="settingsIcon"><Settings size={20}/></span><div><h3>Connexion administrateur</h3><p>Seules les personnes autorisées peuvent modifier ou supprimer les informations.</p></div></div>{admin?<div className="adminStatus"><Check size={18}/> Session administrateur active <button className="secondary" onClick={()=>void logout()}><LogOut size={16}/> Déconnexion</button></div>:<div className="adminLogin"><label>Adresse e-mail<input type="email" autoComplete="username" value={email} onChange={e=>setEmail(e.target.value)}/></label><label>Mot de passe<input type="password" autoComplete="current-password" value={password} onChange={e=>setPassword(e.target.value)}/></label><button className="primary" onClick={()=>void login()}><LogIn size={17}/> Se connecter</button><p>Le compte doit être autorisé dans la base Supabase PRESTO.</p></div>}{userId&&!admin&&<p className="cloudFootnote">Compte connecté, mais autorisation administrateur absente.</p>}</section>
+  <section className="settingsCard"><div className="settingsCardHead"><span className="settingsIcon"><Download size={20}/></span><div><h3>{language==='ar'?'ملف Excel المحفوظ تلقائيًا':'Excel sauvegardé automatiquement'}</h3><p>{language==='ar'?'يُحدّث من قاعدة PRESTO عند كل إضافة أو تعديل أو حذف.':'Actualisé après chaque ajout, modification ou suppression dans PRESTO.'}</p></div></div>
+   <div className="excelCloudStatus"><span>{excelStatus==='saving'?(language==='ar'?'جارٍ الحفظ في Excel...':'Enregistrement Excel en cours...'):excelStatus==='saved'?(language==='ar'?'تم تحديث Excel':'Excel mis à jour'):excelStatus==='error'?(language==='ar'?'تحتاج نسخة Excel إلى إعادة المزامنة':'Synchronisation Excel à relancer'):(language==='ar'?'ملف Excel سحابي خاص':'Fichier Excel privé dans le cloud')}</span>{excelSavedAt&&<small>{new Date(excelSavedAt).toLocaleString(language==='ar'?'ar-MR':'fr-FR')}</small>}</div>
+   <div className="settingsActions"><button className="primary" disabled={!admin||excelStatus==='saving'} onClick={()=>void mirrorExcel()}>{language==='ar'?'تحديث ملف Excel الآن':'Actualiser Excel maintenant'}</button><button className="secondary" disabled={!admin} onClick={()=>void downloadCloudExcel()}><Download size={16}/>{language==='ar'?'تنزيل النسخة المحفوظة':'Télécharger Excel sauvegardé'}</button></div>
+   <p className="cloudFootnote">{language==='ar'?'البيانات الأصلية محفوظة في قاعدة مشتركة، وملف Excel نسخة تلقائية خاصة بالإدارة.':'La base partagée reste la source de vérité. Le classeur Excel est une copie privée réservée aux administrateurs.'}</p>
+  </section>
   <section className="settingsCard"><div className="settingsCardHead"><span className="settingsIcon"><Settings size={20}/></span><div><h3>Informations de l'entreprise</h3><p>Ces données sont partagées entre les visiteurs.</p></div></div><label className="settingsField">Entreprise<input value={company} disabled={!admin} maxLength={70} onChange={e=>setCompany(e.target.value)}/></label><label className="settingsField">Ville<input value={city} disabled={!admin} maxLength={90} onChange={e=>setCity(e.target.value)}/></label>{admin&&<button className="primary" onClick={()=>void saveProfile()}>Enregistrer le profil</button>}</section>
   <section className="settingsCard"><div className="settingsCardHead"><span className="settingsIcon"><ShieldAlert size={20}/></span><div><h3>Confidentialité et accès</h3><p>Le site est public en lecture. Les visiteurs peuvent voir toutes les informations, y compris les numéros de téléphone.</p></div></div><p className="cloudFootnote">Ne saisissez pas de données personnelles sans autorisation des personnes concernées. Les modifications sont conservées dans la base jusqu'à leur suppression par un administrateur.</p></section>
   <section className="settingsCard"><div className="settingsCardHead"><span className="settingsIcon"><RefreshCw size={20}/></span><div><h3>Effacer le registre partagé</h3><p>Cette action supprime les fiches pour tous les visiteurs.</p></div></div><button className="settingsDangerButton" disabled={!admin} onClick={()=>{if(!prestoCloud||!window.confirm('Effacer TOUS les livreurs pour TOUS les visiteurs ?'))return;void mutate(()=>prestoCloud.from('presto_drivers').delete().gte('id',1))}}><Trash2 size={16}/> Supprimer tous les livreurs</button></section></div>}
   <footer>PRESTO · DONNÉES SYNCHRONISÉES · {loading?'CHARGEMENT':'SUPABASE CLOUD'}</footer></main></div>
-  {selectedId!==null&&rows.some(d=>d.id===selectedId)&&(()=>{const d=rows.find(x=>x.id===selectedId)!;return <DriverProfile key={d.id} driver={{id:d.id,name:d.name,phone:d.phone,bag:d.bag,shirt:d.shirt,verified:d.verified,payments:{bankily:d.bankily,masrvi:d.masrvi,sedad:d.sedad,click:d.click},paymentNumbers:{bankily:d.bankily_account,masrvi:d.masrvi_account,sedad:d.sedad_account,click:d.click_account},deliveryDate:d.delivery_date,observations:d.observations}} onClose={()=>setSelectedId(null)} readOnly={!admin} onSave={async next=>{if(!prestoCloud||!admin)throw Error("Accès administrateur requis.");const {error}=await prestoCloud.from("presto_drivers").update({name:next.name,phone:next.phone,bag:next.bag,shirt:next.shirt,verified:next.verified,bankily:next.payments.bankily,masrvi:next.payments.masrvi,sedad:next.payments.sedad,click:next.payments.click,bankily_account:next.paymentNumbers?.bankily||"",masrvi_account:next.paymentNumbers?.masrvi||"",sedad_account:next.paymentNumbers?.sedad||"",click_account:next.paymentNumbers?.click||"",delivery_date:next.deliveryDate||"",observations:next.observations||""}).eq("id",next.id);if(error)throw Error(error.message);await load();}}/>})()}
+  {selectedId!==null&&rows.some(d=>d.id===selectedId)&&(()=>{const d=rows.find(x=>x.id===selectedId)!;return <DriverProfile key={d.id} driver={{id:d.id,name:d.name,phone:d.phone,bag:d.bag,shirt:d.shirt,verified:d.verified,payments:{bankily:d.bankily,masrvi:d.masrvi,sedad:d.sedad,click:d.click},paymentNumbers:{bankily:d.bankily_account,masrvi:d.masrvi_account,sedad:d.sedad_account,click:d.click_account},deliveryDate:d.delivery_date,observations:d.observations}} onClose={()=>setSelectedId(null)} readOnly={!admin} onSave={async next=>{if(!prestoCloud||!admin)throw Error("Accès administrateur requis.");const {error}=await prestoCloud.from("presto_drivers").update({name:next.name,phone:next.phone,bag:next.bag,shirt:next.shirt,verified:next.verified,bankily:next.payments.bankily,masrvi:next.payments.masrvi,sedad:next.payments.sedad,click:next.payments.click,bankily_account:next.paymentNumbers?.bankily||"",masrvi_account:next.paymentNumbers?.masrvi||"",sedad_account:next.paymentNumbers?.sedad||"",click_account:next.paymentNumbers?.click||"",delivery_date:next.deliveryDate||"",observations:next.observations||""}).eq("id",next.id);if(error)throw Error(error.message);await load();await mirrorExcel();}}/>})()}
  {editing&&admin&&<div className="modalWrap" onClick={e=>{if(e.target===e.currentTarget)setEditing(null)}}><section className="modal"><div className="modalHead"><h2>{editing.id?'Modifier':'Ajouter'} un livreur</h2><button onClick={()=>setEditing(null)}><X size={19}/></button></div><div className="modalBody"><label>Nom du livreur<input value={editing.name} onChange={e=>setEditing({...editing,name:e.target.value})} maxLength={100}/></label><label>Téléphone<input value={editing.phone} onChange={e=>setEditing({...editing,phone:e.target.value})} maxLength={30}/></label><label>Date de remise<input value={editing.delivery_date||''} onChange={e=>setEditing({...editing,delivery_date:e.target.value})} maxLength={30}/></label><label>Observations<input value={editing.observations||''} onChange={e=>setEditing({...editing,observations:e.target.value})} maxLength={1000}/></label><div className="checks">{(['bag','shirt','verified'] as const).map(k=><label key={k}><input type="checkbox" checked={editing[k]} onChange={e=>setEditing({...editing,[k]:e.target.checked})}/>{k==='bag'?'Sac remis':k==='shirt'?'Chemise remise':'Dossier vérifié'}</label>)}</div><h3>Mobile Money</h3><div className="checks">{pays.map(([k,label])=><label key={k}><input type="checkbox" checked={editing[k]} onChange={e=>setEditing({...editing,[k]:e.target.checked})}/>{label}</label>)}</div></div><div className="modalActions"><button className="secondary" onClick={()=>setEditing(null)}>Annuler</button><button className="primary" disabled={!editing.name.trim()} onClick={()=>void save()}><Check size={17}/> Enregistrer</button></div></section></div>}
  </div>;
 }
