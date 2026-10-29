@@ -295,3 +295,99 @@ html[dir="rtl"] .modalBody,html[dir="rtl"] .settingsCard{line-height:1.7}
 .paymentMethodNumber input{display:block;width:100%;min-width:0;padding:12px 13px;border:1px solid #d5dde5;border-radius:9px;background:#fff;font:inherit;font-size:13px;color:#1c2b39;text-align:left;direction:ltr;outline:none}
 .paymentMethodNumber input:focus{border-color:#ee6638;box-shadow:0 0 0 3px #ee663820}
 @media(max-width:530px){.quickAccountGrid{grid-template-columns:1fr}.modalBody{padding:18px}.paymentMethodField{padding:12px}}
+
+/* PRESTO - redesigned responsive driver registration / editing dialog */
+.driverEditorOverlay{padding:22px;background:rgba(10,22,38,.66);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);z-index:70}
+.driverEditorDialog{width:min(760px,100%);max-width:760px;max-height:min(94dvh,1040px);border-radius:22px;border:1px solid #fff;box-shadow:0 28px 85px #0b172b50;overflow:hidden;background:#f9fbfd;color:#253447}
+.driverEditorHead{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-shrink:0;padding:23px 28px;border-bottom:1px solid #ecedf1;background:linear-gradient(113deg,#fff 0%,#fff8f4 100%)}
+.driverEditorHeading{display:flex;align-items:flex-start;gap:15px;min-width:0}
+.driverEditorHeroIcon{display:grid;place-items:center;flex:0 0 49px;width:49px;height:49px;border-radius:15px;background:#fff0e8;color:#e96031;box-shadow:0 4px 12px #ee64241b}
+.driverEditorEyebrow{display:block;color:#d87248;font-weight:800;font-size:10px;letter-spacing:.6px;margin-bottom:3px}
+.driverEditorHead h2{font-size:24px;line-height:1.3;margin:0;color:#152336;font-weight:800}
+.driverEditorHead p{font-size:12px;line-height:1.8;color:#8793a1;margin:5px 0 0}
+.driverEditorClose{flex-shrink:0;width:36px;height:36px;display:grid;place-items:center;border:1px solid #e9edf1;border-radius:11px;background:white;color:#607080;cursor:pointer;transition:background .15s}
+.driverEditorClose:hover{background:#f8e9e4;color:#bd4e2d}
+.driverEditorForm{display:flex;flex-direction:column;flex:1;min-height:0}
+.driverEditorBody{padding:23px 27px;display:flex;flex-direction:column;gap:20px;overflow-y:auto;overscroll-behavior:contain;background:#f8fafc}
+.driverEditorSection{border-radius:15px;border:1px solid #e8edf3;background:#fff;padding:20px;box-shadow:0 5px 15px #10253a05}
+.driverEditorSectionHead{display:flex;align-items:center;gap:11px;margin-bottom:17px}
+.driverEditorSectionIcon{width:37px;height:37px;border-radius:11px;display:grid;place-items:center;background:#fff0e9;color:#e56537;flex-shrink:0}
+.driverEditorSectionHead h3{margin:0;font-weight:800;font-size:15px;color:#24344a}
+.driverEditorSectionHead p{font-size:11px;color:#93a0ac;margin:3px 0 0;line-height:1.5}
+.driverEditorCount{margin-inline-start:auto;padding:6px 10px;border-radius:18px;color:#e05c31;background:#fff1e9;font-size:12px;font-weight:800;direction:ltr}
+.driverEditorFieldGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}
+.driverEditorField{display:grid;gap:8px;font-size:12px;font-weight:700;color:#536275;min-width:0}
+.driverEditorField>span>b{color:#e9673b}
+.driverEditorInputWrap{display:flex;gap:10px;align-items:center;width:100%;min-width:0;border:1px solid #dfe6ee;border-radius:11px;background:#fff;padding:0 13px;transition:border-color .15s,box-shadow .15s}
+.driverEditorInputWrap>svg{color:#9aabba;flex-shrink:0}
+.driverEditorInputWrap:focus-within{border-color:#ec794a;box-shadow:0 0 0 3px #ef794a1b}
+.driverEditorInputWrap input,.driverEditorInputWrap textarea{width:100%;min-width:0;min-height:47px;border:0!important;outline:none;background:transparent;color:#273448;font-size:13px;font-weight:500;font-family:inherit;padding:10px 0;box-shadow:none!important}
+.driverEditorInputWrap input::placeholder,.driverEditorInputWrap textarea::placeholder,.driverEditorPayNumber input::placeholder{color:#a3afbd;font-weight:400}
+.driverEditorNotes{grid-column:1/-1}
+.driverEditorTextArea{align-items:flex-start;padding-top:11px}
+.driverEditorTextArea>svg{margin-top:3px}
+.driverEditorTextArea textarea{resize:vertical;min-height:63px;line-height:1.7}
+.driverEditorDateField{align-self:start}
+.driverEditorDateRow{display:flex;align-items:stretch;gap:9px;min-width:0}
+.driverEditorDateInput{flex:1;min-width:0}
+.driverEditorDateInput input{cursor:pointer;color-scheme:light;min-height:47px;direction:ltr}
+.driverEditorTodayBtn{border:1px solid #ffd8c9;color:#d75f33;background:#fff2ec;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;gap:6px;font-weight:750;font-size:12px;padding:0 13px;min-width:85px;white-space:nowrap;cursor:pointer}
+.driverEditorTodayBtn:hover{background:#ffe5d9}
+.driverEditorDateField small{color:#99a5b2;font-size:10px;line-height:1.6;font-weight:500}
+.driverEditorDateField .driverEditorDateLegacy{color:#bd6238}
+.driverEditorChecks{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.driverEditorCheck{cursor:pointer;display:flex;align-items:center;gap:9px;padding:12px 11px;min-height:57px;border:1px solid #e3eaf0;border-radius:11px;background:#fafcfd;color:#66768a;font-size:12px;font-weight:650;transition:background .18s,border-color .18s}
+.driverEditorCheck.isChecked{background:#edfaf4;border-color:#b9e7cf;color:#207e55}
+.driverEditorCheckIcon{display:grid;place-items:center;color:#9cabb9;flex-shrink:0}
+.driverEditorCheck.isChecked .driverEditorCheckIcon{color:#2d9a6f}
+.driverEditorCheck>span:nth-child(2){flex:1;line-height:1.5}
+.driverEditorCheck input{width:17px;height:17px;accent-color:#27986a;cursor:pointer;flex-shrink:0}
+.driverEditorPayments{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.driverEditorPayCard{border:1px solid #e3e9f0;border-radius:13px;background:#fcfdff;padding:14px;min-width:0;transition:border-color .15s,box-shadow .15s}
+.driverEditorPayCard.isActive{border-color:#b8dccc;box-shadow:0 2px 9px #248c6020}
+.driverEditorPayHeading{display:flex;align-items:center;gap:10px;cursor:pointer}
+.driverEditorPayHeading img{width:42px;height:42px;padding:5px;object-fit:contain;border:1px solid #f0f1f4;background:#fff;border-radius:10px;flex-shrink:0}
+.driverEditorPayHeading strong{flex:1;font-size:13px;color:#304055}
+.driverEditorPayHeading input{width:18px;height:18px;accent-color:#22966b;cursor:pointer}
+.driverEditorPayNumber{margin-top:12px;font-size:11px}
+.driverEditorPayNumber input{width:100%;height:41px;padding:10px 12px;border:1px solid #dde4eb;border-radius:9px;background:#fff;color:#27384c;font-size:13px;font-weight:550;text-align:left;direction:ltr;outline:0}
+.driverEditorPayNumber input:focus{border-color:#ee7648;box-shadow:0 0 0 3px #ee76481a}
+.driverEditorActions{display:flex;gap:13px;justify-content:space-between;align-items:center;flex-wrap:wrap;padding:16px 27px;border-top:1px solid #e8edf3;background:#fff}
+.driverEditorFooterHint{display:flex;gap:7px;align-items:center;font-size:11px;color:#8995a4}
+.driverEditorFooterHint svg{color:#26946b;flex-shrink:0}
+.driverEditorFooterButtons{display:flex;gap:10px;margin-inline-start:auto}
+.driverEditorFooterButtons button{border-radius:10px;display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:43px;padding:11px 18px;font-weight:800;font-size:12px;cursor:pointer}
+.driverEditorCancel{background:#f3f5f8;color:#536275;border:1px solid #e6eaf0}
+.driverEditorCancel:hover{background:#e9edf1}
+.driverEditorSave{color:#fff;background:linear-gradient(120deg,#f47443,#e75b2c);border:1px solid #e76336;box-shadow:0 5px 15px #e7633630}
+.driverEditorSave:hover{filter:brightness(.96)}
+.driverEditorFooterButtons button:disabled,.driverEditorClose:disabled{opacity:.5;cursor:not-allowed}
+.driverEditorError{color:#b93325;font-size:12px;max-width:100%}
+.driverEditorOverlay[dir=rtl] .driverEditorEyebrow{letter-spacing:0}
+@media(max-width:730px){
+ .driverEditorOverlay{padding:9px;align-items:center}
+ .driverEditorDialog{max-height:96dvh;border-radius:18px}
+ .driverEditorHead{padding:16px 18px}
+ .driverEditorHead h2{font-size:20px}
+ .driverEditorHeading{gap:11px}
+ .driverEditorHeroIcon{width:43px;height:43px;flex-basis:43px}
+ .driverEditorBody{padding:14px;gap:13px}
+ .driverEditorSection{padding:15px}
+ .driverEditorChecks{grid-template-columns:1fr}
+ .driverEditorCheck{min-height:48px}
+ .driverEditorActions{padding:12px 15px}
+ .driverEditorFooterHint{display:none}
+}
+@media(max-width:520px){
+ .driverEditorFieldGrid,.driverEditorPayments{grid-template-columns:1fr}
+ .driverEditorSectionHead h3{font-size:14px}
+ .driverEditorSectionHead p{font-size:10px}
+ .driverEditorDateField{width:100%}
+ .driverEditorDateRow{width:100%}
+ .driverEditorDateInput{min-width:0}
+ .driverEditorTodayBtn{min-width:76px;padding:0 9px}
+ .driverEditorFooterButtons{width:100%;margin:0}
+ .driverEditorFooterButtons button{flex:1;padding:11px 9px}
+ .driverEditorPayCard{padding:12px}
+}
+@media(prefers-reduced-motion:reduce){.driverEditorCheck,.driverEditorPayCard,.driverEditorInputWrap{transition:none}}
