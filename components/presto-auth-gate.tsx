@@ -21,6 +21,9 @@ export default function PrestoAuthGate({children}:{children:ReactNode}){
  const [pending,setPending]=useState(false);
  const [notice,setNotice]=useState('');
  const [recovering,setRecovering]=useState(false);
+ const [changingPassword,setChangingPassword]=useState(false);
+ const [newPassword,setNewPassword]=useState('');
+ const [changeNotice,setChangeNotice]=useState('');
 
  useEffect(()=>{
   const client=prestoCloud;
@@ -62,7 +65,7 @@ export default function PrestoAuthGate({children}:{children:ReactNode}){
     if(error)throw error;
     setPassword('');
     if(data.session){setStage('ready');}
-    else setNotice(ar?'تم إنشاء الحساب، لكن إعداد Supabase الحالي يتطلب تأكيد البريد قبل الدخول. يجب إيقاف Confirm email من إعدادات المصادقة لتفعيل الدخول المباشر.':'Compte créé, mais Supabase exige encore une confirmation e-mail. Désactivez Confirm email dans les paramètres Auth pour une connexion immédiate.');
+    else {setMode('login');setNotice(ar?'تم إنشاء طلب الحساب. افتح بريدك الإلكتروني واضغط رابط التأكيد، ثم سجّل الدخول بكلمة المرور.':'Confirmez le lien envoyé à votre e-mail, puis connectez-vous avec votre mot de passe.');}
    }
   }catch(error){
    setNotice(error instanceof Error?error.message:(ar?'تعذرت العملية. حاول مجددًا.':'Une erreur est survenue.'));
@@ -91,20 +94,41 @@ export default function PrestoAuthGate({children}:{children:ReactNode}){
   }catch(error){setNotice(error instanceof Error?error.message:'Erreur de réinitialisation.');}
   finally{setPending(false);}
  };
+ const changePassword=async(event:FormEvent<HTMLFormElement>)=>{
+  event.preventDefault();
+  if(!prestoCloud||pending||newPassword.length<8)return;
+  setPending(true);setChangeNotice('');
+  try{
+   const {error}=await prestoCloud.auth.updateUser({password:newPassword});
+   if(error)throw error;
+   setNewPassword('');setChangingPassword(false);
+  }catch(error){setChangeNotice(error instanceof Error?error.message:(ar?'تعذر تغيير كلمة المرور.':'Impossible de modifier le mot de passe.'));}
+  finally{setPending(false);}
+ };
  const signOut=async()=>{
   if(!prestoCloud||pending)return;
   setPending(true);
   const {error}=await prestoCloud.auth.signOut();
   setPending(false);
   if(error){setNotice(error.message);return;}
-  setStage('guest');setMode('login');setPassword('');setNotice('');
+  setStage('guest');setMode('login');setPassword('');setNotice('');setChangingPassword(false);
  };
 
  if(stage==='ready'&&!recovering)return <>
   {children}
-  <button className="presto-auth-signout" type="button" onClick={()=>void signOut()} disabled={pending} title={ar?'تسجيل الخروج':'Se déconnecter'}>
-   <LogOut size={16}/><span>{ar?'خروج':'Déconnexion'}</span>
-  </button>
+  <div className="presto-auth-account-actions">
+   <button className="presto-auth-signout" type="button" onClick={()=>{setChangingPassword(true);setChangeNotice('');setNewPassword('')}} disabled={pending} title={ar?'تغيير كلمة المرور':'Changer le mot de passe'}><LockKeyhole size={16}/><span>{ar?'تغيير كلمة المرور':'Changer le mot de passe'}</span></button>
+   <button className="presto-auth-signout" type="button" onClick={()=>void signOut()} disabled={pending} title={ar?'تسجيل الخروج':'Se déconnecter'}><LogOut size={16}/><span>{ar?'خروج':'Déconnexion'}</span></button>
+  </div>
+  {changingPassword&&<div className="presto-auth-password-overlay" dir={ar?'rtl':'ltr'} onMouseDown={e=>{if(e.target===e.currentTarget&&!pending)setChangingPassword(false)}}>
+   <form className="presto-auth-password-dialog" role="dialog" aria-modal="true" aria-label={ar?'تغيير كلمة المرور':'Changer le mot de passe'} onSubmit={changePassword}>
+    <h2>{ar?'تغيير كلمة المرور':'Changer le mot de passe'}</h2>
+    <p>{ar?'اكتب كلمة مرور جديدة من 8 أحرف على الأقل.':'Saisissez un nouveau mot de passe d’au moins 8 caractères.'}</p>
+    <input autoFocus required type="password" dir="ltr" minLength={8} autoComplete="new-password" value={newPassword} onChange={e=>setNewPassword(e.target.value)} placeholder={ar?'كلمة المرور الجديدة':'Nouveau mot de passe'}/>
+    {changeNotice&&<p role="status" className="presto-auth-password-feedback">{changeNotice}</p>}
+    <div><button type="button" onClick={()=>{setChangingPassword(false);setNewPassword('')}} disabled={pending}>{ar?'إلغاء':'Annuler'}</button><button type="submit" disabled={pending||newPassword.length<8}>{pending?(ar?'جار الحفظ...':'Enregistrement...'):(ar?'حفظ التغيير':'Enregistrer')}</button></div>
+   </form>
+  </div>}
  </>;
 
  return <main className="presto-auth-page" dir={ar?'rtl':'ltr'}>
