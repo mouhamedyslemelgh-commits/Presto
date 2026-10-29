@@ -518,3 +518,216 @@ html[dir="rtl"] .modalBody,html[dir="rtl"] .settingsCard{line-height:1.7}
  .driverProfileHeroStats>span{font-size:10px}
 }
 @media(prefers-reduced-motion:reduce){.driverRegisterRow,.driverProfilePaymentCard,.driverProfileCompletionTrack>span{transition:none}}
+
+
+/* PRESTO 2026 — mobile-first operations, payments, analytics & settings */
+.opsPanel{width:100%;min-width:0;background:#fff;border:1px solid #e7edf2;border-radius:25px;padding:26px;box-shadow:0 12px 38px rgba(26,49,78,.045);margin-bottom:25px;overflow:hidden}
+.opsPanelHeader{display:flex;align-items:center;justify-content:space-between;gap:18px;padding-bottom:22px;border-bottom:1px solid #edf1f5}
+.opsPanelHeaderIntro{display:flex;gap:15px;align-items:center;min-width:0}
+.opsHeaderIcon,.opsSettingsIntroIcon{width:56px;height:56px;flex:0 0 56px;border-radius:18px;background:linear-gradient(145deg,#fff2e8,#ffebe1);color:#e6663d;display:grid;place-items:center;border:1px solid #ffe6da}
+.opsEyebrow{font-size:10px;color:#dc714b;font-weight:850;letter-spacing:.25px;display:block;margin-bottom:6px}
+.opsPanelHeader h2{font-size:clamp(20px,2.5vw,27px);line-height:1.35;letter-spacing:-.3px;color:#17283c;margin:0 0 6px;font-weight:850}
+.opsPanelHeader p{font-size:12px;line-height:1.7;color:#8594a4;margin:0}
+.opsTotal{flex:0 0 auto;min-width:86px;border-radius:15px;background:#f6f8fb;border:1px solid #e8edf2;padding:12px 14px;display:grid;gap:2px;text-align:center}
+.opsTotal strong{font-size:25px;font-weight:900;line-height:1.1;color:#20354d;font-variant-numeric:tabular-nums}
+.opsTotal small{font-size:10px;color:#8292a2;font-weight:750}
+.opsMetrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:21px}
+.opsMetric{position:relative;min-width:0;border:1px solid #e9edf2;background:#fafbfd;border-radius:17px;padding:17px 16px 20px;display:flex;gap:11px;align-items:center;overflow:hidden}
+.opsMetricIcon{width:45px;height:45px;flex:0 0 45px;border-radius:12px;background:#fff0e8;color:#e56b3d;display:grid;place-items:center}
+.opsMetric>div:not(.opsMiniTrack){min-width:0;display:grid;gap:5px}
+.opsMetric small{font-size:11px;font-weight:700;color:#7d8fa2;line-height:1.4}
+.opsMetric strong{font-size:23px;font-weight:850;color:#23394d;font-variant-numeric:tabular-nums}
+.opsMetric strong span{font-size:11px;color:#9aabb8;font-weight:650}
+.opsMiniTrack{position:absolute;bottom:0;left:0;right:0;height:4px;background:#edf1f5}
+.opsMiniTrack i{display:block;height:100%;background:#ed7145;border-radius:3px}
+.opsSectionTop{display:flex;justify-content:space-between;gap:15px;align-items:center;margin:27px 0 15px}
+.opsSectionTop h3{font-size:17px;font-weight:850;color:#213449;margin:0 0 5px}
+.opsSectionTop p{font-size:12px;line-height:1.7;color:#95a1ae;margin:0}
+.opsSubCount{display:inline-flex;align-items:center;gap:7px;white-space:nowrap;padding:9px 12px;border-radius:999px;background:#edf8f2;color:#278563;font-weight:800;font-size:11px}
+.opsSearchToolbar{display:flex;align-items:center;gap:12px;justify-content:space-between;margin:0 0 14px}
+.opsSearch{display:flex;align-items:center;gap:9px;min-width:0;width:min(430px,100%);height:47px;border:1px solid #dde6ee;border-radius:12px;background:#f9fafc;padding:0 13px;transition:border .2s,box-shadow .2s;color:#8a9aac}
+.opsSearch:focus-within{background:#fff;border-color:#eb835e;box-shadow:0 0 0 3px #ed764320}
+.opsSearch input{flex:1;border:0;outline:0;background:transparent;font-size:13px;min-width:0;color:#283b50}
+.opsSearch input::placeholder{color:#a0adbb}
+.opsSearch button{display:grid;place-items:center;background:none;border:0;padding:5px;color:#8797a6;cursor:pointer}
+.opsSearchResult{font-size:11px;color:#91a0ae;white-space:nowrap}
+.opsSearchResult b{color:#e5683e}
+.opsFilterChips{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 19px}
+.opsFilterChips button{border:1px solid #e5ebf0;border-radius:99px;padding:9px 15px;background:#fff;color:#75869a;font-weight:800;font-size:11px;cursor:pointer;transition:.16s}
+.opsFilterChips button.active{background:#fff0e8;color:#d45c36;border-color:#f7cbb5}
+.opsFilterChips button:hover{border-color:#edbd9d}
+.opsDriverCards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}
+.opsDriverCard{min-width:0;border:1px solid #e5ebf2;border-radius:17px;background:#fff;padding:17px;box-shadow:0 5px 17px #1d37500a;transition:box-shadow .2s,border-color .2s}
+.opsDriverCard:hover{border-color:#f2c9b1;box-shadow:0 9px 25px #1d375010}
+.opsIdentity{display:flex;align-items:center;gap:12px;width:100%;text-align:start;border:0;background:none;color:#20344b;padding:0 0 13px;cursor:pointer;border-bottom:1px solid #f0f2f5}
+.opsDriverAvatar{width:45px;height:45px;flex:0 0 45px;border-radius:14px;background:linear-gradient(140deg,#f4b076,#ed6f40);color:white;font-size:20px;font-weight:900;display:grid;place-items:center}
+.opsIdentityText{display:grid;gap:5px;min-width:0;flex:1}
+.opsIdentityText strong{font-size:14px;line-height:1.45;font-weight:850;overflow-wrap:anywhere}
+.opsIdentityText small{font-size:10px;color:#94a1af;line-height:1.45}
+.opsProfileArrow{color:#adbac8;flex:0 0 16px}
+.opsCardFlags{display:grid;gap:8px;margin-top:13px}
+.opsFlag{display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid #e9edf2;border-radius:11px;background:#f8fafc;padding:10px 12px;cursor:pointer}
+.opsFlag.isOn{background:#f0faf5;border-color:#d2ecdb}
+.opsFlag>span{display:flex;align-items:center;gap:8px;font-size:12px;color:#798c9e;font-weight:750;line-height:1.4}
+.opsFlag.isOn>span{color:#2e8963}
+.opsFlag input{width:19px;height:19px;flex:0 0 19px;accent-color:#2a936a;cursor:pointer}
+.opsFlag input:disabled{cursor:not-allowed;opacity:.7}
+.opsCardFooter{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;border-top:1px solid #eef1f5;margin-top:14px;padding-top:13px}
+.opsCardState{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:800;border-radius:999px;padding:6px 8px}
+.opsCardState.isGood{color:#298661;background:#e9f7ef}
+.opsCardState.isWaiting{color:#ac734e;background:#fff3e9}
+.opsCardFooter button{border:0;background:transparent;color:#d4613d;cursor:pointer;display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:800;padding:7px 0}
+.opsEmpty{grid-column:1/-1;background:#f8fafc;border:1px dashed #dce4ec;border-radius:14px;padding:46px 20px;display:flex;align-items:center;flex-direction:column;text-align:center;color:#9aa8b6;gap:7px}
+.opsEmpty strong{font-size:14px;color:#617287}
+.opsEmpty p{font-size:12px;margin:0}
+.opsPaymentSummary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:21px}
+.opsProviderSummary{display:flex;align-items:center;gap:10px;min-width:0;background:#fafbfd;border:1px solid #e7ecf2;border-radius:15px;padding:13px 11px;text-align:start;cursor:pointer;transition:.15s}
+.opsProviderSummary.selected{background:#fff1eb;border-color:#f3ba9a}
+.opsProviderSummary:hover{background:#fff8f4}
+.opsProviderLogo{width:45px;height:45px;flex:0 0 45px;display:grid;place-items:center;border-radius:12px;border:1px solid #e9edf1;background:#fff}
+.opsProviderLogo img{width:39px;height:39px;object-fit:contain;padding:2px}
+.opsProviderSummary>div{display:grid;gap:4px;min-width:0}
+.opsProviderSummary small{font-size:10px;color:#718296;font-weight:750}
+.opsProviderSummary strong{font-size:19px;color:#243950;font-weight:850;white-space:nowrap}
+.opsProviderSummary strong span{font-size:10px;color:#9eabb9;font-weight:650}
+.opsProviderPercent{margin-inline-start:auto;font-size:10px;font-weight:850;color:#d46e4b}
+.opsPaymentMethods{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-top:13px}
+.opsMethod{display:flex;align-items:center;gap:9px;border:1px solid #e8ecf1;background:#f8fafc;border-radius:12px;padding:10px 9px;min-width:0}
+.opsMethod.isActive{background:#f3faf6;border-color:#d2ebdc}
+.opsMethodLogo{display:grid;place-items:center;flex:0 0 34px;width:34px;height:34px;border:1px solid #e4e9ed;border-radius:9px;background:#fff}
+.opsMethodLogo img{width:29px;height:29px;object-fit:contain}
+.opsMethodInfo{min-width:0;flex:1;display:grid;gap:3px}
+.opsMethodInfo strong{font-size:11px;color:#3b5267;font-weight:800}
+.opsMethodInfo span{font-size:10px;color:#99a7b3;overflow-wrap:anywhere;text-align:start;unicode-bidi:plaintext;min-width:0}
+.opsMethod.isActive .opsMethodInfo span{color:#466b60;font-weight:750}
+.opsSwitch{position:relative;flex:0 0 31px;width:31px;height:19px;cursor:pointer}
+.opsSwitch input{position:absolute;opacity:0;inset:0;width:100%;height:100%;cursor:pointer;margin:0;z-index:2}
+.opsSwitch>span{display:block;position:relative;width:31px;height:19px;border-radius:99px;background:#cdd6df;transition:background .15s}
+.opsSwitch>span:before{content:"";position:absolute;top:3px;left:3px;height:13px;width:13px;border-radius:50%;background:#fff;transition:transform .15s;box-shadow:0 1px 2px #20304a35}
+.opsSwitch input:checked+span{background:#29986c}
+.opsSwitch input:checked+span:before{transform:translateX(12px)}
+.opsSwitch input:focus-visible+span{outline:2px solid #eb7045;outline-offset:2px}
+.opsSwitch input:disabled+span{opacity:.58}
+.opsReportSummary{margin-top:20px;border-radius:19px;background:linear-gradient(125deg,#192d42,#30475b);padding:22px 24px;color:#fff;display:flex;justify-content:space-between;align-items:center;gap:15px;position:relative;overflow:hidden}
+.opsReportSummary:after{content:"";position:absolute;inset:auto -28px -90px auto;width:230px;height:230px;border-radius:50%;background:#ff8b5140;filter:blur(32px)}
+.opsReportSummary>div{position:relative;z-index:1;display:grid;gap:3px}
+.opsReportSummary span{color:#cadce9;font-size:12px;font-weight:700}
+.opsReportSummary strong{font-size:45px;line-height:1.1;font-weight:900;font-variant-numeric:tabular-nums}
+.opsReportSummary p{margin:0;font-size:11px;color:#bbcad7}
+.opsReportSummaryIcon{position:relative;z-index:1;width:65px;height:65px;border-radius:17px;border:1px solid #ffffff38;background:#ffffff16;display:grid;place-items:center;color:#ffe2cf}
+.opsReportMetrics{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:17px}
+.opsReportMetric{--metric:#e97545;background:#fff;border:1px solid #e6ecf2;border-radius:17px;padding:19px;box-shadow:0 5px 18px #112b4907;min-width:0}
+.opsReportMetric.accent-blue{--metric:#3890b4}.opsReportMetric.accent-green{--metric:#269668}.opsReportMetric.accent-purple{--metric:#8570b8}
+.opsReportMetricTop{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.opsReportMetricTop>span{width:44px;height:44px;border-radius:13px;display:grid;place-items:center;color:var(--metric);background:color-mix(in srgb,var(--metric) 12%,white)}
+.opsReportMetricTop small{font-size:14px;color:var(--metric);font-weight:850;font-variant-numeric:tabular-nums}
+.opsReportMetric h3{font-size:14px;line-height:1.5;font-weight:800;color:#3a4c5f;margin:17px 0 5px}
+.opsReportMetric p{display:flex;align-items:baseline;gap:5px;color:#abb7c2;margin:0 0 15px}
+.opsReportMetric p strong{font-size:29px;color:#24394e;line-height:1.15}
+.opsReportMetric p span{font-size:12px}
+.opsMetricProgress{height:8px;border-radius:99px;background:#edf1f5;overflow:hidden}
+.opsMetricProgress span{display:block;height:100%;border-radius:99px;background:var(--metric);transition:width .25s ease}
+.opsReportBreakdown{margin-top:20px;padding:2px 0 10px;border-top:1px solid #e9edf2}
+.opsBreakdownGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.opsBreakdownItem{display:flex;align-items:center;gap:12px;min-width:0;border:1px solid #e8edf1;background:#fbfcfd;border-radius:12px;padding:12px}
+.opsBreakdownItem img{width:39px;height:39px;object-fit:contain;border-radius:8px;background:#fff;flex-shrink:0}
+.opsBreakdownItem>div{flex:1;min-width:0;display:grid;gap:10px}
+.opsBreakdownItem strong{font-size:12px;color:#34495d}
+.opsBreakdownItem>span{font-size:12px;color:#647c91;font-weight:850;white-space:nowrap;direction:ltr}
+.opsBreakdownTrack{height:5px;border-radius:10px;background:#e9eef2;overflow:hidden}
+.opsBreakdownTrack span{display:block;height:100%;border-radius:10px;background:#e96f43}
+.opsReportExport{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;padding:18px 0 0;margin-top:15px;border-top:1px solid #e8edf1}
+.opsReportExport>span{display:inline-flex;align-items:center;gap:9px;color:#6c7f91;font-size:12px;font-weight:800}
+.opsReportExport button{min-height:44px}
+.opsSettingsPage{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:start;gap:18px;max-width:none}
+.opsSettingsPage>*{min-width:0}
+.opsSettingsIntro{grid-column:1/-1;display:flex;gap:15px;align-items:center;padding:24px 27px;border:1px solid #e6ecf2;background:linear-gradient(120deg,#fff,#fff7f2);border-radius:22px}
+.opsSettingsIntro h2{font-size:23px;color:#203347;font-weight:850;line-height:1.35;margin:0 0 7px}
+.opsSettingsIntro p{font-size:12px;color:#8696a7;line-height:1.8;margin:0}
+.opsSettingsPage .settingsCard,.opsSettingsPage .settingsLanguageCard{border-radius:19px;box-shadow:0 8px 27px #1725360b;border:1px solid #e6edf2;background:#fff;margin:0;padding:23px}
+.opsSettingsPage .settingsCardHead{align-items:flex-start;margin-bottom:20px}
+.opsSettingsPage .settingsCardHead>div{min-width:0}
+.opsSettingsPage .settingsCardHead h3,.opsSettingsPage .settingsLanguageCard h3{font-size:16px;color:#283c51;margin:0 0 7px;line-height:1.5;font-weight:850}
+.opsSettingsPage .settingsCardHead p,.opsSettingsPage .settingsLanguageCard p{font-size:12px;color:#94a1af;line-height:1.8;overflow-wrap:anywhere}
+.opsSettingsPage .settingsIcon{width:48px;height:48px;flex:0 0 48px;border-radius:14px}
+.opsLanguageCard{display:flex;justify-content:space-between;align-items:center;gap:14px;grid-column:1/-1}
+.opsSettingsSectionIcon{width:46px;height:46px;flex:0 0 46px;border-radius:13px;background:#fff0e6;display:grid;place-items:center;color:#e86c41}
+.opsLanguageCard>div{min-width:0;flex:1}
+.opsSettingsPage .settingsCard .primary,.opsSettingsPage .settingsCard .secondary{min-height:44px;justify-content:center;text-align:center}
+.opsSettingsPage .settingsCard .primary{box-shadow:none;border-radius:11px}
+.opsSettingsPage .prestoSheetsActions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.opsSettingsPage .prestoSheetsActions>*{min-width:0}
+.opsSettingsPage .prestoSheetsActions .prestoSheetsGuide{grid-column:1/-1;line-height:1.7;text-align:start;margin-top:2px}
+.opsSettingsPage .excelCloudStatus{min-height:50px;overflow-wrap:anywhere}
+.opsSettingsPage .cloudFootnote{line-height:1.75}
+.opsSettingsPage .opsMigrationCard{border:1px solid #f7e0ce;background:#fffdfa}
+.opsSettingsPage .opsDangerCard{grid-column:1/-1;border-color:#f2dcdc;background:#fffcfc}
+.opsSettingsPage .opsDangerCard .settingsIcon{background:#fff1f1;color:#cf5353}
+.opsSettingsPage .opsDangerCard .settingsDangerButton{max-width:100%;white-space:normal}
+.opsSettingsPage .opsSheetsCard,.opsSettingsPage .opsCompanyCard{align-self:stretch}
+@media(max-width:1080px){
+ .opsPaymentSummary{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .opsDriverCards{grid-template-columns:1fr}
+}
+@media(max-width:730px){
+ .opsPanel{padding:16px 14px;border-radius:20px;margin-bottom:17px}
+ .opsPanelHeader{align-items:flex-start;gap:10px;padding-bottom:17px}
+ .opsPanelHeaderIntro{gap:11px}
+ .opsHeaderIcon,.opsSettingsIntroIcon{width:44px;height:44px;flex-basis:44px;border-radius:13px}
+ .opsPanelHeader h2{font-size:20px}
+ .opsPanelHeader p{font-size:11px}
+ .opsTotal{min-width:65px;padding:9px 8px}
+ .opsTotal strong{font-size:20px}
+ .opsMetrics{gap:8px;margin-top:15px}
+ .opsMetric{flex-direction:column;align-items:flex-start;gap:6px;padding:12px 10px 15px}
+ .opsMetricIcon{width:36px;height:36px;flex-basis:36px}
+ .opsMetric small{font-size:10px}
+ .opsMetric strong{font-size:20px}
+ .opsSectionTop{margin:20px 0 13px;align-items:flex-start}
+ .opsSectionTop h3{font-size:15px}
+ .opsSectionTop p{font-size:11px}
+ .opsSubCount{font-size:10px;padding:7px 9px}
+ .opsSearchToolbar{gap:7px;flex-direction:column;align-items:stretch}
+ .opsSearch{width:100%}
+ .opsSearchResult{align-self:flex-start}
+ .opsDriverCard{padding:13px;border-radius:15px}
+ .opsIdentityText strong{font-size:14px}
+ .opsPaymentSummary{gap:8px;margin-top:14px}
+ .opsProviderSummary{padding:9px;gap:7px}
+ .opsProviderLogo{width:37px;height:37px;flex-basis:37px}
+ .opsProviderLogo img{width:33px;height:33px}
+ .opsProviderSummary strong{font-size:17px}
+ .opsProviderPercent{font-size:9px}
+ .opsReportMetrics{gap:9px}
+ .opsReportMetric{padding:13px}
+ .opsReportMetric h3{font-size:12px}
+ .opsReportMetric p strong{font-size:24px}
+ .opsReportMetricTop>span{height:37px;width:37px}
+ .opsReportSummary{padding:17px 19px}
+ .opsReportSummary strong{font-size:37px}
+ .opsSettingsPage{grid-template-columns:1fr;gap:13px}
+ .opsSettingsIntro{padding:18px}
+ .opsSettingsIntro h2{font-size:19px}
+ .opsSettingsPage .settingsCard,.opsSettingsPage .settingsLanguageCard{padding:18px;border-radius:17px}
+ .opsSettingsPage .opsDangerCard{grid-column:auto}
+}
+@media(max-width:430px){
+ .opsPanelHeaderIntro{gap:9px}
+ .opsTotal{min-width:58px}
+ .opsTotal small{font-size:9px}
+ .opsCardFooter{align-items:flex-start}
+ .opsPaymentMethods{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+ .opsMethod{padding:8px 6px;gap:5px}
+ .opsMethodLogo{width:26px;height:26px;flex:0 0 26px}
+ .opsMethodLogo img{width:23px;height:23px}
+ .opsMethodInfo strong{font-size:10px}
+ .opsMethodInfo span{font-size:9px}
+ .opsSwitch{flex-basis:29px;width:29px}
+ .opsReportMetric h3{min-height:34px}
+ .opsBreakdownGrid{grid-template-columns:1fr}
+ .opsSettingsPage .prestoSheetsActions{grid-template-columns:1fr}
+ .opsSettingsPage .prestoSheetsActions .prestoSheetsGuide{grid-column:auto}
+ .opsLanguageCard{flex-wrap:wrap}
+ .opsLanguageCard .prestoLanguagePicker{margin-inline-start:auto}
+}
+@media(prefers-reduced-motion:reduce){.opsDriverCard,.opsFilterChips button,.opsMetricProgress span{transition:none}}
