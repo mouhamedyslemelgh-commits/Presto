@@ -277,3 +277,9 @@ html[dir="rtl"] .excelExportHeader,html[dir="rtl"] .excelExportChoice{font-famil
 html[dir="rtl"] th,html[dir="rtl"] td{text-align:start}
 html[dir="rtl"] .sideCaption,html[dir="rtl"] .brandSub,html[dir="rtl"] .sectionHeading,html[dir="rtl"] .stat small{letter-spacing:0}
 html[dir="rtl"] .modalBody,html[dir="rtl"] .settingsCard{line-height:1.7}
+
+/* Google Sheets connection actions, private spreadsheet link + manual authorization guide */
+.prestoSheetsActions{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-top:14px}
+.prestoSheetsActions a.secondary{display:inline-flex;align-items:center;justify-content:center;text-align:center;text-decoration:none}
+.prestoSheetsGuide{color:#d85b34;font-weight:750;text-decoration:underline;text-underline-offset:3px;font-size:12px}
+.prestoSheetsGuide:hover{color:#b74827}

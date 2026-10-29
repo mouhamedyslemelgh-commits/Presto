@@ -32,7 +32,7 @@ export default function SharedDashboard(){
  const [selectedId,setSelectedId]=useState<number|null>(null);
  const [loading,setLoading]=useState(true),[msg,setMsg]=useState(''),[search,setSearch]=useState(''),[editing,setEditing]=useState<Row|null>(null);
  const [userId,setUserId]=useState<string|null>(null),[admin,setAdmin]=useState(true);
- const [excelStatus,setExcelStatus]=useState<'idle'|'saving'|'saved'|'error'>('idle');
+ const [excelStatus,setExcelStatus]=useState<'idle'|'ready'|'saving'|'saved'|'error'>('idle');
  const [excelSavedAt,setExcelSavedAt]=useState<string|null>(null);
  const [exporting,setExporting]=useState(false);
  const [email,setEmail]=useState(''),[password,setPassword]=useState(''),[company,setCompany]=useState('PRESTO'),[city,setCity]=useState('Nouakchott · MR');
@@ -81,7 +81,7 @@ export default function SharedDashboard(){
   try{await downloadSavedPrestoExcel();}
   catch(error){setMsg(error instanceof Error?error.message:'Impossible de télécharger Excel.')}
  };
- useEffect(()=>{void fetch('/api/google-sheets/sync').then(x=>x.json()).then(x=>setExcelStatus(x.connected?'saved':'idle')).catch(()=>setExcelStatus('idle'));},[]);
+ useEffect(()=>{void fetch('/api/google-sheets/sync').then(x=>x.json()).then(x=>setExcelStatus(x.connected?'ready':'idle')).catch(()=>setExcelStatus('idle'));},[]);
  const mutate=async(job:()=>PromiseLike<{error:{message:string}|null}>)=>{
   if(!admin){setMsg('Connexion administrateur obligatoire pour modifier les données.');return;}
   try{const {error}=await job();if(error){setMsg(t('Échec de sauvegarde : ')+error.message);return;}await load();await mirrorExcel();}catch(e){setMsg(t('Impossible de contacter la base partagée.'))}
@@ -260,9 +260,13 @@ export default function SharedDashboard(){
   {view==='reports'&&<section className="panel report"><h2>{t("Rapports partagés")}</h2>{[['Sacs remis',totals.bags],['Chemises',totals.shirts],['Dossiers complets',totals.complete],['Mobile Money actif',totals.all-totals.missing]].map(([label,n])=><div className="reportLine" key={label}><div><b>{t(String(label))}</b><span>{pct(Number(n))}%</span></div><div className="track"><div style={{width:pct(Number(n))+'%'}}/></div></div>)}<ExcelExportDialog drivers={rows} busy={exporting} variant="wide" onExport={exportXlsx}/></section>}
   {view==='settings'&&<div className="settingsPage"><section className="settingsLanguageCard"><div><h3>{t("Langue de l’interface")}</h3><p>{t("Choisissez la langue d'affichage du tableau de bord.")}</p></div><LanguageSwitcher/></section>
 {legacyCount>0&&<section className="settingsCard"><div className="settingsCardHead"><span className="settingsIcon"><Users size={20}/></span><div><h3>{language==='ar'?'نقل البيانات القديمة إلى الموقع المشترك':'Migrer les livreurs de ce navigateur'}</h3><p>{legacyCount} {language==='ar'?'سجلًا محفوظًا هنا':'livreur(s) locaux à importer'}</p></div></div><button className="primary" disabled={legacyUploading} onClick={()=>void importLegacy()}>{legacyUploading?(language==='ar'?'جار النقل...':'Importation...'):(language==='ar'?'نقل السجلات القديمة':'Importer les anciens livreurs')}</button></section>}
-<section className="settingsCard"><div className="settingsCardHead"><span className="settingsIcon"><Download size={20}/></span><div><h3>Google Sheets</h3><p>{language==='ar'?'جدول Google يُحدّث تلقائيًا بعد ربط حساب Google.':'Le tableau Google sera actualisé automatiquement après connexion du compte Google.'}</p></div></div>
-<div className="excelCloudStatus"><span>{excelStatus==='saving'?(language==='ar'?'جار التحديث...':'Synchronisation...'):excelStatus==='saved'?(language==='ar'?'المزامنة جاهزة أو اكتملت':'Synchronisation configurée / terminée'):excelStatus==='error'?(language==='ar'?'تعذرت المزامنة':'Erreur de synchronisation'):(language==='ar'?'Google Sheets غير مرتبط بعد':'Google Sheets non connecté')}</span>{excelSavedAt&&<small>{new Date(excelSavedAt).toLocaleString(language==='ar'?'ar-MR':'fr-FR')}</small>}</div>
+<section className="settingsCard"><div className="settingsCardHead"><span className="settingsIcon"><Download size={20}/></span><div><h3>Google Sheets</h3><p>{language==='ar'?'الجدول موجود في حساب Google. تتطلب المزامنة المستمرة موافقة Google مرة واحدة.':'La feuille est créée dans votre Drive. Une autorisation Google unique est nécessaire pour la synchronisation automatique.'}</p></div></div>
+<div className="excelCloudStatus"><span>{excelStatus==='saving'?(language==='ar'?'جار التحديث...':'Synchronisation...'):excelStatus==='saved'?(language==='ar'?'اكتملت المزامنة بنجاح':'Dernière synchronisation réussie'):excelStatus==='ready'?(language==='ar'?'الاتصال مُعدّ، يمكن اختبار المزامنة':'Configuration détectée, prêt à vérifier'):excelStatus==='error'?(language==='ar'?'تعذرت المزامنة':'Erreur de synchronisation'):(language==='ar'?'Google Sheets غير مرتبط بعد':'Google Sheets non connecté')}</span>{excelSavedAt&&<small>{new Date(excelSavedAt).toLocaleString(language==='ar'?'ar-MR':'fr-FR')}</small>}</div>
+<div className="prestoSheetsActions">
+<a className="secondary" href="https://docs.google.com/spreadsheets/d/1JYtPBLUxxDWFFoZOWvA7qcrhI3eRZAAiFamvGqkLTXk/edit" target="_blank" rel="noopener noreferrer">{language==='ar'?'فتح جدول Google Sheets':'Ouvrir Google Sheets'}</a>
 <button className="secondary" disabled={excelStatus==='saving'} onClick={()=>void mirrorExcel()}>{language==='ar'?'تحقق من المزامنة الآن':'Vérifier la synchronisation'}</button>
+<a className="prestoSheetsGuide" href="https://github.com/mouhamedyslemelgh-commits/Presto/blob/main/GOOGLE_SHEETS_SETUP_AR.md" target="_blank" rel="noopener noreferrer">{language==='ar'?'خطوات تفعيل الربط التلقائي':'Activer la synchronisation automatique'}</a>
+</div>
 <p className="cloudFootnote">{language==='ar'?'سجلات الموقع محفوظة في قاعدة PRESTO المشتركة حتى قبل ربط Google Sheets.':'Les données sont conservées dans la base partagée PRESTO même avant le branchement de Google Sheets.'}</p></section>
 <section className="settingsCard"><div className="settingsCardHead"><span className="settingsIcon"><Settings size={20}/></span><div><h3>{t("Informations de l'entreprise")}</h3><p>{t("Ces données sont partagées entre les visiteurs.")}</p></div></div><label className="settingsField">{t("Entreprise")}<input value={company} disabled={!admin} maxLength={70} onChange={e=>setCompany(e.target.value)}/></label><label className="settingsField">{t("Ville")}<input value={city} disabled={!admin} maxLength={90} onChange={e=>setCity(e.target.value)}/></label>{admin&&<button className="primary" onClick={()=>void saveProfile()}>{t("Enregistrer le profil")}</button>}</section>
 
