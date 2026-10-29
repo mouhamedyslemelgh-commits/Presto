@@ -75,3 +75,8 @@
  .presto-auth-flip{transition:none}
  .presto-auth-submit,.presto-auth-submit:before{transition:none}
 }
+
+.presto-auth-language{position:absolute;top:20px;right:22px;z-index:10}
+[dir=rtl] .presto-auth-language{right:auto;left:22px}
+.presto-auth-language .prestoLanguagePicker{box-shadow:0 4px 14px #00000010;background:#f4f4f4;border-radius:20px;padding:3px}
+@media(max-width:600px){.presto-auth-language{position:static;align-self:flex-end;margin-bottom:12px}}
