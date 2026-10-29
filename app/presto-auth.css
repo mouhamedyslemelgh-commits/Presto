@@ -1,0 +1,77 @@
+/* PRESTO sign-in: scoped premium neumorphic shell. No dashboard styles are overwritten. */
+.presto-auth-page{
+ --auth-base:#e8e8e8;--auth-red:#a10f0f;
+ min-height:100dvh;min-height:100vh;
+ background:var(--auth-base);color:#444;
+ display:flex;flex-direction:column;align-items:center;justify-content:center;
+ padding:22px 16px;overflow-x:hidden;isolation:isolate;
+ font-family:Inter,Arial,sans-serif;
+}
+.presto-auth-brand{display:flex;align-items:center;justify-content:center;gap:12px;margin:0 0 20px}
+.presto-auth-brand img{width:70px;height:49px;object-fit:contain;border-radius:11px}
+.presto-auth-brand div{display:flex;flex-direction:column;gap:2px}
+.presto-auth-brand strong{font-size:22px;font-weight:850;letter-spacing:.6px}
+.presto-auth-brand small{font-size:11px;color:#898989;font-weight:550}
+.presto-auth-scene{width:520px;height:520px;max-width:100%;perspective:1800px;flex-shrink:0}
+.presto-auth-flip{width:100%;height:100%;position:relative;transform-style:preserve-3d;transition:transform .9s cubic-bezier(.22,1,.36,1)}
+.presto-auth-flip.flipped{transform:rotateY(180deg)}
+.presto-auth-face{
+ position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+ border-radius:50%;backface-visibility:hidden;-webkit-backface-visibility:hidden;
+ background:#e8e8e8;box-shadow:-22px -22px 44px #fff,22px 22px 50px #c3c3c3,inset -1px -1px 1px #ffffff90;
+}
+.presto-auth-face:before{content:'';pointer-events:none;position:absolute;inset:12px;border:1px solid #ffffffb3;border-radius:inherit;box-shadow:inset 3px 3px 9px #a3a3a32e,inset -3px -3px 9px #ffffffb3}
+.presto-auth-back{transform:rotateY(180deg)}
+.presto-auth-inner{position:relative;z-index:1;width:290px;max-width:calc(100% - 65px)}
+.presto-auth-heading{text-align:center;margin-bottom:22px}
+.presto-auth-heading>svg{color:#a10f0f;margin:0 auto 7px}
+.presto-auth-heading h1{font-size:36px;color:#4a4a4a;font-weight:800;line-height:1.25;margin:0 0 5px;text-shadow:1px 1px 1px #fff}
+.presto-auth-heading p{margin:0;font-size:12px;color:#939393;line-height:1.6}
+.presto-auth-inner form{display:flex;flex-direction:column;gap:16px}
+.presto-auth-field{display:flex;align-items:center;gap:9px;height:47px;width:100%;border-radius:12px;padding:0 12px 0 15px;background:#e8e8e8;box-shadow:inset -6px -6px 10px #fffffff2,inset 6px 6px 10px #b8becc73;transition:box-shadow .2s,transform .2s}
+.presto-auth-field:focus-within{transform:translateY(-1px);box-shadow:inset 3px 3px 7px #780a0a35,inset -3px -3px 7px #d4373730}
+.presto-auth-field svg{color:#909090;flex-shrink:0}
+.presto-auth-field:focus-within svg{color:#a10f0f}
+.presto-auth-field input{width:100%;min-width:0;border:0;outline:0;background:transparent;color:#393939;font:500 13px Inter,Arial,sans-serif;padding:0}
+.presto-auth-field input::placeholder{color:#9b9b9b;font-weight:400}
+.presto-auth-eye{display:grid;place-items:center;flex-shrink:0;border:0;padding:2px;color:#818181;background:transparent}
+.presto-auth-forgot{align-self:flex-end;color:#898989;background:transparent;padding:0;border:0;font-size:11px}
+.presto-auth-forgot:hover,.presto-auth-toggle button:hover{color:#771111;text-decoration:underline}
+.presto-auth-submit{display:flex;align-items:center;justify-content:center;gap:8px;min-height:46px;border:0;border-radius:12px;background:#a10f0f;color:#fff;padding:11px 13px;box-shadow:0 9px 19px #780a0a36,-4px -4px 12px #fff9;font-size:14px;font-weight:750;position:relative;overflow:hidden;transition:transform .2s,box-shadow .2s,background .2s}
+.presto-auth-submit:before{content:'';position:absolute;inset:0;transform:translateX(-120%) skewX(-22deg);width:45%;background:linear-gradient(110deg,transparent,#ffffff55,transparent);transition:transform .6s}
+.presto-auth-submit:hover:not(:disabled){background:#820e0e;transform:translateY(-2px);box-shadow:0 11px 22px #780a0a55}
+.presto-auth-submit:hover:before{transform:translateX(290%) skewX(-22deg)}
+.presto-auth-submit:active{transform:scale(.98)}
+.presto-auth-submit:disabled{opacity:.6;cursor:wait}
+.presto-auth-toggle{text-align:center;margin:22px 0 0;font-size:12px;color:#898989;line-height:1.8}
+.presto-auth-toggle button{border:0;padding:0;background:transparent;color:#a10f0f;font-weight:750;font-size:12px}
+.presto-auth-messages{color:#a10f0f;font-size:12px;text-align:center;margin-top:16px;max-width:440px;line-height:1.7;min-height:21px;overflow-wrap:anywhere}
+.presto-auth-footer{text-align:center;color:#a1a1a1;font-size:11px;margin-top:17px}
+.presto-auth-loading{padding:70px 12px;font-size:13px;color:#666}
+.presto-auth-signout{position:fixed;bottom:17px;left:17px;z-index:45;display:flex;align-items:center;gap:6px;padding:9px 12px;border:1px solid #e0e5eb;border-radius:50px;background:#fff;color:#516172;box-shadow:0 8px 22px #17253626;font-size:12px;font-weight:650}
+.presto-auth-signout:hover{color:#a10f0f;background:#fff6f6}
+[dir=rtl] .presto-auth-signout{left:auto;right:17px}
+@media(max-width:600px){
+ .presto-auth-page{justify-content:flex-start;padding-top:20px}
+ .presto-auth-scene{width:min(430px,100%);height:490px;margin-top:9px}
+ .presto-auth-face{border-radius:35px}
+ .presto-auth-face:before{inset:10px;border-radius:27px}
+ .presto-auth-inner{width:calc(100% - 54px);max-width:340px}
+ .presto-auth-brand{margin-bottom:7px}
+ .presto-auth-heading h1{font-size:29px}
+ .presto-auth-field{height:47px}
+ .presto-auth-inner form{gap:15px}
+ .presto-auth-footer{margin-top:12px}
+}
+@media(max-width:360px){
+ .presto-auth-page{padding:13px 12px}
+ .presto-auth-scene{height:475px}
+ .presto-auth-inner{width:calc(100% - 40px)}
+ .presto-auth-heading h1{font-size:26px}
+ .presto-auth-heading{margin-bottom:15px}
+ .presto-auth-field input{font-size:12px}
+}
+@media(prefers-reduced-motion:reduce){
+ .presto-auth-flip{transition:none}
+ .presto-auth-submit,.presto-auth-submit:before{transition:none}
+}
