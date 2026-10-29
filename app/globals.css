@@ -162,6 +162,54 @@ html[dir="rtl"] .driverProfilePayValue strong{direction:ltr;text-align:right;uni
 @media(max-width:740px){.driverProfileDialog{max-height:96vh;border-radius:17px}.driverProfileOverlay{padding:9px}.driverProfileHero{padding:23px 20px}.driverProfileAvatar{width:71px;height:71px;flex-basis:71px;border-radius:18px;font-size:26px}.driverProfileHeroMain{gap:14px}.driverProfileHeroText h2{font-size:24px}.driverProfileBody{padding:21px 17px}.driverProfileInfoGrid,.driverProfileFields{grid-template-columns:repeat(2,minmax(0,1fr))}.driverProfileEquipment{grid-template-columns:1fr}.driverProfilePayments{grid-template-columns:1fr 1fr;gap:10px}.driverProfilePaymentCard{padding:13px}.driverProfilePayLogo{width:39px;height:39px;flex-basis:39px}.driverProfilePayHead{gap:6px;flex-wrap:wrap}.driverProfilePayHead>div strong{font-size:13px}.driverProfilePayTag{font-size:9px}.driverProfileFooter{padding:15px}.driverProfileFooter>span{display:none}.driverProfileFooter>div{width:100%;justify-content:flex-end}}
 @media(max-width:530px){.driverProfilePayments{grid-template-columns:1fr}.driverProfileHeroStats{gap:10px}.driverProfileHeroStats>span{font-size:11px}.driverProfileInfoGrid,.driverProfileFields{grid-template-columns:1fr}.quickAccountGrid{grid-template-columns:1fr}.driverProfileHeroText h2{font-size:22px}}
 
+
+/* Styled PRESTO scoped Excel export */
+.excelExportTrigger{display:inline-flex;align-items:center;justify-content:center;gap:10px;border:1px solid #e75e31;background:#f26330;color:#fff;padding:13px 19px;border-radius:10px;font-size:13px;font-weight:800;white-space:nowrap;cursor:pointer;box-shadow:0 5px 13px #ee6a3525}
+.excelExportTrigger:hover{background:#dc5326}
+.excelExportTrigger:disabled{opacity:.55;cursor:wait}
+.excelExportWide{margin-top:14px;width:max-content;max-width:100%}
+.excelExportOverlay{position:fixed;inset:0;z-index:210;background:#0d1726ae;backdrop-filter:blur(7px);display:flex;align-items:center;justify-content:center;padding:14px;overflow-y:auto}
+.excelExportDialog{width:min(100%,780px);max-height:95vh;overflow:auto;background:#fff;border-radius:20px;box-shadow:0 25px 95px #0a13238c}
+.excelExportHeader{display:flex;align-items:flex-start;gap:13px;padding:25px 27px;background:linear-gradient(120deg,#fffdfb,#fff4ec);border-bottom:1px solid #f1e2d8}
+.excelExportIcon{width:51px;height:51px;flex:0 0 51px;display:grid;place-items:center;border-radius:15px;background:#e5f7ed;color:#16865c}
+.excelExportHeader>div{min-width:0;flex:1}
+.excelExportHeader h2{font-size:19px;line-height:1.35;margin:0 0 7px;color:#182b3d}
+.excelExportHeader p{font-size:12px;line-height:1.6;color:#8292a1;margin:0}
+.excelExportClose{background:#ffffff;color:#5b6c7a;border:1px solid #e9e7e4;width:37px;height:37px;flex:0 0 37px;border-radius:11px;display:grid;place-items:center}
+.excelExportBody{padding:25px 27px;display:grid;gap:19px}
+.excelExportChoices{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px}
+.excelExportChoice{background:#fbfcfd;border:1px solid #e4eaf0;border-radius:14px;display:flex;flex-direction:column;gap:10px;text-align:start;padding:17px 15px;position:relative;color:#34495a;min-height:128px}
+.excelExportChoice svg{color:#90a0ad}
+.excelExportChoice strong{font-size:13px;color:#23384b;line-height:1.35}
+.excelExportChoice small{font-size:11px;color:#8b99a5;line-height:1.45}
+.excelExportChoice.active{border:2px solid #f16b3c;background:#fff7f2;padding:16px 14px;box-shadow:0 4px 14px #f9784420}
+.excelExportChoice.active svg{color:#e45d30}
+.excelExportRadio{position:absolute;top:16px;inset-inline-end:15px;width:16px;height:16px;border:2px solid #d6dee4;border-radius:50%}
+.excelExportChoice.active .excelExportRadio{border-color:#ef6636;background:#ef6636;box-shadow:inset 0 0 0 3px white}
+.excelExportInputs{display:grid;grid-template-columns:minmax(0,1fr) 40px minmax(0,1fr);align-items:end;gap:12px;padding:15px 17px;border:1px solid #e8edf2;border-radius:14px;background:#f9fbfc}
+.excelExportInputs label,.excelExportSingle{font-weight:750;font-size:12px;color:#536476;display:grid;gap:8px}
+.excelExportInputs input,.excelExportSingle select{width:100%;height:46px;min-width:0;border-radius:10px;border:1px solid #dae2e8;background:#fff;color:#24384d;padding:10px 13px;outline:0;font-size:15px;font-family:Arial,sans-serif;direction:ltr}
+.excelExportSingle select{direction:inherit;font-size:13px}
+.excelExportInputs input:focus,.excelExportSingle select:focus{border-color:#ed6d40;box-shadow:0 0 0 3px #f76d3e24}
+.excelExportDash{font-weight:800;color:#d8683c;font-size:21px;text-align:center;margin-bottom:11px}
+.excelExportHint{grid-column:1/-1;display:flex;align-items:center;gap:8px;color:#8b97a7;font-size:11px;margin:0;line-height:1.55}
+.excelExportPreview{display:flex;align-items:center;gap:15px;background:#e9f7ef;border:1px solid #d0eeda;border-radius:13px;padding:15px 17px}
+.excelExportPreviewBadge{display:flex;gap:8px;align-items:center;color:#17815a;font-size:26px;font-weight:850;flex-shrink:0}
+.excelExportPreview strong{font-size:12px;color:#24543b}
+.excelExportPreview p{font-size:11px;color:#5e9276;margin:5px 0 0;line-height:1.5}
+.excelExportDesignInfo{display:flex;align-items:flex-start;gap:10px;color:#6f7f91;background:#f6f8fa;border-radius:11px;padding:12px 13px}
+.excelExportDesignInfo svg{flex:0 0 auto;color:#288c68}
+.excelExportDesignInfo p{font-size:11px;line-height:1.6;margin:0}
+.excelExportError{padding:13px;border-radius:10px;color:#b64f32;background:#fff0e9;font-size:12px;margin:0}
+.excelExportFooter{padding:17px 26px;border-top:1px solid #e9eef2;display:flex;align-items:center;justify-content:flex-end;gap:10px}
+.excelExportCancel,.excelExportDownload{font-size:13px;font-weight:800;padding:13px 18px;border-radius:10px;display:flex;align-items:center;justify-content:center;gap:8px}
+.excelExportCancel{background:#f1f3f6;border:1px solid #e4e9ee;color:#637587}
+.excelExportDownload{background:#e96636;border:1px solid #e96636;color:white;box-shadow:0 5px 12px #ef653729}
+.excelExportDownload:disabled{opacity:.45;cursor:not-allowed}
+html[dir="rtl"] .excelExportHeader,html[dir="rtl"] .excelExportChoice{font-family:Tahoma,Arial,sans-serif}
+@media(max-width:700px){.excelExportHeader{padding:17px}.excelExportHeader h2{font-size:16px}.excelExportBody{padding:17px;gap:14px}.excelExportChoices{gap:7px}.excelExportChoice{padding:12px 9px;min-height:119px;gap:8px}.excelExportChoice.active{padding:11px 8px}.excelExportChoice strong{font-size:11px}.excelExportChoice small{font-size:10px}.excelExportChoice svg{width:18px}.excelExportRadio{width:13px;height:13px;top:10px;inset-inline-end:10px}.excelExportFooter{padding:14px}}
+@media(max-width:440px){.excelExportOverlay{padding:7px}.excelExportChoices{grid-template-columns:1fr}.excelExportChoice{min-height:unset;display:grid;grid-template-columns:25px minmax(0,1fr);align-items:center;gap:1px 10px;padding:11px}.excelExportChoice.active{padding:10px}.excelExportChoice strong,.excelExportChoice small{grid-column:2}.excelExportChoice>svg{grid-column:1;grid-row:1/3}.excelExportInputs{grid-template-columns:minmax(0,1fr) 20px minmax(0,1fr);gap:6px;padding:11px}.excelExportHint{font-size:10px}.excelExportDash{font-size:17px}.excelExportFooter button{padding:11px 13px}}
+
 /* Shared PRESTO status and admin account */
 .syncNotice{display:flex;align-items:center;justify-content:space-between;gap:14px;margin:0 0 18px;background:#eff6fc;border:1px solid #bfdce9;color:#24586e;font-size:13px;padding:13px 16px;border-radius:10px}
 .syncNotice button{border:0;background:transparent;color:inherit;display:grid;place-items:center}
@@ -210,3 +258,6 @@ html[dir="rtl"] .driverProfilePayValue strong{direction:ltr;text-align:right;uni
 .excelCloudStatus{display:flex;justify-content:space-between;align-items:center;gap:12px;background:#edf8f1;border:1px solid #d5eddd;border-radius:12px;padding:14px 17px;margin:15px 0;color:#196d4a;font-weight:800;font-size:12px}
 .excelCloudStatus small{font-size:11px;font-weight:600;color:#718778}
 @media(max-width:650px){.excelCloudStatus{flex-direction:column;align-items:flex-start}}
+
+.prestoAuthActions{display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+.prestoAuthActions button{display:inline-flex;align-items:center;justify-content:center;gap:8px}
