@@ -8,17 +8,17 @@ export function normalizeHeader(value:unknown):string{
  return String(value??'').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').replace(/[\u064B-\u065F]/g,'').toLowerCase().replace(/[^a-z0-9\u0600-\u06FF]/g,'');
 }
 const fields={
- name:['livreur','nomlivreur','nometprenom','nomcomplet','noms','nom','driver','drivername','السائق','اسمالسائق','الاسم','الاسمواللقب','الاسمكامل'],
+ name:['livreur','nomlivreur','nometprenom','nomcomplet','noms','nom','driver','drivername','السائق','اسمالسائق','الاسم','الاسمواللقب','الاسمكامل','الاسمبالكامل'],
  phone:['telephone','numerotelephone','numerodetelephone','tel','portable','mobile','phone','contact','رقمالهاتف','الهاتف','رقمالسائق','رقمالاتصال'],
  id:['n','no','num','numero','id','رقم','الرقم'],
- bag:['sac','sacs','sacremis','sacsremis','sacsremises','bag','bags','الحقيبة','حقائب','الحقيبه','تسليمالحقيبة'],
- shirt:['chemise','chemises','chemisemise','chemisesremises','shirt','shirts','القميص','قمصان','تسليمالقميص'],
+ bag:['sac','sacs','sacremis','sacsremis','sacsremises','bag','bags','الحقيبة','الحقائب','حقائب','الحقيبه','تسليمالحقيبة'],
+ shirt:['chemise','chemises','chemisemise','chemiseremise','chemisesremises','shirt','shirts','القميص','قمصان','تسليمالقميص'],
  bankily:['bankily','بنكيلي','بنكلي','بنكيلى','bankilybpm'],
  masrvi:['masrvi','masrivy','masrivi','مصرفي','مصريفي','مصرڤي'],
  sedad:['sedad','seddad','سداد'],
  click:['click','klik','كليك','كليڭ'],
  date:['datederemise','dateremise','date','dateenregistrement','remisedate','تاريخالتسليم','التاريخ'],
- verified:['dossier','dossierverifie','verifie','dossiervalid','validation','ملفمكتمل','التحقق','الملف'],
+ verified:['dossier','dossierverifie','verifie','dossiervalid','validation','ملفمكتمل','ملفموثق','التحقق','الملف'],
  status:['statut','status','etat','etatdudossier','الحالة','الوضعية'],
  notes:['observations','observation','remarques','remarque','notes','comments','ملاحظات','الملاحظات'],
 } as const;
@@ -26,7 +26,7 @@ type Field=keyof typeof fields;
 function identify(value:unknown):Field|null{
  const h=normalizeHeader(value);
  if(!h)return null;
- for(const [k,values] of Object.entries(fields) as [Field,readonly string[]][])if(values.includes(h))return k;
+ for(const [k,values] of Object.entries(fields) as [Field,readonly string[]][])if(values.some(alias=>normalizeHeader(alias)===h))return k;
  if(h.includes('livreur')||h.includes('اسمالسائق'))return 'name';
  if(h.includes('telephone')||h.includes('الهاتف'))return 'phone';
  if(h.includes('bankily'))return 'bankily';
@@ -44,7 +44,7 @@ function cellText(value:Cell):string{
 }
 function positive(value:Cell):boolean{
  const text=normalizeHeader(cellText(value));
- if(!text||['0','non','no','false','absent','manquant','لا','غيرمتوفر','لايوجد','aucun','na','n'].includes(text))return false;
+ if(!text||/^[—–\-✗✕×]+$/.test(cellText(value))||['0','non','no','false','absent','manquant','لا','غيرمتوفر','لايوجد','aucun','na','n'].includes(text))return false;
  if(typeof value==='number')return value!==0;
  return true;
 }
@@ -87,11 +87,33 @@ export function parsePrestoSheet(input:Cell[][]):ParsedImport{
   }
   const bag=positive(get('bag')),shirt=positive(get('shirt'));
   const verified=mapped.verified!==undefined?positive(get('verified')):statusVerified(get('status'));
-  items.push({name,phone,bag,shirt,verified,payments,accounts,deliveryDate:cellText(get('date')).slice(0,30),observations:cellText(get('notes')).slice(0,1000)});
+  const mappedIndexes=new Set(Object.values(mapped));
+  const extras=row.flatMap((value,j)=>!mappedIndexes.has(j)&&cellText(value)?[cellText(input[headerRow][j])+' : '+cellText(value)]:[]);
+  const originalId=cellText(get('id'));
+  if(originalId)extras.unshift('N° Excel : '+originalId);
+  const notes=[cellText(get('notes')),...extras].filter(Boolean).join(' | ');
+  if(notes.length>1000)throw Error('Observations trop longues à la ligne '+(i+1)+' (maximum 1000 caractères).');
+  items.push({name,phone,bag,shirt,verified,payments,accounts,deliveryDate:cellText(get('date')).slice(0,30),observations:notes});
  }
  if(items.length===0)warnings.push('Aucun livreur valide trouvé dans cette feuille.');
  if(mapped.phone===undefined)warnings.push('Colonne Téléphone absente : détection des doublons par nom uniquement.');
  for(const col of ['bankily','masrvi','sedad','click'] as const)if(mapped[col]===undefined)warnings.push('Colonne '+col+' absente : comptes considérés comme non enregistrés.');
  if(mapped.bag===undefined||mapped.shirt===undefined)warnings.push('Colonnes Sac et/ou Chemise absentes : valeurs « Non ».');
  return {items,warnings:warnings.slice(0,20),headerRow:headerRow+1,columns,skipped};
+}
+
+export function parsePrestoWorkbook(sheets:SheetData[]):ParsedImport{
+ const parsed:ParsedImport[]=[];const warnings:string[]=[];const seen=new Set<string>();
+ for(const sheet of sheets){
+  try{const p=parsePrestoSheet(sheet.data);if(p.items.length)parsed.push(p);}
+  catch(error){warnings.push(sheet.sheet+' : '+(error instanceof Error?error.message:'Lecture impossible'));}
+ }
+ if(!parsed.length)throw Error('Aucune feuille contenant des livreurs reconnue.');
+ const items:ImportedDriver[]=[];let skipped=0;
+ for(const p of parsed){skipped+=p.skipped;warnings.push(...p.warnings);for(const d of p.items){
+  const key=d.phone.replace(/\D/g,'')||normalizeHeader(d.name);
+  if(seen.has(key)){skipped++;warnings.push('Doublon entre feuilles : '+d.name);continue;}
+  seen.add(key);items.push(d);
+ }}
+ return {items,skipped,warnings,headerRow:0,columns:[...new Set(parsed.flatMap(p=>p.columns))]};
 }

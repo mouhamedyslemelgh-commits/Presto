@@ -70,12 +70,13 @@ export default function SharedDashboard(){
    const response=await fetch('/api/google-sheets/sync',{method:'POST'});
    const result=await response.json();
    if(!response.ok)throw Error(result.error||'Google Sheets synchronization unavailable');
-   if(result.connected&&result.ok){setExcelSavedAt(new Date().toISOString());setExcelStatus('saved');}
-   else {setExcelStatus('idle');}
+   if(result.connected&&result.ok){setExcelSavedAt(new Date().toISOString());setExcelStatus('saved');return 'saved' as const;}
+   else {setExcelStatus('idle');return 'not_connected' as const;}
   }catch(error){
    setExcelStatus('error');
    setMsg((language==='ar'?'تم حفظ البيانات في PRESTO، لكن Google Sheets لم يتحدث: ':'PRESTO enregistré, mais Google Sheets non actualisé : ')+(error instanceof Error?error.message:'Erreur'));
   }
+  return 'error' as const;
  };
  const downloadCloudExcel=async()=>{
   try{await downloadSavedPrestoExcel();}
@@ -129,8 +130,8 @@ export default function SharedDashboard(){
     added+=batch.length;
    }
    await load();
-   await mirrorExcel();
-   return {added,updated,skipped};
+   const googleSheets=await mirrorExcel();
+   return {added,updated,skipped,googleSheets};
   }catch(e){
    await load();
    throw Error('Importation partielle possible. Vérifiez le registre avant de réessayer. '+(e instanceof Error?e.message:''));
@@ -251,7 +252,8 @@ export default function SharedDashboard(){
   <aside className={'sidebar '+(openMenu?'open':'')}><div className="brand"><div className="brandImageFrame"><img src="/logos/presto.webp" alt="PRESTO بريستو" width={310} height={170}/></div><span className="brandSub">{t("OPERATIONS · LIVREURS")}</span></div><div className="sideCaption">{t("ESPACE DE TRAVAIL")}</div><nav>{menus.map(([v,title,Icon])=><button key={v} className={view===v?'selected':''} onClick={()=>go(v)}><Icon size={17}/>{t(title)}</button>)}</nav><div className="sideFoot"><small>{t("BASE PARTAGÉE")}</small><strong>{city}</strong><small>{company} · {t('Cloud Sync')}</small></div></aside>
   {openMenu&&<div className="shade" onClick={()=>setOpenMenu(false)}/>}
   <div className="workspace"><header className="topbar"><button className="menuButton" onClick={()=>setOpenMenu(x=>!x)} aria-label={t("Ouvrir la navigation")}><Menu size={20}/></button><img className="mobileBrandLogo" src="/logos/presto.webp" alt="PRESTO" width={80} height={48}/><div>{t("Opérations /")}<b>{t("Tableau de bord")}</b></div><div className="topRight"><LanguageSwitcher/><span className="date">{t("Données partagées")}</span><span className="avatar">{t("OP")}</span></div></header>
-  <main><div className="pageHead"><div><h1>{t(titles[view])}</h1><p>{t('Informations synchronisées entre tous les visiteurs')} · {t(loading?'Chargement...':'Actualisées automatiquement')}</p></div><div className="headActions">{view==='drivers'&&<ExcelImporter onImport={importDrivers} publicSite/>}{view==='drivers'&&<button className="primary" onClick={()=>setEditing(emptyRow())}><Plus size={16}/>{t("Nouveau livreur")}</button>}<ExcelExportDialog drivers={rows} busy={exporting} onExport={exportXlsx}/></div></div>
+  <main><div className="pageHead"><div><h1>{t(titles[view])}</h1><p>{t('Informations synchronisées entre tous les visiteurs')} · {t(loading?'Chargement...':'Actualisées automatiquement')}</p></div><div className="headActions"><ExcelImporter onImport={importDrivers} publicSite/>{view==='drivers'&&<button className="primary" onClick={()=>setEditing(emptyRow())}><Plus size={16}/>{t("Nouveau livreur")}</button>}<ExcelExportDialog drivers={rows} busy={exporting} onExport={exportXlsx}/></div></div>
+  {view==='dashboard'&&<section className="settingsCard" style={{marginBottom:20}}><h2>{language==='ar'?'إضافة ملف Excel':'Ajouter un fichier Excel'}</h2><p>{language==='ar'?'ارفع ملف السائقين بصيغة XLSX. تُقرأ الأسماء والهواتف والمعدات وحسابات الدفع والتواريخ والملاحظات، ثم تُحفظ في السجل المشترك.':'Importez un fichier XLSX : noms, téléphones, équipements, comptes, dates et observations sont enregistrés dans le registre partagé.'}</p><ExcelImporter onImport={importDrivers} publicSite/></section>}
   {msg&&<div className="syncNotice" role="status">{msg}<button onClick={()=>setMsg('')} aria-label={t("Fermer")}><X size={15}/></button></div>}
   {view==='dashboard'&&<><div className="statGrid">{[['LIVREURS',totals.all,'+ Total enregistré','orange'],['SACS REMIS',totals.bags,pct(totals.bags)+' % '+t('de remise'),'blue'],['CHEMISES',totals.shirts,pct(totals.shirts)+' % '+t('distribuées'),'cyan'],['DOSSIERS COMPLETS',totals.complete,pct(totals.complete)+' % '+t('des livreurs'),'green']].map(s=><div className={'stat '+s[3]} key={s[0]}><small>{t(String(s[0]))}</small><div><strong>{s[1]}</strong><span><ArrowUpRight size={22}/></span></div><p>{t(String(s[2]))}</p></div>)}</div><div className="sectionHeading"><h2>{t("MOYENS DE PAIEMENT")}</h2><small>{t("Comptes enregistrés")}</small></div><div className="paymentGrid">{pays.map(([k,name,bank,color])=><button className="payment" key={k} onClick={()=>go('mobile')} style={{'--c':color} as React.CSSProperties}><div className="paymentHeader"><span className="paymentLogo"><img src={'/logos/'+k+'.webp'} alt={name} width={54} height={54}/></span><div><b>{name}</b><small>{bank}</small></div><strong>{count(k)}</strong></div><div className="track"><div style={{width:pct(count(k))+'%'}}/></div></button>)}</div><div className="bottomGrid"><section className="panel register"><div className="panelTitle"><div><h2>{t("Registre des remises")}</h2><p>{t("Les cinq derniers livreurs")}</p></div><button className="secondary" onClick={()=>go('drivers')}>{t("Voir le registre")}</button></div>{table(rows.slice(-5).reverse(),true)}</section><aside className="attention"><small>{t("POINT D’ATTENTION")}</small><strong>{totals.missing}</strong><span>{t("sans mobile money")}</span><hr/><h3>{t("Priorité opérationnelle")}</h3><p>{t("Relancer les livreurs sans compte actif.")}</p><button onClick={()=>go('drivers')}>{t("Voir les dossiers à relancer")}<ArrowUpRight size={15}/></button></aside></div></>}
   {view==='drivers'&&<section className="panel fullTable"><div className="panelTitle"><div><h2>{t("Registre des livreurs")}</h2><p>{totals.all} {t('livreurs')} · {t('Accès partagé')}</p></div></div><div className="controls"><label><Search size={17}/><input value={search} onChange={e=>setSearch(e.target.value)} placeholder={t("Rechercher un livreur")}/></label></div>{table(filtered)}</section>}
