@@ -283,3 +283,15 @@ html[dir="rtl"] .modalBody,html[dir="rtl"] .settingsCard{line-height:1.7}
 .prestoSheetsActions a.secondary{display:inline-flex;align-items:center;justify-content:center;text-align:center;text-decoration:none}
 .prestoSheetsGuide{color:#d85b34;font-weight:750;text-decoration:underline;text-underline-offset:3px;font-size:12px}
 .prestoSheetsGuide:hover{color:#b74827}
+
+/* Separate account numbers for each mobile-money provider in the driver form. */
+.modal{max-height:min(94vh,1050px);display:flex;flex-direction:column}
+.modalHead,.modalActions{flex-shrink:0}
+.modalBody{overflow-y:auto;min-height:0;overscroll-behavior:contain}
+.paymentMethodField{background:#f8fafb;border:1px solid #e5e9ee;border-radius:12px;padding:13px;min-width:0;display:grid;gap:12px}
+.paymentMethodToggle{display:flex!important;align-items:center;gap:9px;font-size:13px;font-weight:750;color:#243142;cursor:pointer}
+.paymentMethodToggle input{width:17px;height:17px;accent-color:#22966b;flex-shrink:0}
+.paymentMethodNumber{display:grid;gap:7px;font-size:11px;font-weight:650;color:#66788b;min-width:0}
+.paymentMethodNumber input{display:block;width:100%;min-width:0;padding:12px 13px;border:1px solid #d5dde5;border-radius:9px;background:#fff;font:inherit;font-size:13px;color:#1c2b39;text-align:left;direction:ltr;outline:none}
+.paymentMethodNumber input:focus{border-color:#ee6638;box-shadow:0 0 0 3px #ee663820}
+@media(max-width:530px){.quickAccountGrid{grid-template-columns:1fr}.modalBody{padding:18px}.paymentMethodField{padding:12px}}
