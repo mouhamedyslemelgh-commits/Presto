@@ -1,8 +1,9 @@
 'use client';
 
 import {useEffect,useState,type FormEvent,type ReactNode} from 'react';
-import {Eye,EyeOff,Mail,LockKeyhole,UserRound,ArrowRight,ArrowLeft,LogOut,ShieldCheck,Phone} from 'lucide-react';
+import {Eye,EyeOff,Mail,LockKeyhole,UserRound,ArrowRight,ArrowLeft,LogOut,ShieldCheck,Phone,Settings2} from 'lucide-react';
 import {prestoCloud} from '../lib/presto-cloud';
+import PrestoAccountProfile from './presto-account-profile';
 import {useLanguage,LanguageSwitcher} from './presto-language';
 
 type Mode='login'|'signup';
@@ -22,6 +23,7 @@ export default function PrestoAuthGate({children}:{children:ReactNode}){
  const [notice,setNotice]=useState('');
  const [recovering,setRecovering]=useState(false);
  const [changingPassword,setChangingPassword]=useState(false);
+ const [editingProfile,setEditingProfile]=useState(false);
  const [newPassword,setNewPassword]=useState('');
  const [changeNotice,setChangeNotice]=useState('');
 
@@ -111,15 +113,17 @@ export default function PrestoAuthGate({children}:{children:ReactNode}){
   const {error}=await prestoCloud.auth.signOut();
   setPending(false);
   if(error){setNotice(error.message);return;}
-  setStage('guest');setMode('login');setPassword('');setNotice('');setChangingPassword(false);
+  setStage('guest');setMode('login');setPassword('');setNotice('');setChangingPassword(false);setEditingProfile(false);
  };
 
  if(stage==='ready'&&!recovering)return <>
   {children}
   <div className="presto-auth-account-actions">
+   <button className="presto-auth-signout" type="button" onClick={()=>setEditingProfile(true)} disabled={pending} title={ar?'تعديل حسابي':'Modifier mon compte'}><Settings2 size={16}/><span>{ar?'حسابي':'Mon compte'}</span></button>
    <button className="presto-auth-signout" type="button" onClick={()=>{setChangingPassword(true);setChangeNotice('');setNewPassword('')}} disabled={pending} title={ar?'تغيير كلمة المرور':'Changer le mot de passe'}><LockKeyhole size={16}/><span>{ar?'تغيير كلمة المرور':'Changer le mot de passe'}</span></button>
    <button className="presto-auth-signout" type="button" onClick={()=>void signOut()} disabled={pending} title={ar?'تسجيل الخروج':'Se déconnecter'}><LogOut size={16}/><span>{ar?'خروج':'Déconnexion'}</span></button>
   </div>
+  {editingProfile&&<PrestoAccountProfile onClose={()=>setEditingProfile(false)}/>}
   {changingPassword&&<div className="presto-auth-password-overlay" dir={ar?'rtl':'ltr'} onMouseDown={e=>{if(e.target===e.currentTarget&&!pending)setChangingPassword(false)}}>
    <form className="presto-auth-password-dialog" role="dialog" aria-modal="true" aria-label={ar?'تغيير كلمة المرور':'Changer le mot de passe'} onSubmit={changePassword}>
     <h2>{ar?'تغيير كلمة المرور':'Changer le mot de passe'}</h2>
