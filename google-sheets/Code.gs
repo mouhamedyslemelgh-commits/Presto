@@ -6,16 +6,12 @@
  * Never add the shared secret to browser-side Next.js code.
  */
 const PROPS=PropertiesService.getScriptProperties();
+const EXISTING_PRESTO_SHEET_ID='1JYtPBLUxxDWFFoZOWvA7qcrhI3eRZAAiFamvGqkLTXk';
 const HEADERS=['N°','Date de remise','Livreur','Téléphone','Sac','Chemise','Bankily','Masrvi','Sedad','CLICK','Dossier vérifié','Comptes MM','Statut','Observations'];
 function setupPresto(){
- let id=PROPS.getProperty('PRESTO_SHEET_ID');
- let spreadsheet;
- if(id){spreadsheet=SpreadsheetApp.openById(id);}
- else{
-  spreadsheet=SpreadsheetApp.create('PRESTO — Base des livreurs');
-  id=spreadsheet.getId();
-  PROPS.setProperty('PRESTO_SHEET_ID',id);
- }
+ const id=PROPS.getProperty('PRESTO_SHEET_ID')||EXISTING_PRESTO_SHEET_ID;
+ const spreadsheet=SpreadsheetApp.openById(id);
+ PROPS.setProperty('PRESTO_SHEET_ID',id);
  if(!PROPS.getProperty('PRESTO_SHARED_SECRET')){
   PROPS.setProperty('PRESTO_SHARED_SECRET',Utilities.getUuid().replace(/-/g,'')+Utilities.getUuid().replace(/-/g,''));
  }
