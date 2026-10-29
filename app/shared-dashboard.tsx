@@ -189,7 +189,7 @@ export default function SharedDashboard(){
   const confirmed=window.confirm(language==='ar'?'هل تريد نقل سجلات هذا المتصفح إلى قاعدة PRESTO المشتركة؟ سيتمكن كل من لديه رابط الموقع من الاطلاع على هذه البيانات، بما فيها أرقام الهواتف والحسابات.':'Importer les anciens livreurs de cet appareil dans la base PRESTO partagée ? Leurs noms, numéros de téléphone et comptes seront visibles par les visiteurs du site.');
   if(!confirmed)return;
   setLegacyUploading(true);
-  const normalized=(v:unknown)=>String(v??'').replace(/\\D/g,'');
+  const normalized=(v:unknown)=>String(v??'').replace(/\D/g,'');
   try{
    let known=[...rows];
    let added=0,skipped=0;
@@ -220,7 +220,7 @@ export default function SharedDashboard(){
     }
    }
    await load();await mirrorExcel();
-   setMsg((language==='ar'?'اكتمل نقل البيانات القديمة. أُضيف: ':'Anciennes données importées. Ajoutés : ')+added+(language==='ar'+'، تم تجاوز المكرر: ':' · doublons ignorés : ')+skipped);
+   setMsg((language==='ar'?'اكتمل نقل البيانات القديمة. أُضيف: ':'Anciennes données importées. Ajoutés : ')+added+(language==='ar'?'، تم تجاوز المكرر: ':' · doublons ignorés : ')+skipped);
    setLegacyCount(0);
   }catch(e){await load();setMsg((language==='ar'?'قد يكون النقل جزئيًا. راجع السجلات قبل المحاولة مجددًا: ':'Importation possiblement partielle. Vérifiez la liste avant de réessayer : ')+(e instanceof Error?e.message:''));}
   finally{setLegacyUploading(false);}
