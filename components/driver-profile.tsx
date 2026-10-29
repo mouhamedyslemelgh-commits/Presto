@@ -1,6 +1,6 @@
 'use client';
 import {useEffect,useState} from 'react';
-import {X,UserRound,Phone,CalendarDays,PackageCheck,Shirt,ClipboardCheck,Edit3,Save,Check,CheckCircle2,ShieldCheck,Wallet,Hash,StickyNote,ArrowUpRight} from 'lucide-react';
+import {X,UserRound,Phone,CalendarDays,PackageCheck,Shirt,ClipboardCheck,Edit3,Save,Check,ShieldCheck,Wallet,Hash,StickyNote,ArrowUpRight} from 'lucide-react';
 import {useLanguage} from './presto-language';
 export type ProfilePayment='bankily'|'masrvi'|'sedad'|'click';
 export type ProfileDriver={
@@ -22,10 +22,9 @@ export default function DriverProfile({driver,displayNumber,onSave,onClose,readO
  const [editing,setEditing]=useState(false),[saving,setSaving]=useState(false),[error,setError]=useState('');
  useEffect(()=>{const onKey=(e:KeyboardEvent)=>{if(e.key==='Escape'&&!saving)onClose()};window.addEventListener('keydown',onKey);return()=>window.removeEventListener('keydown',onKey)},[onClose,saving]);
  const active=providers.filter(p=>draft.payments[p.key]).length;
+ const rank=displayNumber??draft.id;
+ const initials=draft.name.trim().split(/\s+/).slice(0,2).map(x=>x.slice(0,1)).join('')||'•';
  const complete=draft.bag&&draft.shirt&&draft.verified&&active>0;
- const completion=Math.round((Number(draft.bag)+Number(draft.shirt)+Number(draft.verified)+Number(active>0))*25);
- const number=displayNumber??draft.id;
- const initials=draft.name.trim().split(/\s+/).slice(0,2).map(part=>Array.from(part)[0]||'').join('')||'•';
  const change=(k:keyof ProfileDriver,value:string|boolean)=>setDraft(v=>({...v,[k]:value}));
  const paymentEnabled=(key:ProfilePayment,on:boolean)=>setDraft(v=>({...v,payments:{...v.payments,[key]:on}}));
  const paymentNumber=(key:ProfilePayment,num:string)=>setDraft(v=>({...v,paymentNumbers:{...v.paymentNumbers,[key]:num},payments:{...v.payments,[key]:num.trim()?true:v.payments[key]}}));
@@ -47,8 +46,7 @@ export default function DriverProfile({driver,displayNumber,onSave,onClose,readO
   <div className="driverProfileHero">
    <div className="driverProfileHeroGlow"/>
    <div className="driverProfileHeroTop"><span className="driverProfileEyebrow"><UserRound size={14}/>{ar?'ملف السائق الشخصي':'FICHE PERSONNELLE DU LIVREUR'}</span><button className="driverProfileClose" onClick={onClose} aria-label={ar?'إغلاق الملف':'Fermer la fiche'}><X size={20}/></button></div>
-   <div className="driverProfileHeroMain"><div className="driverProfileAvatar driverProfileInitialAvatar" aria-hidden="true"><span>{initials}</span></div><div className="driverProfileHeroText"><div className="driverProfileCode"><Hash size={13}/>{ar?'السائق رقم':'LIVREUR N°'} <b dir="ltr">{number}</b></div><h2 id="driver-profile-heading">{draft.name}</h2><span className={'driverProfileState '+(complete?'complete':'pending')}><span className="driverProfileDot"/>{complete?(ar?'الملف مكتمل':'Dossier complet'):(ar?'الملف قيد الاستكمال':'Dossier à compléter')}</span></div></div>
-   <div className="driverProfileCompletion"><div><span>{ar?'اكتمال بيانات الملف':'Complétude de la fiche'}</span><strong>{completion}%</strong></div><div className="driverProfileCompletionTrack"><span style={{width:completion+'%'}}/></div></div>
+   <div className="driverProfileHeroMain"><div className="driverProfileAvatar driverProfileInitialAvatar" aria-hidden="true"><span>{initials}</span></div><div className="driverProfileHeroText"><div className="driverProfileCode"><Hash size={12}/> PRESTO · {String(rank).padStart(2,'0')}</div><h2 id="driver-profile-heading">{draft.name}</h2><span className={'driverProfileState '+(complete?'complete':'pending')}><span className="driverProfileDot"/>{complete?(ar?'الملف مكتمل':'Dossier complet'):(ar?'يحتاج إلى متابعة':'Dossier à compléter')}</span></div></div>
    <div className="driverProfileHeroStats"><span><Wallet size={15}/>{ar?'حسابات نشطة':'Comptes actifs'} <strong>{active} / 4</strong></span><span><ShieldCheck size={15}/>{ar?'المعدات المسلّمة':'Équipements remis'} <strong>{Number(draft.bag)+Number(draft.shirt)} / 2</strong></span></div>
   </div>
   <div className="driverProfileBody">
@@ -60,7 +58,7 @@ export default function DriverProfile({driver,displayNumber,onSave,onClose,readO
    </div>:<div className="driverProfileInfoGrid">
     {info('رقم الهاتف الأساسي','Téléphone principal',maskPhone&&draft.phone?'•••• ••••':draft.phone)}
     {info('تاريخ التسليم','Date de remise',draft.deliveryDate||'')}
-    {info('رقم السائق في السجل','Rang dans le registre',String(number))}
+    {info('الترتيب في السجل','Rang du livreur',String(rank))}
    </div>}
    <div className="driverProfileSectionTitle"><div className="driverProfileMiniIcon"><PackageCheck size={18}/></div><div><h3>{ar?'المعدات والملف':'Équipements et dossier'}</h3><p>{ar?'حالة تسليم المستلزمات والتحقق من الملف':'Remise du matériel et vérification du dossier'}</p></div></div>
    <div className="driverProfileEquipment">{features.map(item=><div className={'driverProfileEquipmentCard '+(draft[item.key]?'isYes':'isNo')} key={item.key}><item.icon size={22}/><span>{ar?item.ar:item.fr}</span>{editing?<input type="checkbox" aria-label={ar?item.ar:item.fr} checked={draft[item.key]} onChange={e=>change(item.key,e.target.checked)}/>:<strong>{draft[item.key]?(ar?'تم':'Oui'):(ar?'لم يتم':'Non')}</strong>}</div>)}</div>
@@ -70,7 +68,7 @@ export default function DriverProfile({driver,displayNumber,onSave,onClose,readO
     {editing?<div className="driverProfilePayEdit"><label>{ar?'رقم الحساب / الهاتف':'Numéro de compte / téléphone'}<input dir="ltr" inputMode="tel" maxLength={80} value={draft.paymentNumbers?.[p.key]||''} placeholder={ar?'أدخل رقم الحساب':'Saisir le numéro'} onChange={e=>paymentNumber(p.key,e.target.value)}/></label><label className="driverProfilePayCheck"><input type="checkbox" checked={draft.payments[p.key]} onChange={e=>paymentEnabled(p.key,e.target.checked)}/>{ar?'تفعيل هذا الحساب':'Activer ce compte'}</label></div>:<div className="driverProfilePayValue"><span>{ar?'رقم الحساب':'NUMÉRO DU COMPTE'}</span><strong dir="ltr">{draft.paymentNumbers?.[p.key]|| (draft.payments[p.key]?(ar?'لم يُسجّل الرقم بعد':'Numéro non renseigné'):'—')}</strong></div>}
    </article>)}</div>
    <div className="driverProfileSectionTitle"><div className="driverProfileMiniIcon"><StickyNote size={18}/></div><div><h3>{ar?'الملاحظات':'Observations'}</h3><p>{ar?'معلومات إضافية خاصة بهذا السائق':'Informations complémentaires sur ce livreur'}</p></div></div>
-   {editing?<textarea className="driverProfileNotesInput" maxLength={1000} rows={3} value={draft.observations||''} onChange={e=>change('observations',e.target.value)} placeholder={ar?'أضف ملاحظات حول السائق...':'Ajouter des remarques sur le livreur...'}/>:<div className={'driverProfileNotes '+(!draft.observations?.trim()?'isEmpty':'')}>{!draft.observations?.trim()&&<CheckCircle2 size={18}/>}<span>{draft.observations?.trim()|| (ar?'لا توجد ملاحظات على هذا السائق.':'Aucune observation sur ce livreur.')}</span></div>}
+   {editing?<textarea className="driverProfileNotesInput" maxLength={1000} rows={3} value={draft.observations||''} onChange={e=>change('observations',e.target.value)} placeholder={ar?'أضف ملاحظات حول السائق...':'Ajouter des remarques sur le livreur...'}/>:<div className={'driverProfileNotes '+(!draft.observations?.trim()?'isEmpty':'')}>{draft.observations?.trim()|| (ar?'لا توجد ملاحظات على هذا السائق.':'Aucune observation sur ce livreur.')}</div>}
    {error&&<p className="driverProfileError" role="alert">{error}</p>}
   </div>
   <footer className="driverProfileFooter"><span>{ar?'ملف السائق • PRESTO':'Fiche livreur · PRESTO'} <ArrowUpRight size={14}/></span><div><button className="driverProfileDone" onClick={onClose}>{ar?'إغلاق':'Fermer'}</button>{editing&&!readOnly&&<button className="driverProfileSave" onClick={()=>void save()} disabled={saving||!draft.name.trim()}><Save size={16}/>{saving?(ar?'جار الحفظ...':'Enregistrement...'):(ar?'حفظ التغييرات':'Enregistrer les modifications')}</button>}</div></footer>
