@@ -1,7 +1,7 @@
 'use client';
 
 import {useEffect,useState,type FormEvent,type ReactNode} from 'react';
-import {Eye,EyeOff,Mail,LockKeyhole,UserRound,ArrowRight,ArrowLeft,LogOut,ShieldCheck} from 'lucide-react';
+import {Eye,EyeOff,Mail,LockKeyhole,UserRound,ArrowRight,ArrowLeft,LogOut,ShieldCheck,Phone} from 'lucide-react';
 import {prestoCloud} from '../lib/presto-cloud';
 import {useLanguage,LanguageSwitcher} from './presto-language';
 
@@ -15,6 +15,7 @@ export default function PrestoAuthGate({children}:{children:ReactNode}){
  const [mode,setMode]=useState<Mode>('login');
  const [email,setEmail]=useState('');
  const [name,setName]=useState('');
+ const [phone,setPhone]=useState('');
  const [password,setPassword]=useState('');
  const [visible,setVisible]=useState(false);
  const [pending,setPending]=useState(false);
@@ -44,6 +45,8 @@ export default function PrestoAuthGate({children}:{children:ReactNode}){
   if(!/^\S+@\S+\.\S+$/.test(email.trim())){setNotice(ar?'أدخل بريدًا إلكترونيًا صحيحًا.':'Saisissez une adresse e-mail valide.');return;}
   if(password.length<8){setNotice(ar?'يجب أن تحتوي كلمة المرور على 8 أحرف على الأقل.':'Le mot de passe doit contenir au moins 8 caractères.');return;}
   if(mode==='signup'&&!name.trim()){setNotice(ar?'اكتب اسمك الكامل.':'Saisissez votre nom complet.');return;}
+  const cleanPhone=phone.trim().replace(/\s+/g,'');
+  if(mode==='signup'&&!/^\+?[0-9]{7,15}$/.test(cleanPhone)){setNotice(ar?'أدخل رقم هاتف صحيحًا بين 7 و15 رقمًا.':'Indiquez un numéro valide (7 à 15 chiffres).');return;}
   setPending(true);
   try{
    if(mode==='login'){
@@ -54,12 +57,12 @@ export default function PrestoAuthGate({children}:{children:ReactNode}){
    }else{
     const {data,error}=await prestoCloud.auth.signUp({
      email:email.trim(),password,
-     options:{data:{full_name:name.trim().slice(0,100)},emailRedirectTo:window.location.origin}
+     options:{data:{full_name:name.trim().slice(0,100),phone:cleanPhone},emailRedirectTo:window.location.origin}
     });
     if(error)throw error;
     setPassword('');
     if(data.session){setStage('ready');}
-    else setNotice(ar?'تم إرسال طلب إنشاء الحساب. افتح بريدك الإلكتروني واضغط على رابط التأكيد، ثم سجّل الدخول.':'Consultez votre boîte e-mail et confirmez votre adresse avant de vous connecter.');
+    else setNotice(ar?'تم إنشاء الحساب، لكن إعداد Supabase الحالي يتطلب تأكيد البريد قبل الدخول. يجب إيقاف Confirm email من إعدادات المصادقة لتفعيل الدخول المباشر.':'Compte créé, mais Supabase exige encore une confirmation e-mail. Désactivez Confirm email dans les paramètres Auth pour une connexion immédiate.');
    }
   }catch(error){
    setNotice(error instanceof Error?error.message:(ar?'تعذرت العملية. حاول مجددًا.':'Une erreur est survenue.'));
@@ -128,11 +131,12 @@ export default function PrestoAuthGate({children}:{children:ReactNode}){
     </section>
     <section className="presto-auth-face presto-auth-back" inert={mode!=='signup'||recovering}>
      <div className="presto-auth-inner">
-      <div className="presto-auth-heading"><UserRound size={22}/><h1>{ar?'إنشاء حساب':'Inscription'}</h1><p>{ar?'انضم إلى فريق PRESTO بسهولة':'Créez votre compte en quelques instants'}</p></div>
+      <div className="presto-auth-heading"><UserRound size={22}/><h1>{ar?'إنشاء حساب':'Inscription'}</h1><p>{ar?'اسمك ورقمك وبريدك ورمز دخولك':'Nom, téléphone, e-mail et code d’accès'}</p></div>
       <form onSubmit={submit}>
        <label className="presto-auth-field"><UserRound size={17}/><input required autoComplete="name" maxLength={100} placeholder={ar?'الاسم الكامل':'Nom complet'} value={name} onChange={e=>setName(e.target.value)}/></label>
+       <label className="presto-auth-field"><Phone size={17}/><input dir="ltr" required type="tel" inputMode="tel" autoComplete="tel" maxLength={22} placeholder={ar?'رقم الهاتف':'Numéro de téléphone'} value={phone} onChange={e=>setPhone(e.target.value)}/></label>
        <label className="presto-auth-field"><Mail size={17}/><input dir="ltr" required type="email" autoComplete="email" placeholder={ar?'البريد الإلكتروني':'Adresse e-mail'} value={email} onChange={e=>setEmail(e.target.value)}/></label>
-       <label className="presto-auth-field"><LockKeyhole size={17}/><input dir="ltr" required minLength={8} autoComplete="new-password" type={visible?'text':'password'} placeholder={ar?'كلمة المرور (8 أحرف على الأقل)':'Mot de passe (8 caractères min.)'} value={password} onChange={e=>setPassword(e.target.value)}/><button className="presto-auth-eye" type="button" onClick={()=>setVisible(v=>!v)} aria-label={visible?'Hide password':'Show password'}>{visible?<EyeOff size={17}/>:<Eye size={17}/>}</button></label>
+       <label className="presto-auth-field"><LockKeyhole size={17}/><input dir="ltr" required minLength={8} autoComplete="new-password" type={visible?'text':'password'} placeholder={ar?'كود الدخول (8 أحرف على الأقل)':'Code d’accès (8 caractères min.)'} value={password} onChange={e=>setPassword(e.target.value)}/><button className="presto-auth-eye" type="button" onClick={()=>setVisible(v=>!v)} aria-label={visible?'Hide password':'Show password'}>{visible?<EyeOff size={17}/>:<Eye size={17}/>}</button></label>
        <button className="presto-auth-submit" disabled={pending||!prestoCloud} type="submit">{pending?(ar?'جار الإنشاء...':'Création...'):ar?'إنشاء حساب':'Créer mon compte'}</button>
       </form>
       <p className="presto-auth-toggle">{ar?'لديك حساب بالفعل؟':'Déjà inscrit ?'} <button type="button" onClick={()=>{setMode('login');setNotice('');setPassword('')}}>{ar?'تسجيل الدخول':'Connexion'}</button></p>
