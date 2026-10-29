@@ -80,3 +80,82 @@
 [dir=rtl] .presto-auth-language{right:auto;left:22px}
 .presto-auth-language .prestoLanguagePicker{box-shadow:0 4px 14px #00000010;background:#f4f4f4;border-radius:20px;padding:3px}
 @media(max-width:600px){.presto-auth-language{position:static;align-self:flex-end;margin-bottom:12px}}
+
+
+/*
+ * iOS Safari/WebKit can paint both sides of a CSS-3D flipped form,
+ * producing mirrored labels and two overlapping sets of inputs.
+ * On phones and touch devices, use a single-face 2-D transition.
+ * The inactive form is removed from painting and hit-testing.
+ */
+@media (max-width: 760px) {
+ .presto-auth-scene {
+  perspective: none;
+  -webkit-perspective: none;
+ }
+ .presto-auth-flip,
+ .presto-auth-flip.flipped {
+  transform: none;
+  -webkit-transform: none;
+  transform-style: flat;
+  -webkit-transform-style: flat;
+  transition: none;
+ }
+ .presto-auth-face,
+ .presto-auth-back {
+  transform: none;
+  -webkit-transform: none;
+  backface-visibility: visible;
+  -webkit-backface-visibility: visible;
+ }
+ .presto-auth-front {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  z-index: 2;
+ }
+ .presto-auth-back {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  z-index: 1;
+ }
+ .presto-auth-flip.flipped .presto-auth-front {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  z-index: 1;
+ }
+ .presto-auth-flip.flipped .presto-auth-back {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  z-index: 2;
+  animation: presto-auth-face-enter .35s cubic-bezier(.22,1,.36,1) both;
+ }
+ .presto-auth-flip:not(.flipped) .presto-auth-front {
+  animation: presto-auth-face-enter .35s cubic-bezier(.22,1,.36,1) both;
+ }
+ .presto-auth-inner {
+  max-width: min(340px, calc(100% - 48px));
+ }
+ .presto-auth-field {
+  direction: ltr;
+ }
+ .presto-auth-field input {
+  text-align: start;
+ }
+ .presto-auth-heading, .presto-auth-toggle {
+  overflow-wrap: anywhere;
+ }
+}
+@keyframes presto-auth-face-enter {
+ from {opacity: 0;scale: .965;}
+ to {opacity: 1;scale: 1;}
+}
+@media (prefers-reduced-motion: reduce) {
+ .presto-auth-flip.flipped .presto-auth-back,
+ .presto-auth-flip:not(.flipped) .presto-auth-front {
+  animation: none;
+ }
+}
