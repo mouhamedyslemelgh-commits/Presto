@@ -3,7 +3,7 @@
 import {useEffect,useState,type FormEvent,type ReactNode} from 'react';
 import {Eye,EyeOff,Mail,LockKeyhole,UserRound,ArrowRight,ArrowLeft,LogOut,ShieldCheck} from 'lucide-react';
 import {prestoCloud} from '../lib/presto-cloud';
-import {useLanguage} from './presto-language';
+import {useLanguage,LanguageSwitcher} from './presto-language';
 
 type Mode='login'|'signup';
 type Stage='checking'|'guest'|'ready';
@@ -105,6 +105,7 @@ export default function PrestoAuthGate({children}:{children:ReactNode}){
  </>;
 
  return <main className="presto-auth-page" dir={ar?'rtl':'ltr'}>
+  <div className="presto-auth-language"><LanguageSwitcher/></div>
   <div className="presto-auth-brand">
    <img src="/logos/presto.webp" width={122} height={66} alt="PRESTO"/>
    <div><strong>PRESTO</strong><small>{ar?'نظام إدارة السائقين':'Gestion des livreurs'}</small></div>
