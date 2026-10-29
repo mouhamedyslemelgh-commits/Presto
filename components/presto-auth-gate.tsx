@@ -1,7 +1,7 @@
 'use client';
 
 import {useEffect,useState,type FormEvent,type ReactNode} from 'react';
-import {Eye,EyeOff,Mail,LockKeyhole,UserRound,ArrowRight,ArrowLeft,LogOut,ShieldCheck,Phone,Settings2} from 'lucide-react';
+import {Eye,EyeOff,Mail,LockKeyhole,UserRound,ArrowRight,ArrowLeft,LogOut,ShieldCheck,Phone,Settings2,X} from 'lucide-react';
 import {prestoCloud} from '../lib/presto-cloud';
 import PrestoAccountProfile from './presto-account-profile';
 import {useLanguage,LanguageSwitcher} from './presto-language';
