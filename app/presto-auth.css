@@ -176,3 +176,12 @@
 .presto-auth-password-dialog button:disabled{opacity:.55;cursor:wait}
 .presto-auth-password-dialog .presto-auth-password-feedback{color:#a10f0f}
 @media(max-width:600px){.presto-auth-account-actions{bottom:10px;left:10px;gap:6px}.presto-auth-account-actions .presto-auth-signout{padding:8px 10px;font-size:11px}}
+
+/* Four signup fields remain comfortably readable on small phones. */
+@media (max-width: 600px) {
+ .presto-auth-flip.flipped .presto-auth-heading { margin-bottom: 12px; }
+ .presto-auth-flip.flipped .presto-auth-inner form { gap: 11px; }
+ .presto-auth-flip.flipped .presto-auth-toggle { margin-top: 12px; }
+ .presto-auth-flip.flipped .presto-auth-field { height: 45px; }
+ .presto-auth-flip.flipped .presto-auth-inner { max-width: min(340px, calc(100% - 44px)); }
+}
