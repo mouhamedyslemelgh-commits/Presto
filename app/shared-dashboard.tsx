@@ -76,6 +76,7 @@ export default function SharedDashboard(){
   try{await downloadSavedPrestoExcel();}
   catch(error){setMsg(error instanceof Error?error.message:'Impossible de télécharger Excel.')}
  };
+ useEffect(()=>{if(admin){void mirrorExcel();}},[admin]);
  const mutate=async(job:()=>PromiseLike<{error:{message:string}|null}>)=>{
   if(!admin){setMsg('Connexion administrateur obligatoire pour modifier les données.');return;}
   try{const {error}=await job();if(error){setMsg('Échec de sauvegarde : '+error.message);return;}await load();await mirrorExcel();}catch(e){setMsg('Impossible de contacter la base partagée.')}
