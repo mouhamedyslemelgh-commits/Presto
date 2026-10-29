@@ -67,7 +67,10 @@ export default function SharedDashboard(){
  const mirrorExcel=async()=>{
   setExcelStatus('saving');
   try{
-   const response=await fetch('/api/google-sheets/sync',{method:'POST'});
+   const currentSession=await prestoCloud.auth.getSession();
+   const bearer=currentSession.data.session?.access_token;
+   if(!bearer)throw Error('A valid login is required to sync Google Sheets.');
+   const response=await fetch('/api/google-sheets/sync',{method:'POST',headers:{Authorization:'Bearer '+bearer}});
    const result=await response.json();
    if(!response.ok)throw Error(result.error||'Google Sheets synchronization unavailable');
    if(result.connected&&result.ok){setExcelSavedAt(new Date().toISOString());setExcelStatus('saved');return 'saved' as const;}
