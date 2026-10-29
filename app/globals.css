@@ -268,3 +268,7 @@ html[dir="rtl"] .excelExportHeader,html[dir="rtl"] .excelExportChoice{font-famil
 .prestoClaimBox input:focus{border-color:#eb623a;box-shadow:0 0 0 3px #eb623a1c}
 .prestoClaimBox .primary{justify-self:start}
 .prestoClaimBox .cloudFootnote{margin:0}
+
+/* Shared profile image for existing and future drivers. */
+.driverProfileAvatar{background:#fff;overflow:hidden}
+.driverProfileAvatar img{display:block;width:100%;height:100%;object-fit:contain}

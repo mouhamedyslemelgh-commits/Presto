@@ -23,7 +23,6 @@ export default function DriverProfile({driver,onSave,onClose,readOnly=false,mask
  useEffect(()=>{const onKey=(e:KeyboardEvent)=>{if(e.key==='Escape'&&!saving)onClose()};window.addEventListener('keydown',onKey);return()=>window.removeEventListener('keydown',onKey)},[onClose,saving]);
  const active=providers.filter(p=>draft.payments[p.key]).length;
  const complete=draft.bag&&draft.shirt&&draft.verified&&active>0;
- const initials=draft.name.trim().split(/\s+/).slice(0,2).map(x=>x.charAt(0)).join('').toUpperCase()||'PR';
  const change=(k:keyof ProfileDriver,value:string|boolean)=>setDraft(v=>({...v,[k]:value}));
  const paymentEnabled=(key:ProfilePayment,on:boolean)=>setDraft(v=>({...v,payments:{...v.payments,[key]:on}}));
  const paymentNumber=(key:ProfilePayment,num:string)=>setDraft(v=>({...v,paymentNumbers:{...v.paymentNumbers,[key]:num},payments:{...v.payments,[key]:num.trim()?true:v.payments[key]}}));
@@ -45,7 +44,7 @@ export default function DriverProfile({driver,onSave,onClose,readOnly=false,mask
   <div className="driverProfileHero">
    <div className="driverProfileHeroGlow"/>
    <div className="driverProfileHeroTop"><span className="driverProfileEyebrow"><UserRound size={14}/>{ar?'ملف السائق الشخصي':'FICHE PERSONNELLE DU LIVREUR'}</span><button className="driverProfileClose" onClick={onClose} aria-label={ar?'إغلاق الملف':'Fermer la fiche'}><X size={20}/></button></div>
-   <div className="driverProfileHeroMain"><div className="driverProfileAvatar">{initials}</div><div className="driverProfileHeroText"><div className="driverProfileCode"><Hash size={12}/> PRESTO · {String(draft.id).padStart(4,'0')}</div><h2 id="driver-profile-heading">{draft.name}</h2><span className={'driverProfileState '+(complete?'complete':'pending')}><span className="driverProfileDot"/>{complete?(ar?'الملف مكتمل':'Dossier complet'):(ar?'يحتاج إلى متابعة':'Dossier à compléter')}</span></div></div>
+   <div className="driverProfileHeroMain"><div className="driverProfileAvatar"><img src="/images/presto-driver.jpeg" alt={ar?'سائق توصيل بريستو':'Livreur Presto'} width={1402} height={1122}/></div><div className="driverProfileHeroText"><div className="driverProfileCode"><Hash size={12}/> PRESTO · {String(draft.id).padStart(4,'0')}</div><h2 id="driver-profile-heading">{draft.name}</h2><span className={'driverProfileState '+(complete?'complete':'pending')}><span className="driverProfileDot"/>{complete?(ar?'الملف مكتمل':'Dossier complet'):(ar?'يحتاج إلى متابعة':'Dossier à compléter')}</span></div></div>
    <div className="driverProfileHeroStats"><span><Wallet size={15}/>{ar?'حسابات نشطة':'Comptes actifs'} <strong>{active} / 4</strong></span><span><ShieldCheck size={15}/>{ar?'المعدات المسلّمة':'Équipements remis'} <strong>{Number(draft.bag)+Number(draft.shirt)} / 2</strong></span></div>
   </div>
   <div className="driverProfileBody">
