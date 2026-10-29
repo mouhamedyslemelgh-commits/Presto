@@ -24,6 +24,7 @@ export default function PrestoAuthGate({children}:{children:ReactNode}){
  const [recovering,setRecovering]=useState(false);
  const [changingPassword,setChangingPassword]=useState(false);
  const [editingProfile,setEditingProfile]=useState(false);
+ const [accountMenuOpen,setAccountMenuOpen]=useState(false);
  const [newPassword,setNewPassword]=useState('');
  const [changeNotice,setChangeNotice]=useState('');
 
@@ -118,10 +119,13 @@ export default function PrestoAuthGate({children}:{children:ReactNode}){
 
  if(stage==='ready'&&!recovering)return <>
   {children}
-  <div className="presto-auth-account-actions">
-   <button className="presto-auth-signout" type="button" onClick={()=>setEditingProfile(true)} disabled={pending} title={ar?'تعديل حسابي':'Modifier mon compte'}><Settings2 size={16}/><span>{ar?'حسابي':'Mon compte'}</span></button>
-   <button className="presto-auth-signout" type="button" onClick={()=>{setChangingPassword(true);setChangeNotice('');setNewPassword('')}} disabled={pending} title={ar?'تغيير كلمة المرور':'Changer le mot de passe'}><LockKeyhole size={16}/><span>{ar?'تغيير كلمة المرور':'Changer le mot de passe'}</span></button>
-   <button className="presto-auth-signout" type="button" onClick={()=>void signOut()} disabled={pending} title={ar?'تسجيل الخروج':'Se déconnecter'}><LogOut size={16}/><span>{ar?'خروج':'Déconnexion'}</span></button>
+  <div className={'presto-auth-account-actions'+(accountMenuOpen?' expanded':'')} dir={ar?'rtl':'ltr'}>
+   <button type="button" className="presto-auth-account-toggle" onClick={()=>setAccountMenuOpen(v=>!v)} aria-expanded={accountMenuOpen} aria-label={ar?'قائمة حسابي':'Menu de mon compte'}><Settings2 size={19}/><span>{ar?'حسابي':'Mon compte'}</span>{accountMenuOpen?<X size={15}/>:null}</button>
+   <div className="presto-auth-account-links">
+    <button className="presto-auth-signout" type="button" onClick={()=>{setEditingProfile(true);setAccountMenuOpen(false)}} disabled={pending} title={ar?'تعديل حسابي':'Modifier mon compte'}><Settings2 size={16}/><span>{ar?'بيانات حسابي':'Mon profil'}</span></button>
+    <button className="presto-auth-signout" type="button" onClick={()=>{setChangingPassword(true);setChangeNotice('');setNewPassword('');setAccountMenuOpen(false)}} disabled={pending} title={ar?'تغيير كلمة المرور':'Changer le mot de passe'}><LockKeyhole size={16}/><span>{ar?'تغيير كلمة المرور':'Changer le mot de passe'}</span></button>
+    <button className="presto-auth-signout" type="button" onClick={()=>{setAccountMenuOpen(false);void signOut()}} disabled={pending} title={ar?'تسجيل الخروج':'Se déconnecter'}><LogOut size={16}/><span>{ar?'خروج':'Déconnexion'}</span></button>
+   </div>
   </div>
   {editingProfile&&<PrestoAccountProfile onClose={()=>setEditingProfile(false)}/>}
   {changingPassword&&<div className="presto-auth-password-overlay" dir={ar?'rtl':'ltr'} onMouseDown={e=>{if(e.target===e.currentTarget&&!pending)setChangingPassword(false)}}>
