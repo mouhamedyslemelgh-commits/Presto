@@ -1,6 +1,6 @@
 'use client';
 import {useEffect,useState} from 'react';
-import {X,UserRound,Phone,CalendarDays,PackageCheck,Shirt,ClipboardCheck,Edit3,Save,Check,ShieldCheck,Wallet,Hash,StickyNote,ArrowUpRight} from 'lucide-react';
+import {X,UserRound,Phone,CalendarDays,PackageCheck,Shirt,ClipboardCheck,Edit3,Save,Check,CheckCircle2,ShieldCheck,Wallet,Hash,StickyNote,ArrowUpRight} from 'lucide-react';
 import {useLanguage} from './presto-language';
 export type ProfilePayment='bankily'|'masrvi'|'sedad'|'click';
 export type ProfileDriver={
