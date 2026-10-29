@@ -272,3 +272,8 @@ html[dir="rtl"] .excelExportHeader,html[dir="rtl"] .excelExportChoice{font-famil
 /* Shared profile image for existing and future drivers. */
 .driverProfileAvatar{background:#fff;overflow:hidden}
 .driverProfileAvatar img{display:block;width:100%;height:100%;object-fit:contain}
+
+/* Keep Arabic labels aligned and connected in all dashboard views. */
+html[dir="rtl"] th,html[dir="rtl"] td{text-align:start}
+html[dir="rtl"] .sideCaption,html[dir="rtl"] .brandSub,html[dir="rtl"] .sectionHeading,html[dir="rtl"] .stat small{letter-spacing:0}
+html[dir="rtl"] .modalBody,html[dir="rtl"] .settingsCard{line-height:1.7}
