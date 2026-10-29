@@ -209,3 +209,62 @@ html[dir="rtl"] .driverProfilePayValue strong{direction:ltr;text-align:right;uni
 html[dir="rtl"] .excelExportHeader,html[dir="rtl"] .excelExportChoice{font-family:Tahoma,Arial,sans-serif}
 @media(max-width:700px){.excelExportHeader{padding:17px}.excelExportHeader h2{font-size:16px}.excelExportBody{padding:17px;gap:14px}.excelExportChoices{gap:7px}.excelExportChoice{padding:12px 9px;min-height:119px;gap:8px}.excelExportChoice.active{padding:11px 8px}.excelExportChoice strong{font-size:11px}.excelExportChoice small{font-size:10px}.excelExportChoice svg{width:18px}.excelExportRadio{width:13px;height:13px;top:10px;inset-inline-end:10px}.excelExportFooter{padding:14px}}
 @media(max-width:440px){.excelExportOverlay{padding:7px}.excelExportChoices{grid-template-columns:1fr}.excelExportChoice{min-height:unset;display:grid;grid-template-columns:25px minmax(0,1fr);align-items:center;gap:1px 10px;padding:11px}.excelExportChoice.active{padding:10px}.excelExportChoice strong,.excelExportChoice small{grid-column:2}.excelExportChoice>svg{grid-column:1;grid-row:1/3}.excelExportInputs{grid-template-columns:minmax(0,1fr) 20px minmax(0,1fr);gap:6px;padding:11px}.excelExportHint{font-size:10px}.excelExportDash{font-size:17px}.excelExportFooter button{padding:11px 13px}}
+
+/* Shared PRESTO status and admin account */
+.syncNotice{display:flex;align-items:center;justify-content:space-between;gap:14px;margin:0 0 18px;background:#eff6fc;border:1px solid #bfdce9;color:#24586e;font-size:13px;padding:13px 16px;border-radius:10px}
+.syncNotice button{border:0;background:transparent;color:inherit;display:grid;place-items:center}
+.adminLogin{display:grid;gap:15px;max-width:470px}
+.adminLogin label{display:grid;gap:7px;font-weight:700;color:#536277;font-size:12px}
+.adminLogin input{border:1px solid #dce4eb;padding:13px 14px;border-radius:10px;outline:0;font-size:14px}
+.adminLogin input:focus{border-color:#ef6438}
+.adminLogin button{justify-self:start}
+.adminLogin p,.cloudFootnote{font-size:12px;line-height:1.65;color:#8a94a1}
+.adminStatus{display:flex;align-items:center;gap:14px;flex-wrap:wrap;background:#eaf8f0;color:#187354;padding:14px;border-radius:12px;font-weight:700;font-size:13px}
+.adminStatus button{margin-left:auto}
+.settingsCard input:disabled{opacity:.55;cursor:not-allowed}
+/* PRESTO Excel importer: independent responsive review dialog */
+.excelImportButton{border:1px solid #cae9d9;background:#ebf8f0;color:#177c56;font-weight:750;white-space:nowrap}
+.excelImportButton:hover{background:#dff2e8}
+.excelImportButton:disabled{opacity:.45}
+.paymentAccountNumber{display:block;font-size:10px;letter-spacing:.2px;color:#5e6e84;margin:4px 0 0}
+.excelModalWrap{position:fixed;inset:0;display:flex;justify-content:center;align-items:center;padding:18px;background:#0c1826a8;z-index:120}
+.excelModal{background:#fff;border-radius:18px;box-shadow:0 25px 90px #0b152d6b;width:min(980px,100%);max-height:93vh;overflow:auto}
+.excelModalHeader{display:flex;align-items:start;justify-content:space-between;gap:20px;padding:23px 26px;border-bottom:1px solid #e8ecf1}
+.excelModalHeader h2{display:flex;align-items:center;gap:10px;font-size:21px;margin:0 0 8px;color:#15283a}
+.excelModalHeader h2 svg{color:#22996b}
+.excelModalHeader p{font-size:12px;color:#8c98a5;margin:0}
+.excelModalHeader>button{border:0;background:transparent;color:#607284;padding:7px}
+.excelModalBody{padding:24px 26px;display:grid;gap:16px}
+.excelSheetSelector{font-size:12px;font-weight:750;color:#526176;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.excelSheetSelector select{appearance:auto;border:1px solid #d9e1e9;border-radius:9px;background:#f9fafc;padding:10px 12px;color:#233548;font-size:13px;max-width:100%}
+.excelStats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.excelStats>div{display:grid;gap:5px;background:#f6f8fb;padding:16px;border-radius:12px}
+.excelStats strong{font-size:28px;color:#15283a}
+.excelStats span{font-size:11px;font-weight:650;color:#758598}
+.excelDetected{font-size:12px;color:#718194;line-height:1.6;margin:0}
+.excelMode{display:flex;gap:12px;flex-wrap:wrap}
+.excelMode label{display:flex;align-items:center;gap:8px;background:#f5f8fa;border-radius:10px;padding:12px 14px;font-size:12px;color:#3e5266;cursor:pointer}
+.excelMode input{accent-color:#228f66}
+.excelWarnings{background:#fff6e9;color:#9e652a;border:1px solid #ffdfaa;border-radius:12px;padding:12px 14px;display:flex;gap:10px;font-size:12px;line-height:1.5}
+.excelWarnings svg{flex:0 0 auto}
+.excelWarnings p{margin:0 0 5px}
+.excelError{background:#fff0ed;color:#ab4634;padding:14px;border-radius:10px;font-size:13px}
+.excelSuccess{background:#e8f9ee;color:#16815a;border-radius:11px;padding:16px;display:flex;align-items:center;gap:12px;font-weight:650;font-size:13px}
+.excelBusy{font-size:13px;color:#40779a}
+.excelModalFooter{padding:17px 25px;border-top:1px solid #e9edf0;display:flex;justify-content:flex-end;gap:10px}
+@media(max-width:700px){.excelModalWrap{padding:8px}.excelModal{max-height:96vh}.excelModalHeader{padding:16px}.excelModalHeader h2{font-size:16px}.excelModalBody{padding:16px}.excelModalFooter{padding:15px}.excelStats{gap:6px}.excelStats>div{padding:10px}.excelStats strong{font-size:22px}.excelStats span{font-size:9px}.excelModalFooter .primary{font-size:12px}.headActions{flex-wrap:wrap}}
+
+/* PRESTO automatic private Excel snapshot status */
+.excelCloudStatus{display:flex;justify-content:space-between;align-items:center;gap:12px;background:#edf8f1;border:1px solid #d5eddd;border-radius:12px;padding:14px 17px;margin:15px 0;color:#196d4a;font-weight:800;font-size:12px}
+.excelCloudStatus small{font-size:11px;font-weight:600;color:#718778}
+@media(max-width:650px){.excelCloudStatus{flex-direction:column;align-items:flex-start}}
+
+.prestoAuthActions{display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+.prestoAuthActions button{display:inline-flex;align-items:center;justify-content:center;gap:8px}
+
+.prestoClaimBox{display:grid;gap:13px;margin-top:16px;background:#f7fafc;border:1px solid #dde7ee;border-radius:13px;padding:15px;max-width:520px}
+.prestoClaimBox label{font-size:12px;color:#526879;font-weight:700;display:grid;gap:9px}
+.prestoClaimBox input{border:1px solid #dce5ed;border-radius:10px;padding:12px 14px;color:#213748;background:#fff;outline:0;font-size:14px}
+.prestoClaimBox input:focus{border-color:#eb623a;box-shadow:0 0 0 3px #eb623a1c}
+.prestoClaimBox .primary{justify-self:start}
+.prestoClaimBox .cloudFootnote{margin:0}

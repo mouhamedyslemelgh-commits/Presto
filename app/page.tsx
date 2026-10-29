@@ -1,4 +1,6 @@
 'use client';
+import {prestoCloud} from '../lib/presto-cloud';
+import SharedDashboard from './shared-dashboard';
 import {useEffect,useMemo,useRef,useState} from 'react';
 import ExcelImporter from '../components/excel-importer';
 import ExcelExportDialog,{type ExcelExportScope} from '../components/excel-export-dialog';
@@ -42,7 +44,7 @@ const views:[View,string,typeof Users][]=[['dashboard',"Vue d’ensemble",Layout
 const blank:Driver={id:0,name:'',phone:'',bag:false,shirt:false,verified:false,payments:{bankily:false,masrvi:false,sedad:false,click:false}};
 const hasPay=(x:Driver)=>Object.values(x.payments).some(Boolean);
 const complete=(x:Driver)=>x.bag&&x.shirt&&x.verified&&hasPay(x);
-export default function Home(){
+function LocalHome(){
 const {t,language}=useLanguage();
 const [rows,setRows]=useState<Driver[]>([]),[ready,setReady]=useState(false),[view,setView]=useState<View>('dashboard'),[filter,setFilter]=useState('all'),[query,setQuery]=useState(''),[menu,setMenu]=useState(false),[editing,setEditing]=useState<Driver|null>(null),[dialog,setDialog]=useState(false);
 const [prefs,setPrefs]=useState<Preferences>(defaultPreferences),[settingsMessage,setSettingsMessage]=useState('');
@@ -154,3 +156,4 @@ return <div className="shell" dir={language==='ar'?'rtl':'ltr'}><div className={
 
  </div>}</main></div>{selectedDriver&&<DriverProfile key={selectedDriver.id} driver={selectedDriver} onClose={()=>setSelectedDriverId(null)} onSave={updated=>setRows(v=>v.map(x=>x.id===updated.id?updated:x))} maskPhone={prefs.maskPhones}/>}{dialog&&editing&&<div className="modalWrap" onClick={e=>{if(e.target===e.currentTarget)setDialog(false)}}><section className="modal"><div className="modalHead"><h2>{rows.some(x=>x.id===editing.id)?t('Modifier un livreur'):t('Ajouter un livreur')}</h2><button onClick={()=>setDialog(false)}><X size={20}/></button></div><div className="modalBody"><label>{t("Nom du livreur")}<input autoFocus value={editing.name} onChange={e=>setEditing({...editing,name:e.target.value})}/></label><label>{t("Téléphone (stockage local uniquement)")}<input value={editing.phone} onChange={e=>setEditing({...editing,phone:e.target.value})}/></label><label>{t("Date de remise")}<input value={editing.deliveryDate||''} onChange={e=>setEditing({...editing,deliveryDate:e.target.value})} placeholder={t("JJ/MM/AAAA")}/></label><label>{t("Observations")}<input value={editing.observations||''} onChange={e=>setEditing({...editing,observations:e.target.value})} maxLength={1000}/></label><div className="checks">{[['bag','Sac remis'],['shirt','Chemise remise'],['verified','Dossier vérifié']].map(([k,label])=><label key={k}><input type="checkbox" checked={Boolean(editing[k as 'bag'|'shirt'|'verified'])} onChange={e=>setEditing({...editing,[k]:e.target.checked})}/>{label}</label>)}</div><h3>{t("Mobile Money")}</h3><div className="checks">{methods.map(([k,label])=><label key={k}><input type="checkbox" checked={editing.payments[k]} onChange={e=>setEditing({...editing,payments:{...editing.payments,[k]:e.target.checked}})}/>{label}</label>)}</div><div className="quickAccountGrid">{methods.map(([k,label])=><label key={k}><span>{label} — {language==='ar'?'رقم الحساب':'Numéro du compte'}</span><input dir="ltr" inputMode="tel" maxLength={80} value={editing.paymentNumbers?.[k]||''} placeholder={language==='ar'?'رقم مستقل لهذه الخدمة':'Numéro propre à ce service'} onChange={e=>setEditing({...editing,paymentNumbers:{...editing.paymentNumbers,[k]:e.target.value},payments:{...editing.payments,[k]:e.target.value.trim()?true:editing.payments[k]}})}/></label>)}</div></div><div className="modalActions"><button className="secondary" onClick={()=>setDialog(false)}>{t("Annuler")}</button><button className="primary" disabled={!editing.name.trim()} onClick={save}><Check size={17}/> {t("Enregistrer")}</button></div></section></div>}</div>;
 }
+export default function Home(){return prestoCloud?<SharedDashboard/>:<LocalHome/>;}

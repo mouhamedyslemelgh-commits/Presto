@@ -69,7 +69,7 @@ async function addLogo(wb:any,ws:any){
   bitmap.close();
  }catch{/* Logo must not prevent the workbook from downloading. */}
 }
-export async function downloadPrestoXlsx(drivers:ExportDriver[],company='PRESTO',selection?:{scope:'all'|'range'|'single';suffix?:string}){
+export async function createPrestoExcelBytes(drivers:ExportDriver[],company='PRESTO',selection?:{scope:'all'|'range'|'single';suffix?:string}){
  const ExcelJS=await import('exceljs');
  const wb=new ExcelJS.Workbook();
  wb.creator='PRESTO | Opérations Livreurs';wb.lastModifiedBy='PRESTO';
@@ -185,7 +185,11 @@ export async function downloadPrestoXlsx(drivers:ExportDriver[],company='PRESTO'
  daily.pageSetup={paperSize:9,orientation:'landscape',fitToPage:true,fitToWidth:1,fitToHeight:0};
  await addLogo(wb,ws);
  const out=await wb.xlsx.writeBuffer();
- const url=URL.createObjectURL(new Blob([new Uint8Array(out)],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}));
+ return new Uint8Array(out);
+}
+export async function downloadPrestoXlsx(drivers:ExportDriver[],company='PRESTO',selection?:{scope:'all'|'range'|'single';suffix?:string}){
+ const bytes=await createPrestoExcelBytes(drivers,company,selection);
+ const url=URL.createObjectURL(new Blob([bytes],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}));
  const a=document.createElement('a');a.href=url;const suffix=selection?.scope&&selection.scope!=='all'&&selection.suffix?'_'+selection.suffix.replace(/[^a-zA-Z0-9_-]/g,'').slice(0,40):'';
  a.download='LIVREUR_Presto_v2'+suffix+'.xlsx';document.body.appendChild(a);a.click();a.remove();
  window.setTimeout(()=>URL.revokeObjectURL(url),15000);
