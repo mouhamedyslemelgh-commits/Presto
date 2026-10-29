@@ -731,3 +731,15 @@ html[dir="rtl"] .modalBody,html[dir="rtl"] .settingsCard{line-height:1.7}
  .opsLanguageCard .prestoLanguagePicker{margin-inline-start:auto}
 }
 @media(prefers-reduced-motion:reduce){.opsDriverCard,.opsFilterChips button,.opsMetricProgress span{transition:none}}
+
+
+/* Keep page actions readable without dominating the iPhone viewport. */
+@media(max-width:760px){
+ .workspace .pageHead{margin-bottom:18px;gap:15px}
+ .workspace .pageHead h1{font-size:24px;line-height:1.35;letter-spacing:0}
+ .workspace .pageHead p{font-size:11px;line-height:1.6}
+ .workspace .headActions{width:100%;display:flex;align-items:stretch;gap:8px;flex-wrap:wrap}
+ .workspace .headActions .excelImportButton,.workspace .headActions .excelExportTrigger,.workspace .headActions .primary{flex:1 1 125px;min-width:0;min-height:43px;line-height:1.3;padding:11px 10px;border-radius:11px;font-size:11px;white-space:normal;box-shadow:none}
+ .workspace .headActions svg{height:16px;width:16px;flex:0 0 16px}
+ .workspace main{padding-bottom:max(90px,calc(75px + env(safe-area-inset-bottom,0px)))}
+}
