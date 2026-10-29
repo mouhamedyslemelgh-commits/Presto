@@ -36,6 +36,8 @@ export default function SharedDashboard(){
  const [excelSavedAt,setExcelSavedAt]=useState<string|null>(null);
  const [exporting,setExporting]=useState(false);
  const [email,setEmail]=useState(''),[password,setPassword]=useState(''),[company,setCompany]=useState('PRESTO'),[city,setCity]=useState('Nouakchott · MR');
+ const [claimCode,setClaimCode]=useState(''),[claiming,setClaiming]=useState(false);
+ const [legacyCount,setLegacyCount]=useState(0),[legacyUploading,setLegacyUploading]=useState(false);
  const load=useCallback(async()=>{
   if(!prestoCloud)return;
   const all:Row[]=[];
@@ -45,12 +47,17 @@ export default function SharedDashboard(){
    const chunk=(data??[]) as Row[];all.push(...chunk);
    if(chunk.length<1000)break;
   }
-  setRows(all);setLoading(false);setMsg('');
+  setRows(all);setLoading(false);
  },[]);
  useEffect(()=>{
   if(!prestoCloud)return;
   let active=true;
   void load();
+  try{
+   const raw=localStorage.getItem('presto-ops-live-v1');
+   const data=raw?JSON.parse(raw):[];
+   if(Array.isArray(data))setLegacyCount(data.filter(x=>x&&typeof x.name==='string'&&x.name.trim()).length);
+  }catch{}
   void prestoCloud.from('presto_profile').select('company,city').eq('id',1).maybeSingle().then(({data})=>{if(active&&data){setCompany(data.company);setCity(data.city)}});
   void prestoCloud.auth.getSession().then(({data})=>{if(active)setUserId(data.session?.user.id??null)});
   const {data:listener}=prestoCloud.auth.onAuthStateChange((_event,session)=>{if(active)setUserId(session?.user.id??null)});
@@ -158,6 +165,67 @@ export default function SharedDashboard(){
     'Compte demandé. Confirmez votre e-mail si nécessaire puis faites autoriser votre compte par le responsable PRESTO.'));
  };
  const logout=async()=>{if(!prestoCloud)return;await prestoCloud.auth.signOut();setAdmin(false);setUserId(null);setMsg('Déconnecté.')};
+ const claimOwner=async()=>{
+  if(!prestoCloud||!userId)return;
+  if(!claimCode.trim()){setMsg(language==='ar'?'أدخل رمز التفعيل الخاص بالمسؤول.':'Saisissez le code de configuration de PRESTO.');return;}
+  setClaiming(true);
+  try{
+   const {data,error}=await prestoCloud.rpc('presto_claim_owner',{setup_code:claimCode.trim()});
+   if(error)throw Error(error.message);
+   if(data===true){setAdmin(true);setMsg(language==='ar'?'تم تفعيل حسابك بصفة مسؤول PRESTO. يمكنك الآن حفظ البيانات المشتركة.':'Compte administrateur PRESTO activé. Vous pouvez maintenant gérer les données partagées.');}
+   setClaimCode('');
+  }catch(e){setMsg((language==='ar'?'تعذر تفعيل حساب المسؤول: ':'Impossible d’activer le compte administrateur : ')+(e instanceof Error?e.message:'Erreur'))}
+  finally{setClaiming(false);}
+ };
+ const importLegacy=async()=>{
+  if(!prestoCloud||!admin)return;
+  let data:any[]=[];
+  try{
+   const raw=localStorage.getItem('presto-ops-live-v1');
+   const list=raw?JSON.parse(raw):[];
+   data=Array.isArray(list)?list.filter(x=>x&&typeof x.name==='string'&&x.name.trim().length>0).slice(0,10000):[];
+  }catch{setMsg('Impossible de lire les anciens fichiers de ce navigateur.');return;}
+  if(!data.length){setMsg(language==='ar'?'لا توجد سجلات قديمة في هذا الجهاز.':'Aucun ancien livreur stocké dans ce navigateur.');return;}
+  const confirmed=window.confirm(language==='ar'?'هل تريد نقل سجلات هذا المتصفح إلى قاعدة PRESTO المشتركة؟ سيتمكن كل من لديه رابط الموقع من الاطلاع على هذه البيانات، بما فيها أرقام الهواتف والحسابات.':'Importer les anciens livreurs de cet appareil dans la base PRESTO partagée ? Leurs noms, numéros de téléphone et comptes seront visibles par les visiteurs du site.');
+  if(!confirmed)return;
+  setLegacyUploading(true);
+  const normalized=(v:unknown)=>String(v??'').replace(/\\D/g,'');
+  try{
+   let known=[...rows];
+   let added=0,skipped=0;
+   for(let start=0;start<data.length;start+=100){
+    const batch=[] as Record<string,unknown>[];
+    for(const d of data.slice(start,start+100)){
+     const phone=String(d.phone??'').slice(0,30),name=String(d.name??'').trim().slice(0,100);
+     const key=normalized(phone);
+     if(!name)continue;
+     const duplicate=known.some(x=>(key&&normalized(x.phone)===key)||(!key&&x.name.trim().toLowerCase()===name.toLowerCase()));
+     if(duplicate){skipped++;continue;}
+     const payments=d.payments&&typeof d.payments==='object'?d.payments:{};
+     const nums=d.paymentNumbers&&typeof d.paymentNumbers==='object'?d.paymentNumbers:{};
+     const row={
+      name,phone,bag:Boolean(d.bag),shirt:Boolean(d.shirt),verified:Boolean(d.verified),
+      bankily:Boolean(payments.bankily),masrvi:Boolean(payments.masrvi),sedad:Boolean(payments.sedad),click:Boolean(payments.click),
+      bankily_account:String(nums.bankily??'').slice(0,80),masrvi_account:String(nums.masrvi??'').slice(0,80),
+      sedad_account:String(nums.sedad??'').slice(0,80),click_account:String(nums.click??'').slice(0,80),
+      delivery_date:String(d.deliveryDate??'').slice(0,30),observations:String(d.observations??'').slice(0,1000)
+     };
+     batch.push(row);
+     known.push({...emptyRow(),...row,id:-(added+batch.length)} as Row);
+    }
+    if(batch.length){
+     const {error}=await prestoCloud.from('presto_drivers').insert(batch);
+     if(error)throw Error(error.message);
+     added+=batch.length;
+    }
+   }
+   await load();await mirrorExcel();
+   setMsg((language==='ar'?'اكتمل نقل البيانات القديمة. أُضيف: ':'Anciennes données importées. Ajoutés : ')+added+(language==='ar'+'، تم تجاوز المكرر: ':' · doublons ignorés : ')+skipped);
+   setLegacyCount(0);
+  }catch(e){await load();setMsg((language==='ar'?'قد يكون النقل جزئيًا. راجع السجلات قبل المحاولة مجددًا: ':'Importation possiblement partielle. Vérifiez la liste avant de réessayer : ')+(e instanceof Error?e.message:''));}
+  finally{setLegacyUploading(false);}
+ };
+ 
  const exportXlsx=async(ids:number[]|null,scope:ExcelExportScope,suffix:string)=>{
   if(exporting)return;
   setExporting(true);
@@ -198,7 +266,14 @@ export default function SharedDashboard(){
   {view==='settings'&&<div className="settingsPage"><section className="settingsLanguageCard"><div><h3>{t("Langue de l’interface")}</h3><p>{t("Choisissez la langue d'affichage du tableau de bord.")}</p></div><LanguageSwitcher/></section><section className="settingsCard"><div className="settingsCardHead"><span className="settingsIcon"><Settings size={20}/></span><div><h3>Connexion administrateur</h3><p>Seules les personnes autorisées peuvent modifier ou supprimer les informations.</p></div></div>{admin?<div className="adminStatus"><Check size={18}/> Session administrateur active <button className="secondary" onClick={()=>void logout()}><LogOut size={16}/> Déconnexion</button></div>:<div className="adminLogin"><label>Adresse e-mail<input type="email" autoComplete="username" value={email} onChange={e=>setEmail(e.target.value)}/></label><label>Mot de passe<input type="password" autoComplete="current-password" value={password} onChange={e=>setPassword(e.target.value)}/></label><div className="prestoAuthActions">
   <button className="primary" onClick={()=>void login()}><LogIn size={17}/>{language==='ar'?'تسجيل الدخول':'Se connecter'}</button>
   <button className="secondary" onClick={()=>void signup()}>{language==='ar'?'إنشاء حساب':'Créer un compte'}</button>
- </div><p>{language==='ar'?'بعد إنشاء الحساب وتأكيد البريد، يجب منحك صلاحية إدارة PRESTO قبل التعديل.':'Après inscription et confirmation éventuelle du courriel, le compte doit être autorisé pour administrer PRESTO.'}</p></div>}{userId&&!admin&&<p className="cloudFootnote">Compte connecté, mais autorisation administrateur absente.</p>}</section>
+ </div><p>{language==='ar'?'بعد إنشاء الحساب والتحقق من بريدك، سجّل الدخول لتفعيل صلاحيات PRESTO.':'Après inscription et vérification de votre adresse e-mail, connectez-vous pour activer les droits PRESTO.'}</p></div>}
+  {userId&&!admin&&<div className="prestoClaimBox">
+   <label>{language==='ar'?'رمز تفعيل المسؤول (يُستخدم مرة واحدة)':'Code d’activation de l’administrateur (usage unique)'}
+    <input type="password" autoComplete="off" value={claimCode} onChange={e=>setClaimCode(e.target.value)} placeholder={language==='ar'?'أدخل رمز التفعيل':'Entrez le code d’activation'}/></label>
+   <button className="primary" disabled={claiming||!claimCode.trim()} onClick={()=>void claimOwner()}>{claiming?(language==='ar'?'جار التفعيل...':'Activation...'):(language==='ar'?'تفعيل إدارة PRESTO':'Activer mon accès administrateur')}</button>
+   <p className="cloudFootnote">{language==='ar'?'هذا الرمز خاص بمالك PRESTO فقط، ولا يجب مشاركته مع الزوار.':'Ce code est réservé au propriétaire PRESTO et ne doit pas être partagé avec les visiteurs.'}</p>
+  </div>}</section>
+  {admin&&legacyCount>0&&<section className="settingsCard"><div className="settingsCardHead"><span className="settingsIcon"><Users size={20}/></span><div><h3>{language==='ar'?'نقل السائقين المحفوظين سابقًا':'Migrer les livreurs de cet appareil'}</h3><p>{language==='ar'?'عُثر على '+legacyCount+' سجلًا في المتصفح. انقلها إلى قاعدة PRESTO المشتركة بعد المراجعة.':legacyCount+' livreur(s) trouvés dans ce navigateur. Importez-les avec votre consentement vers la base partagée.'}</p></div></div><button className="primary" disabled={legacyUploading} onClick={()=>void importLegacy()}>{legacyUploading?(language==='ar'?'جار النقل...':'Importation...'):(language==='ar'?'نقل السجلات القديمة إلى الموقع المشترك':'Importer mes anciens livreurs')}</button></section>}
   <section className="settingsCard"><div className="settingsCardHead"><span className="settingsIcon"><Download size={20}/></span><div><h3>{language==='ar'?'ملف Excel المحفوظ تلقائيًا':'Excel sauvegardé automatiquement'}</h3><p>{language==='ar'?'يُحدّث من قاعدة PRESTO عند كل إضافة أو تعديل أو حذف.':'Actualisé après chaque ajout, modification ou suppression dans PRESTO.'}</p></div></div>
    <div className="excelCloudStatus"><span>{excelStatus==='saving'?(language==='ar'?'جارٍ الحفظ في Excel...':'Enregistrement Excel en cours...'):excelStatus==='saved'?(language==='ar'?'تم تحديث Excel':'Excel mis à jour'):excelStatus==='error'?(language==='ar'?'تحتاج نسخة Excel إلى إعادة المزامنة':'Synchronisation Excel à relancer'):(language==='ar'?'ملف Excel سحابي خاص':'Fichier Excel privé dans le cloud')}</span>{excelSavedAt&&<small>{new Date(excelSavedAt).toLocaleString(language==='ar'?'ar-MR':'fr-FR')}</small>}</div>
    <div className="settingsActions"><button className="primary" disabled={!admin||excelStatus==='saving'} onClick={()=>void mirrorExcel()}>{language==='ar'?'تحديث ملف Excel الآن':'Actualiser Excel maintenant'}</button><button className="secondary" disabled={!admin} onClick={()=>void downloadCloudExcel()}><Download size={16}/>{language==='ar'?'تنزيل النسخة المحفوظة':'Télécharger Excel sauvegardé'}</button></div>
