@@ -22,7 +22,16 @@ export async function POST(request:Request){
  const url=process.env.NEXT_PUBLIC_PRESTO_SUPABASE_URL;
  const key=process.env.NEXT_PUBLIC_PRESTO_SUPABASE_KEY;
  if(!url||!key)return NextResponse.json({connected:true,ok:false,error:'Cloud database is not configured.'},{status:503});
- const client=createClient(url,key,{auth:{persistSession:false,autoRefreshToken:false}});
+ // Only a verified PRESTO account may trigger a complete driver-data export.
+ const authorization=request.headers.get('authorization')||'';
+ const token=authorization.startsWith('Bearer ')?authorization.slice(7):'';
+ if(!token)return NextResponse.json({error:'Authentication required.'},{status:401});
+ const client=createClient(url,key,{
+  auth:{persistSession:false,autoRefreshToken:false},
+  global:{headers:{Authorization:'Bearer '+token}}
+ });
+ const {data:verified,error:authError}=await client.auth.getUser(token);
+ if(authError||!verified.user)return NextResponse.json({error:'Invalid or expired session.'},{status:401});
  const records:unknown[]=[];
  for(let i=0;i<10000;i+=1000){
   const {data,error}=await client.from('presto_drivers')
