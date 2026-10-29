@@ -6,6 +6,7 @@
  * no historical names or private phone numbers are copied into the site.
  */
 export type ExportDriver={
+ id?:number;
  name:string;phone:string;bag:boolean;shirt:boolean;verified?:boolean;
  payments:{bankily:boolean;masrvi:boolean;sedad:boolean;click:boolean};
  paymentNumbers?:Partial<Record<'bankily'|'masrvi'|'sedad'|'click',string>>;
@@ -68,7 +69,7 @@ async function addLogo(wb:any,ws:any){
   bitmap.close();
  }catch{/* Logo must not prevent the workbook from downloading. */}
 }
-export async function downloadPrestoXlsx(drivers:ExportDriver[],company='PRESTO'){
+export async function downloadPrestoXlsx(drivers:ExportDriver[],company='PRESTO',selection?:{scope:'all'|'range'|'single';suffix?:string}){
  const ExcelJS=await import('exceljs');
  const wb=new ExcelJS.Workbook();
  wb.creator='PRESTO | Opérations Livreurs';wb.lastModifiedBy='PRESTO';
@@ -132,7 +133,7 @@ export async function downloadPrestoXlsx(drivers:ExportDriver[],company='PRESTO'
   const bg=i%2===0?'FFFFFF':SOFTGRAY;
   for(let col=1;col<=13;col++)cellLook(r.getCell(col),{fill:bg,color:'434343',size:10,border:true,align:col===3||col===13?'left':'center'});
   const c=(n:number)=>r.getCell(n);
-  c(1).value={formula:'IF(C'+row+'="","",ROW()-11)',result:driver?i+1:''};
+  c(1).value=driver&&selection?.scope&&selection.scope!=='all'?(driver.id??i+1):{formula:'IF(C'+row+'="","",ROW()-11)',result:driver?i+1:''};
   c(11).value={formula:'IF(C'+row+'="","",COUNTA(G'+row+':J'+row+'))',result:driver?activeAccounts(driver):''};
   c(12).value={formula:'IF(C'+row+'="","",IF(OR(E'+row+'<>"Oui",F'+row+'<>"Oui"),"✖ Équipement manquant",IF(K'+row+'=0,"⚠ Mobile money manquant","✔ Complet")))',result:driver?exportStatus(driver):''};
   if(!driver)continue;
@@ -185,6 +186,7 @@ export async function downloadPrestoXlsx(drivers:ExportDriver[],company='PRESTO'
  await addLogo(wb,ws);
  const out=await wb.xlsx.writeBuffer();
  const url=URL.createObjectURL(new Blob([new Uint8Array(out)],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}));
- const a=document.createElement('a');a.href=url;a.download='LIVREUR_Presto_v2.xlsx';document.body.appendChild(a);a.click();a.remove();
+ const a=document.createElement('a');a.href=url;const suffix=selection?.scope&&selection.scope!=='all'&&selection.suffix?'_'+selection.suffix.replace(/[^a-zA-Z0-9_-]/g,'').slice(0,40):'';
+ a.download='LIVREUR_Presto_v2'+suffix+'.xlsx';document.body.appendChild(a);a.click();a.remove();
  window.setTimeout(()=>URL.revokeObjectURL(url),15000);
 }
