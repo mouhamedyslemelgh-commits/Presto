@@ -1015,3 +1015,125 @@ html[dir="rtl"] .modalBody,html[dir="rtl"] .settingsCard{line-height:1.7}
 .shell .opsSettingsPage .prestoSheetsActions{grid-template-columns:1fr}
 .shell .opsSettingsPage .opsDangerCard{grid-column:auto}
 }
+
+
+/* Driver directory and profile: clearer identity, readable details and actions. */
+.shell .driverRegisterPanel{padding:26px;border-radius:20px;background:#fff}
+.shell .driverRegisterPanelTitle{padding:2px 0 22px;margin-bottom:20px;gap:18px;border-color:#dce6ef}
+.shell .driverRegisterPanelTitle h2{font-size:27px;line-height:1.5;letter-spacing:0}
+.shell .driverRegisterOverline{font-size:11px;color:#ac4b27;line-height:1.7}
+.shell .driverRegisterPanelTitle p{font-size:13px;color:#5a7088;line-height:1.8}
+.shell .driverRegisterRecordCount{background:#edf3f9;border-color:#d3e1ed;padding:15px 20px;color:#25435f;min-width:110px;border-radius:14px}
+.shell .driverRegisterRecordCount strong{font-size:32px}
+.shell .driverRegisterRecordCount small{font-size:12px;margin-top:5px}
+.shell .driverRegisterSearch{padding:14px;background:#f3f7fb;border:1px solid #dce6ef;border-radius:14px;gap:14px;margin-bottom:22px}
+.shell .driverRegisterSearch label:first-child{max-width:560px;min-height:48px;background:#fff;border-color:#cbdbe8;border-radius:10px}
+.shell .driverRegisterSearch input{font-size:14px;color:#25405b}
+.shell .driverRegisterSearch input::placeholder{color:#667e95}
+.shell .driverRegisterSearch>span{font-size:13px;color:#4e6880}
+.shell .driverRegisterTable th{font-size:13px;padding:18px 14px;border-bottom:1px solid #ccdce9;color:#3e5b75;background:#eaf1f7}
+.shell .driverRegisterPanel .driverRegisterTable td{padding:17px 14px}
+.shell .driverRegisterAvatar{height:45px;width:45px;flex-basis:45px;border-radius:13px;background:#fff0e7;border:1px solid #f0d0bc;color:#b64c24;box-shadow:none;font-size:21px}
+.shell .driverRegisterNameStack strong{font-size:16px;font-weight:700;line-height:1.6}
+.shell .driverRegisterNameStack small{font-size:11px;color:#60788f;font-weight:500}
+.shell .driverRegisterNumber{border-radius:10px;background:#eef3f8;color:#34536f;border-color:#d9e4ef;font-size:14px}
+.shell .driverRegisterPhone{font-size:14px;color:#34546f;font-variant-numeric:tabular-nums}
+.shell .driverRegisterPhone svg{color:#6a8299}
+.shell .driverRegisterEquipment .missing{background:#fff2e5;color:#966128}
+.shell .driverRegisterStatus.isDone{border:1px solid #cce4d6;color:#266548;background:#edf8f1}
+.shell .driverRegisterStatus.needsReview{border:1px solid #efd9bd;color:#8b5625;background:#fff5e8}
+.shell .driverRegisterActions{gap:7px}
+.shell .driverRegisterActions button{height:38px;width:38px;border-radius:10px;background:#f0f5fa;border-color:#d5e1ed;color:#355d7f}
+.shell .driverRegisterActions button:first-child{background:#eaf2fa;color:#275b89}
+.shell .driverRegisterActions .driverRegisterDelete{background:#fff5f4;color:#a64a44;border-color:#efd8d6}
+.driverProfileOverlay{padding:24px;background:#0b1b2dbd;backdrop-filter:blur(5px)}
+.driverProfileOverlay .driverProfileDialog{width:min(100%,1000px);max-height:calc(100dvh - 48px);background:#f3f6fa;border:1px solid #d4dfea;border-radius:24px;scrollbar-color:#a7b8c8 #edf2f7}
+.driverProfileDialog .driverProfileHero{padding:24px 32px 22px;background:linear-gradient(120deg,#172e48,#26445f)}
+.driverProfileDialog .driverProfileHeroGlow{opacity:.3}
+.driverProfileDialog .driverProfileEyebrow{font-size:12px;color:#d4e1ed;letter-spacing:0}
+.driverProfileDialog .driverProfileClose{width:42px;height:42px;background:#ffffff12;border-color:#ffffff35}
+.driverProfileDialog .driverProfileHeroMain{gap:24px;margin-top:16px}
+.driverProfileDialog .driverProfileAvatar{width:148px;height:118px;flex-basis:148px;border-radius:18px;border:5px solid #fff;box-shadow:0 8px 24px #06152638}
+.driverProfileDialog .driverProfileHeroText h2{font-size:32px;line-height:1.6;letter-spacing:0;margin:5px 0 10px}
+.driverProfileDialog .driverProfileCode{font-size:12px;color:#f4c7a6;letter-spacing:.3px}
+.driverProfileDialog .driverProfileState{font-size:13px;padding:8px 13px}
+.driverProfileDialog .driverProfileState.complete{background:#d8f5e5;color:#1c6041}
+.driverProfileDialog .driverProfileState.pending{background:#ffebd8;color:#895027}
+.driverProfileDialog .driverProfileHeroStats{margin-top:22px;padding-top:18px;gap:12px;border-color:#ffffff20}
+.driverProfileDialog .driverProfileHeroStats>span{background:#ffffff0c;border:1px solid #ffffff1a;border-radius:10px;padding:10px 14px;font-size:13px;line-height:1.5;color:#e2eaf2}
+.driverProfileDialog .driverProfileHeroStats strong,.driverProfileDialog .driverProfileCount{direction:ltr;unicode-bidi:isolate;font-variant-numeric:tabular-nums}
+.driverProfileDialog .driverProfileBody{padding:28px 32px}
+.driverProfileDialog .driverProfileToolbar{margin-bottom:20px}
+.driverProfileDialog .driverProfileSectionOverline{font-size:11px;letter-spacing:0;color:#a44d2b}
+.driverProfileDialog .driverProfileToolbar h3{font-size:23px;line-height:1.5;color:#213c57}
+.driverProfileDialog .driverProfileEdit{background:#e9f1f9;border-color:#c8dbeb;color:#285a82}
+.driverProfileDialog .driverProfileEdit,.driverProfileDialog .driverProfileCancel{font-size:13px;min-height:44px}
+.driverProfileDialog .driverProfileInfoGrid{gap:14px}
+.driverProfileDialog .driverProfileInfo{padding:19px 20px;gap:10px;min-height:100px;border-color:#d6e2ed;border-radius:13px;background:#fff}
+.driverProfileDialog .driverProfileInfo>span{font-size:13px;color:#5c748b;font-weight:500}
+.driverProfileDialog .driverProfileInfo>strong{font-size:19px;font-weight:700;color:#25415c;direction:ltr;unicode-bidi:isolate;text-align:start;font-variant-numeric:tabular-nums}
+.driverProfileDialog[dir=rtl] .driverProfileInfo>strong{text-align:right}
+.driverProfileDialog .driverProfileSectionTitle{margin:28px 0 17px;gap:12px}
+.driverProfileDialog .driverProfileSectionTitle h3{font-size:20px;color:#203b56;line-height:1.5}
+.driverProfileDialog .driverProfileSectionTitle p{font-size:13px;color:#5e758b;line-height:1.8}
+.driverProfileDialog .driverProfileMiniIcon{background:#e8eef6;color:#3e6487;border:1px solid #d3e0ec;border-radius:12px}
+.driverProfileDialog .driverProfileCount{font-size:14px;background:#e7f4ec;color:#286746;border:1px solid #c8e2d3}
+.driverProfileDialog .driverProfileEquipment{gap:12px}
+.driverProfileDialog .driverProfileEquipmentCard{min-height:72px;padding:16px;border-color:#d8e3ec;background:#fff;border-radius:13px;gap:10px}
+.driverProfileDialog .driverProfileEquipmentCard.isYes{background:#edf7f1;border-color:#c9e2d4}
+.driverProfileDialog .driverProfileEquipmentCard>span{font-size:14px;color:#3f5a70;line-height:1.5}
+.driverProfileDialog .driverProfileEquipmentCard strong{font-size:12px;padding:7px 10px}
+.driverProfileDialog .driverProfileEquipmentCard input{width:22px;height:22px}
+.driverProfileDialog .driverProfilePayments{gap:16px}
+.driverProfileDialog .driverProfilePaymentCard{padding:20px;border-color:#d6e1eb;border-top:3px solid var(--pay-color);border-radius:15px;box-shadow:none}
+.driverProfileDialog .driverProfilePaymentCard:hover{transform:none;box-shadow:0 5px 18px #21344a0a}
+.driverProfileDialog .driverProfilePayHead{gap:12px}
+.driverProfileDialog .driverProfilePayHead strong{font-size:17px;color:#233e57}
+.driverProfileDialog .driverProfilePayHead small{font-size:12px;color:#60778d;line-height:1.5}
+.driverProfileDialog .driverProfilePayLogo{width:51px;height:51px;flex-basis:51px}
+.driverProfileDialog .driverProfilePayTag{font-size:12px;padding:7px 11px}
+.driverProfileDialog .driverProfilePayTag.on{background:#e2f4e9;color:#246645}
+.driverProfileDialog .driverProfilePayTag.off{background:#edf1f5;color:#53687b}
+.driverProfileDialog .driverProfilePayValue{margin-top:20px;padding:16px;background:#f0f5fa;border:1px solid #e0e8f0;gap:9px;border-radius:11px}
+.driverProfileDialog .driverProfilePayValue span{font-size:12px;color:#58718a}
+.driverProfileDialog .driverProfilePayValue strong{font-size:20px;color:#244560;line-height:1.6;font-variant-numeric:tabular-nums;letter-spacing:.3px}
+.driverProfileDialog .driverProfileFields label,.driverProfileDialog .driverProfilePayEdit>label:first-child{font-size:13px;color:#46627d;gap:10px}
+.driverProfileDialog .driverProfileFields input,.driverProfileDialog .driverProfilePayEdit input:not([type=checkbox]),.driverProfileDialog .driverProfileNotesInput{font-size:16px;min-height:48px;border-color:#c9dbe8;border-radius:10px;padding:12px 14px}
+.driverProfileDialog .driverProfilePayCheck{font-size:13px;min-height:36px;color:#45617b}
+.driverProfileDialog .driverProfilePayCheck input{height:20px;width:20px}
+.driverProfileDialog .driverProfileNotes{padding:19px;font-size:14px;line-height:1.9;color:#405c76;border-color:#d6e2ec}
+.driverProfileDialog .driverProfileNotes.isEmpty{font-size:14px;color:#32634d;background:#eef7f2;border-color:#cfe4d7}
+.driverProfileDialog .driverProfileFooter{position:sticky;bottom:0;z-index:5;margin:0;padding:16px 32px;background:#fff;border-top:1px solid #d6e2ed;box-shadow:0 -5px 18px #19324b08}
+.driverProfileDialog .driverProfileFooter>span{font-size:12px;color:#607990}
+.driverProfileDialog .driverProfileDone,.driverProfileDialog .driverProfileSave{font-size:14px;min-height:45px;padding:12px 20px}
+.driverProfileDialog button:focus-visible{outline:3px solid #ed864c;outline-offset:3px}
+@media(max-width:760px){
+.shell .driverRegisterPanel{padding:14px;border-radius:16px}
+.shell .driverRegisterPanelTitle{padding-bottom:16px;gap:12px}.shell .driverRegisterPanelTitle h2{font-size:22px}
+.shell .driverRegisterRecordCount{min-width:80px;padding:12px}.shell .driverRegisterRecordCount strong{font-size:26px}
+.shell .driverRegisterRecordCount small{font-size:10px}
+.shell .driverRegisterSearch{padding:11px;gap:11px}.shell .driverRegisterSearch label:first-child{max-width:none;width:100%;padding:10px}
+.shell .driverRegisterSearch input{font-size:14px}
+.shell .driverRegisterActions button{min-height:42px}
+.driverProfileOverlay{padding:10px}
+.driverProfileOverlay .driverProfileDialog{max-height:calc(100dvh - 20px);border-radius:18px}
+.driverProfileDialog .driverProfileHero{padding:18px}
+.driverProfileDialog .driverProfileHeroMain{gap:15px}
+.driverProfileDialog .driverProfileAvatar{width:100px;height:86px;flex-basis:100px;border-radius:14px}
+.driverProfileDialog .driverProfileHeroText h2{font-size:24px;line-height:1.5}
+.driverProfileDialog .driverProfileHeroStats{gap:8px;margin-top:18px;padding-top:15px}
+.driverProfileDialog .driverProfileHeroStats>span{font-size:12px;padding:8px 10px;flex-wrap:wrap}
+.driverProfileDialog .driverProfileBody{padding:20px 16px}
+.driverProfileDialog .driverProfileInfoGrid,.driverProfileDialog .driverProfileFields{grid-template-columns:1fr}
+.driverProfileDialog .driverProfileInfo{min-height:80px;padding:15px 17px}
+.driverProfileDialog .driverProfileInfo>strong{font-size:18px}
+.driverProfileDialog .driverProfileEquipment,.driverProfileDialog .driverProfilePayments{grid-template-columns:1fr}
+.driverProfileDialog .driverProfileSectionTitle h3{font-size:18px}
+.driverProfileDialog .driverProfileSectionTitle p{font-size:12px}
+.driverProfileDialog .driverProfilePaymentCard{padding:17px}
+.driverProfileDialog .driverProfileFooter{padding:13px 16px;padding-bottom:max(13px,env(safe-area-inset-bottom))}
+.driverProfileDialog .driverProfileFooter>span{display:none}
+.driverProfileDialog .driverProfileFooter>div{width:100%;display:flex;gap:9px}
+.driverProfileDialog .driverProfileFooter button{flex:1;padding:12px;font-size:13px}
+}
+@media(max-width:380px){.driverProfileDialog .driverProfileHeroMain{align-items:flex-start;flex-direction:column}.driverProfileDialog .driverProfileAvatar{flex-basis:auto}.driverProfileDialog .driverProfilePayHead{flex-wrap:wrap}}
