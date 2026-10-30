@@ -1137,3 +1137,68 @@ html[dir="rtl"] .modalBody,html[dir="rtl"] .settingsCard{line-height:1.7}
 .driverProfileDialog .driverProfileFooter button{flex:1;padding:12px;font-size:13px}
 }
 @media(max-width:380px){.driverProfileDialog .driverProfileHeroMain{align-items:flex-start;flex-direction:column}.driverProfileDialog .driverProfileAvatar{flex-basis:auto}.driverProfileDialog .driverProfilePayHead{flex-wrap:wrap}}
+
+
+/* Consistent workspace finish and comfortable navigation at every size. */
+.shell{--surface-shadow:0 6px 24px #1b38530a}
+.shell .workspace{background:#f1f5f9}
+.shell .topbar{background:#ffffffed;border-bottom:1px solid #d9e3ed;gap:18px}
+.shell .topbar>div:first-of-type{display:flex;align-items:center;gap:8px;color:#667f95;font-size:13px}
+.shell .topRight{gap:14px}
+.shell .avatar{border-radius:12px;background:#edf3fa;border:1px solid #d7e4ef;color:#345b7e;font-size:14px}
+.shell .pageHead{padding-bottom:22px;border-bottom:1px solid #d9e3ed;margin-bottom:24px}
+.shell .pageHead h1{font-size:clamp(25px,2.3vw,33px);font-weight:800;line-height:1.5;color:#1b3651}
+.shell .pageHead p{color:#59728a;margin-top:5px}
+.shell .headActions{gap:9px}
+.shell .primary{background:#e85e2c;color:#fff;border:1px solid #d95122;box-shadow:0 4px 10px #b7441815}
+.shell .primary:hover{background:#cf4e20;border-color:#c1471d}
+.shell .secondary:hover{background:#eef4fa;border-color:#b9cfe1;color:#254e71}
+.shell .headActions .excelImportButton{background:#ecf7f0;border-color:#c4dfcf;color:#256346}
+.shell .headActions .excelImportButton:hover{background:#dff1e6;border-color:#a9d0bb}
+.shell .headActions button{min-height:45px;font-weight:700}
+.shell .stat{position:relative;box-shadow:var(--surface-shadow);background:#fff}
+.shell .stat.orange{--c:#dc5b2c;--p:#fff0e7}
+.shell .stat.blue{--c:#287ca2;--p:#eaf4fb}
+.shell .stat.cyan{--c:#287f89;--p:#eaf6f6}
+.shell .stat.green{--c:#28835e;--p:#eaf6ee}
+.shell .stat strong{letter-spacing:0;font-weight:800}
+.shell .payment{box-shadow:var(--surface-shadow)}
+.shell .paymentHeader b{color:#29445e}
+.shell .panelTitle .secondary{font-size:13px;min-height:42px;color:#315e82;border-color:#d2dfeb}
+.shell .prestoLanguagePicker{padding:4px;border-color:#d3dfeb;background:#eef3f8}
+.shell .prestoLanguagePicker button{font-size:13px;min-height:35px;padding:7px 13px;color:#4e6a83}
+.shell .prestoLanguagePicker button.active{color:#244f73;background:#fff;box-shadow:0 2px 6px #18374e12}
+.shell .syncNotice{border:1px solid #cfdfec;background:#edf5fc;color:#305875;border-radius:12px;padding:15px 18px;font-size:14px;line-height:1.7}
+.shell :is(.opsSearch,.driverRegisterSearch label,.controls label):focus-within{border-color:#4278a5;box-shadow:0 0 0 3px #4278a51a}
+.shell :is(.primary,.secondary,.payment,.sidebar nav button){transition:background-color .16s,border-color .16s,box-shadow .16s}
+@media(min-width:1101px){
+.shell .driverRegisterPanel .driverRegisterWrap{max-height:72vh;overflow:auto;scrollbar-width:thin;scrollbar-color:#a8bdcf #f2f6fa}
+.shell .driverRegisterPanel .driverRegisterTable th{top:0;z-index:3;box-shadow:0 1px 0 #ccdae6}
+}
+@media(min-width:701px) and (max-width:1000px){
+.shell .topbar{padding-inline:24px}
+.shell .topbar .date{display:none}
+.shell .pageHead{flex-direction:column;align-items:stretch;gap:17px}
+.shell .headActions{justify-content:flex-start}
+}
+@media(max-width:700px){
+.shell .topbar{padding-inline:14px;gap:10px}
+.shell .topbar>div:first-of-type{display:none}
+.shell .topRight{gap:7px;margin-inline-start:auto}
+.shell .topbar .avatar{display:none}
+.shell .pageHead{padding-bottom:18px;gap:14px}
+.shell .pageHead h1{font-size:26px}
+.shell .pageHead p{font-size:12px;line-height:1.8}
+.shell .headActions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));width:100%;gap:9px}
+.shell .headActions .primary,.shell .headActions .secondary,.shell .headActions .excelExportTrigger{width:100%;font-size:12px;min-height:45px;white-space:normal;justify-content:center}
+.shell .headActions>.primary:only-child{grid-column:1/-1}
+.shell .statGrid{gap:11px}.shell .stat{min-height:154px;border-radius:14px}
+.shell .stat small{font-size:12px;line-height:1.6}
+.shell .stat p{line-height:1.7}
+.shell .sectionHeading{gap:8px}
+.shell .paymentGrid{gap:11px}
+.shell .paymentHeader{gap:8px}
+.shell .paymentHeader strong{width:100%;margin:4px 0 0!important;font-size:29px}
+.shell .track{margin-top:12px}
+}
+@media(prefers-reduced-motion:reduce){.shell :is(.primary,.secondary,.payment,.sidebar nav button){transition:none}}
