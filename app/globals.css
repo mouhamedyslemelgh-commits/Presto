@@ -809,3 +809,71 @@ html[dir="rtl"] .modalBody,html[dir="rtl"] .settingsCard{line-height:1.7}
 @media(max-width:1100px){.shell .bottomGrid{grid-template-columns:1fr}.shell .workspace main{padding:24px;padding-bottom:100px}.shell .pageHead{align-items:flex-start;flex-wrap:wrap}.shell .attention{min-height:280px}}
 @media(max-width:700px){.shell .workspace main{padding:20px 14px 110px}.shell .topbar{height:68px;padding:0 14px}.shell .pageHead{gap:14px}.shell .pageHead h1{font-size:25px}.shell .pageHead p{font-size:12px}.shell .sidebar nav button{font-size:14px}.shell .workspace main>section.settingsCard:has(>.excelImportButton){grid-template-columns:1fr;padding:18px;gap:5px}.shell .workspace main>section.settingsCard:has(>.excelImportButton)>.excelImportButton{grid-column:1;grid-row:auto;justify-self:start;margin-top:9px}.shell .statGrid,.shell .paymentGrid{gap:10px;margin-bottom:22px}.shell .stat{padding:16px 13px;min-height:150px}.shell .stat small{font-size:12px}.shell .stat strong{font-size:34px}.shell .stat p{font-size:11px}.shell .stat>div span{padding:7px}.shell .payment{padding:13px 10px}.shell .paymentHeader{flex-wrap:wrap;gap:8px}.shell .paymentHeader strong{font-size:25px}.shell .paymentLogo{width:38px;height:38px;min-width:38px}.shell .paymentHeader b{font-size:12px}.shell .panel{padding:15px}.shell .panelTitle h2{font-size:19px}.shell .panelTitle .secondary{font-size:12px;padding:10px}.shell .sectionHeading h2{font-size:16px}.shell .driverRegisterRow{background:#fff}.shell .driverRegisterRow td::before{font-size:11px}.shell .attention{min-height:300px}}
 @media(prefers-reduced-motion:reduce){.shell .payment,.shell .sidebar nav button{transition:none}}
+
+
+/* Sidebar and register refinement: reserve a home for account controls. */
+.shell .sidebar{width:224px;min-width:224px;padding:20px 14px 90px;height:100dvh;min-height:0;overflow:hidden;background:linear-gradient(175deg,#192b43,#102137)}
+.shell .brand{padding:0 10px 18px;gap:10px;border-bottom:1px solid #ffffff14;flex-shrink:0}
+.shell .brandImageFrame{width:144px;max-width:100%;border-radius:16px;padding:6px}
+.shell .brandSub{font-size:11px;font-weight:600;letter-spacing:0;color:#b9cbe0}
+.shell .sideCaption{font-size:11px;font-weight:600;color:#91a8c2;margin:23px 12px 12px}
+.shell .sidebar nav{gap:7px;overflow-y:auto;min-height:0;scrollbar-width:thin;scrollbar-color:#45607d transparent}
+.shell .sidebar nav button{flex-shrink:0;min-height:49px;padding:12px 14px;border:1px solid transparent;font-size:14px;gap:12px;color:#bfd0e2}
+.shell .sidebar nav button svg{width:20px;height:20px;flex-shrink:0}
+.shell .sidebar nav button.selected{background:#f46a32;color:white;border:1px solid #ff8959;padding:12px 14px;box-shadow:0 6px 18px #0002}
+.shell .sidebar nav button:hover:not(.selected){background:#ffffff0d;border-color:#ffffff12;color:#fff}
+.shell .sideFoot{margin-top:auto;flex-shrink:0;padding:14px 12px;background:#ffffff06;border:1px solid #ffffff13;border-radius:12px;gap:6px}
+.shell .sideFoot strong{font-size:13px;color:#f2f6fc}
+.shell .sideFoot small{font-size:10px;color:#a9bfd5;line-height:1.5}
+.presto-auth-account-actions.presto-auth-account-actions{bottom:18px;left:14px;right:auto;width:196px;max-width:calc(100vw - 28px);align-items:stretch;z-index:70}
+[dir=rtl].presto-auth-account-actions.presto-auth-account-actions{left:auto;right:14px}
+.presto-auth-account-actions>.presto-auth-account-toggle{display:flex;justify-content:center;min-height:46px;width:100%;border:1px solid #47617f;border-radius:12px;background:#263d59;color:#fff;font-size:13px;box-shadow:0 5px 16px #0b17262b}
+.presto-auth-account-actions>.presto-auth-account-links{display:none;position:absolute;bottom:calc(100% + 12px);inset-inline-start:0;inset-inline-end:auto;flex-direction:column;align-items:stretch;flex-wrap:nowrap;gap:4px;width:240px;max-width:calc(100vw - 28px);border:1px solid #dce4ee;background:#fff;padding:8px;border-radius:16px;box-shadow:0 12px 36px #13283f30}
+.presto-auth-account-actions.expanded>.presto-auth-account-links{display:flex}
+.presto-auth-account-actions .presto-auth-account-links .presto-auth-signout{width:100%;justify-content:flex-start;min-height:46px;padding:12px;border:0;border-radius:10px;background:#fff;box-shadow:none;color:#30465e;font-size:13px;gap:10px}
+.presto-auth-account-actions .presto-auth-account-links .presto-auth-signout:hover{background:#f0f4f9}
+.presto-auth-account-actions .presto-auth-account-links .presto-auth-signout:last-child{color:#b83d36;border-top:1px solid #edf0f4}
+.presto-auth-account-actions button:focus-visible{outline:3px solid #f88c58;outline-offset:3px}
+.shell .bottomGrid{grid-template-columns:minmax(0,1fr)}
+.shell .bottomGrid>.register{padding:24px;border-radius:20px;min-width:0}
+.shell .register .panelTitle{margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid #e6edf4}
+.shell .register .panelTitle h2{font-size:22px;font-weight:800}
+.shell .register .panelTitle p{font-size:13px;color:#64758a}
+.shell .driverRegisterWrap{border:1px solid #dce5ef;border-radius:14px;box-shadow:none}
+.shell .driverRegisterTable th{padding:17px 14px;font-size:12px;background:#edf3f8;color:#435a72}
+.shell .driverRegisterTable td{padding:18px 14px;color:#30465f}
+.shell .driverRegisterWrap.isPreview .driverRegisterRow td{padding-top:18px;padding-bottom:18px}
+.shell .driverRegisterRow:nth-child(even){background:#fafcfe}
+.shell .driverRegisterRow:hover{background:#f0f6fb}
+.shell .driverRegisterNameStack strong{font-size:15px;line-height:1.6;color:#1f3650}
+.shell .driverRegisterNameStack small{font-size:11px;color:#6a7d92}
+.shell .driverRegisterEquipment span{font-size:11px;padding:7px 9px}
+.shell .driverRegisterNotes{font-size:12px;font-weight:500}
+.shell .driverRegisterNotes.noNote{color:#507365}
+.shell .driverRegisterStatus{font-size:12px;padding:8px 11px}
+.shell .driverRegisterDate{font-size:12px;background:#f0f4f9;color:#4a6077;border-color:#e1e8f0}
+@media(min-width:761px){
+.shell .bottomGrid>.attention{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:7px 24px;min-height:0;padding:24px 28px;border-radius:18px}
+.shell .bottomGrid>.attention>strong{grid-column:1;grid-row:1/5;font-size:60px;margin:0;line-height:1}
+.shell .bottomGrid>.attention>small,.shell .bottomGrid>.attention>span,.shell .bottomGrid>.attention h3,.shell .bottomGrid>.attention p{grid-column:2;margin:0}
+.shell .bottomGrid>.attention hr{display:none}
+.shell .bottomGrid>.attention button{grid-column:3;grid-row:1/5;margin:0;max-width:250px;padding:14px 20px}
+}
+@media(max-height:760px) and (min-width:701px){
+.shell .sidebar{padding-top:14px;padding-bottom:80px}
+.shell .brandImageFrame{width:112px}.shell .brand{padding-bottom:12px}.shell .sideCaption{margin-top:14px;margin-bottom:8px}
+.shell .sidebar nav{gap:4px}.shell .sidebar nav button{min-height:43px;padding-top:9px;padding-bottom:9px}
+.shell .sideFoot{padding:10px;margin-top:16px}
+}
+@media(max-width:700px){
+.shell .sidebar{width:224px;min-width:224px;padding-bottom:88px}
+.presto-auth-account-actions.presto-auth-account-actions{width:auto;bottom:calc(14px + env(safe-area-inset-bottom,0px));left:14px}
+.presto-auth-account-actions>.presto-auth-account-toggle{min-width:110px;padding:12px 16px;border-radius:14px}
+.shell .bottomGrid>.register{padding:14px;border-radius:16px}
+.shell .register .panelTitle{gap:8px}.shell .register .panelTitle h2{font-size:19px}
+.shell .driverRegisterWrap{border:0;border-radius:0}
+.shell .driverRegisterRow{background:#fff;border:1px solid #dce5ef;box-shadow:0 3px 12px #17314c06}
+.shell .driverRegisterRow:nth-child(even){background:#fff}
+.shell .driverRegisterNameStack strong{font-size:15px}
+.shell .bottomGrid>.attention{display:flex;min-height:290px}
+}
