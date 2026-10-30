@@ -49,7 +49,7 @@ export default function PrestoAuthGate({children}:{children:ReactNode}){
   if(!prestoCloud||pending)return;
   setNotice('');
   if(!/^\S+@\S+\.\S+$/.test(email.trim())){setNotice(ar?'أدخل بريدًا إلكترونيًا صحيحًا.':'Saisissez une adresse e-mail valide.');return;}
-  if(password.length<8){setNotice(ar?'يجب أن تحتوي كلمة المرور على 8 أحرف على الأقل.':'Le mot de passe doit contenir au moins 8 caractères.');return;}
+  if(mode==='signup'&&password.length<8){setNotice(ar?'يجب أن تحتوي كلمة المرور على 8 أحرف على الأقل.':'Le mot de passe doit contenir au moins 8 caractères.');return;}
   if(mode==='signup'&&!name.trim()){setNotice(ar?'اكتب اسمك الكامل.':'Saisissez votre nom complet.');return;}
   const cleanPhone=phone.trim().replace(/\s+/g,'');
   if(mode==='signup'&&!/^\+?[0-9]{7,15}$/.test(cleanPhone)){setNotice(ar?'أدخل رقم هاتف صحيحًا بين 7 و15 رقمًا.':'Indiquez un numéro valide (7 à 15 chiffres).');return;}
@@ -154,7 +154,7 @@ export default function PrestoAuthGate({children}:{children:ReactNode}){
        <p>{recovering?(ar?'اختر كلمة مرور جديدة لحسابك.':'Choisissez votre nouveau mot de passe.'):(ar?'ادخل إلى مساحة عمل PRESTO':'Accédez à votre espace PRESTO')}</p></div>
       <form onSubmit={recovering?resetPassword:submit}>
        {!recovering&&<label className="presto-auth-field"><Mail size={17}/><input type="email" dir="ltr" required autoComplete="email" placeholder={ar?'البريد الإلكتروني':'Adresse e-mail'} value={email} onChange={e=>setEmail(e.target.value)}/></label>}
-       <label className="presto-auth-field"><LockKeyhole size={17}/><input dir="ltr" required minLength={8} autoComplete={recovering?'new-password':'current-password'} type={visible?'text':'password'} placeholder={recovering?(ar?'كلمة المرور الجديدة':'Nouveau mot de passe'):(ar?'كود الدخول':'Code d’accès')} value={password} onChange={e=>setPassword(e.target.value)}/><button type="button" className="presto-auth-eye" onClick={()=>setVisible(v=>!v)} aria-label={visible?(ar?'إخفاء كلمة المرور':'Masquer le mot de passe'):(ar?'إظهار كلمة المرور':'Afficher le mot de passe')}>{visible?<EyeOff size={17}/>:<Eye size={17}/>}</button></label>
+       <label className="presto-auth-field"><LockKeyhole size={17}/><input dir="ltr" required minLength={recovering?8:1} autoComplete={recovering?'new-password':'current-password'} type={visible?'text':'password'} placeholder={recovering?(ar?'كلمة المرور الجديدة':'Nouveau mot de passe'):(ar?'كود الدخول':'Code d’accès')} value={password} onChange={e=>setPassword(e.target.value)}/><button type="button" className="presto-auth-eye" onClick={()=>setVisible(v=>!v)} aria-label={visible?(ar?'إخفاء كلمة المرور':'Masquer le mot de passe'):(ar?'إظهار كلمة المرور':'Afficher le mot de passe')}>{visible?<EyeOff size={17}/>:<Eye size={17}/>}</button></label>
        {!recovering&&<button className="presto-auth-forgot" type="button" onClick={()=>void forgot()} disabled={pending}>{ar?'نسيت كلمة المرور؟':'Mot de passe oublié ?'}</button>}
        <button className="presto-auth-submit" disabled={pending||!prestoCloud} type="submit">{pending?(ar?'جار المعالجة...':'Veuillez patienter...'):recovering?(ar?'حفظ كلمة المرور':'Enregistrer'):ar?'دخول':'Se connecter'}{ar?<ArrowLeft size={16}/>:<ArrowRight size={16}/>}</button>
       </form>
