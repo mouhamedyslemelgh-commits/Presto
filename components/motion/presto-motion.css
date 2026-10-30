@@ -1,0 +1,47 @@
+/* PRESTO restrained motion: leaves login flip, native scrolling and backend untouched. */
+.shell .stat,
+.shell .payment,
+.shell .panel,
+.shell .settingsCard {
+  transition: box-shadow 180ms ease, border-color 180ms ease;
+}
+.shell .stat {position:relative; isolation:isolate;}
+.shell .prestoSpotlightCard {overflow:hidden;}
+.shell .prestoSpotlightCard::before {
+  content:'';
+  position:absolute; inset:0; z-index:0; pointer-events:none;
+  opacity:0; transition:opacity 180ms ease;
+  background:radial-gradient(circle 190px at var(--presto-pointer-x,50%) var(--presto-pointer-y,50%),
+    color-mix(in srgb, var(--c,#f25c2c) 17%, transparent), transparent 80%);
+}
+.shell .prestoSpotlightCard > * {position:relative;z-index:1;}
+.shell .stat strong {font-variant-numeric:tabular-nums;}
+.shell :is(button,a,input,select,textarea):focus-visible {
+  outline:3px solid #f25c2c;
+  outline-offset:3px;
+}
+.shell .primary, .shell .secondary, .shell .smallBtn {
+  transition:background-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+.shell :is(.driverProfileDialog,.driverEditorDialog,.excelModal) {
+  animation:prestoModalEnter 230ms cubic-bezier(.2,.8,.2,1) both;
+}
+@keyframes prestoModalEnter {
+  from {opacity:0;transform:translateY(9px) scale(.987);}
+  to {opacity:1;transform:translateY(0) scale(1);}
+}
+@media (hover:hover) and (prefers-reduced-motion:no-preference) {
+  .shell .prestoSpotlightCard:hover::before {opacity:1;}
+  .shell .stat:hover, .shell .payment:hover {
+    box-shadow:0 11px 28px rgb(21 31 45 / 10%);
+  }
+  .shell .primary:hover:not(:disabled), .shell .secondary:hover:not(:disabled) {
+    transform:translateY(-1px);
+  }
+}
+@media (prefers-reduced-motion:reduce) {
+  .shell .stat,.shell .payment,.shell .panel,.shell .settingsCard,
+  .shell .primary,.shell .secondary,.shell .smallBtn {transition:none!important;}
+  .shell :is(.driverProfileDialog,.driverEditorDialog,.excelModal) {animation:none!important;}
+  .shell .prestoSpotlightCard::before {display:none;}
+}
