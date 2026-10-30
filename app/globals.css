@@ -743,3 +743,69 @@ html[dir="rtl"] .modalBody,html[dir="rtl"] .settingsCard{line-height:1.7}
  .workspace .headActions svg{height:16px;width:16px;flex:0 0 16px}
  .workspace main{padding-bottom:max(90px,calc(75px + env(safe-area-inset-bottom,0px)))}
 }
+
+
+/* PRESTO dashboard refresh: clear hierarchy, readable Arabic, compact import. */
+.shell{--bg:#f1f4f8;--ink:#192c42;--muted:#5c6c7e;--border:#dde5ed;background:var(--bg)}
+.shell .sidebar{background:#15263b;padding:24px 16px;border-inline-end:1px solid #263b52}
+.shell .brandImageFrame{max-width:172px;background:#fff;border-radius:15px;box-shadow:none}
+.shell .brandSub{color:#c6d2df;font-size:10px;letter-spacing:.4px}
+.shell .sideCaption{color:#9fafc2;font-size:12px;letter-spacing:0;margin:28px 12px 14px}
+.shell .sidebar nav{gap:9px}
+.shell .sidebar nav button{min-height:48px;font-size:14px;font-weight:600;color:#c9d5e2;border-radius:12px;transition:background .18s}
+.shell .sidebar nav button.selected{background:#f36a36;color:#fff;border-color:transparent;box-shadow:0 5px 18px #0002}
+.shell .sidebar nav button.selected svg{color:#fff}
+.shell .sideFoot{background:#21364f;border:1px solid #334961;gap:8px}
+.shell .sideFoot small{color:#bdccdc;font-size:11px}
+.shell .topbar{height:76px;padding:0 30px;border-bottom:1px solid #dee5ed;font-size:13px}
+.shell .date{padding:11px 15px;color:#42634e;background:#edf7f0;border:1px solid #d8eadd}
+.shell .workspace main{max-width:1600px;padding:30px; padding-bottom:100px}
+.shell .pageHead{margin-bottom:24px;align-items:center}
+.shell .pageHead h1{font-size:30px;line-height:1.5;letter-spacing:0;color:#172b43}
+.shell .pageHead p{font-size:13px;line-height:1.8;color:#5c6c7e}
+.shell .headActions{flex-wrap:wrap;align-items:center}
+.shell .primary,.shell .secondary{min-height:44px;font-size:13px;font-weight:700;border-radius:11px}
+.shell .secondary{border:1px solid #dce4ed;background:#fff;color:#41546b}
+.shell .excelImportButton{background:#edf8f1;border-color:#c7e4d1;color:#196644}
+.shell .workspace main>section.settingsCard:has(>.excelImportButton){display:grid;grid-template-columns:1fr auto;column-gap:24px;align-items:center;background:#fff;border:1px solid #dce6e1;border-inline-start:4px solid #279065;border-radius:16px;padding:20px 24px;box-shadow:0 4px 16px #172b4305}
+.shell .workspace main>section.settingsCard:has(>.excelImportButton)>h2{font-size:18px;line-height:1.5;margin:0 0 6px;color:#204435}
+.shell .workspace main>section.settingsCard:has(>.excelImportButton)>p{grid-column:1;font-size:13px;line-height:1.8;color:#586e62;margin:0;max-width:780px}
+.shell .workspace main>section.settingsCard:has(>.excelImportButton)>.excelImportButton{grid-column:2;grid-row:1/3;min-height:46px;padding:12px 20px}
+.shell .statGrid{gap:16px;margin-bottom:28px}
+.shell .stat{border:1px solid #dfe6ee;border-top:3px solid var(--c);border-radius:16px;min-height:166px;padding:22px;box-shadow:0 5px 18px #172b4306}
+.shell .stat small{font-size:13px;color:#536478;font-weight:700;line-height:1.5}
+.shell .stat strong{font-size:44px;color:#192f48;line-height:1.2;font-variant-numeric:tabular-nums}
+.shell .stat>div{margin:13px 0 8px}
+.shell .stat>div span{padding:11px;border-radius:13px}
+.shell .stat p{font-size:12px;color:#536478;line-height:1.6}
+.shell .sectionHeading{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.shell .sectionHeading h2{font-size:17px;color:#233950;letter-spacing:0;margin:0}
+.shell .sectionHeading small{font-size:12px;color:#627286}
+.shell .paymentGrid{gap:16px;margin-bottom:26px}
+.shell .payment{border:1px solid #dfe6ee;padding:19px;border-radius:15px;box-shadow:0 4px 16px #172b4305;transition:border-color .18s,box-shadow .18s}
+.shell .payment:hover{border-color:var(--c);box-shadow:0 6px 20px #172b4310}
+.shell .paymentHeader small{font-size:11px;color:#627286}
+.shell .paymentHeader b{font-size:14px}
+.shell .paymentHeader strong{font-size:29px}
+.shell .paymentLogo{width:46px;height:46px;min-width:46px;border-radius:12px;box-shadow:none}
+.shell .track{height:5px;background:#e9eef3}
+.shell .bottomGrid{grid-template-columns:minmax(0,1fr) 250px;gap:20px;align-items:start}
+.shell .panel{border:1px solid #dfe6ee;border-radius:17px;box-shadow:0 5px 18px #172b4305;padding:22px}
+.shell .panelTitle h2{font-size:21px;line-height:1.5}
+.shell .panelTitle p{color:#627286;font-size:13px;line-height:1.6}
+.shell .attention{min-height:340px;padding:24px;border-radius:17px;background:#1b314b;border:1px solid #29415e}
+.shell .attention>small{font-size:13px;color:#d4dfec}
+.shell .attention>strong{font-size:64px;margin-top:12px;font-variant-numeric:tabular-nums}
+.shell .attention>span{color:#ffd3bc;line-height:1.6}
+.shell .attention p{font-size:13px;color:#d1dce8;line-height:1.8}
+.shell .attention h3{font-size:17px}
+.shell .attention button{min-height:46px;font-size:12px;line-height:1.6}
+.shell .driverRegisterTable th{font-size:12px;color:#53677c;background:#f0f4f8;padding-top:16px;padding-bottom:16px}
+.shell .driverRegisterTable td{font-size:13px}
+.shell .driverRegisterNameStack small,.shell .driverRegisterRow td::before{color:#607287}
+.shell .driverRegisterRow:hover{background:#f8fafc}
+.shell button:focus-visible,.shell a:focus-visible{outline:3px solid #367db7;outline-offset:3px}
+@media(min-width:1101px) and (max-width:1380px){.shell .bottomGrid{grid-template-columns:1fr}.shell .attention{min-height:0;display:grid;grid-template-columns:auto 1fr auto;gap:12px 22px;align-items:center}.shell .attention>strong{grid-column:1;grid-row:1/4;margin:0}.shell .attention>small,.shell .attention>span,.shell .attention h3,.shell .attention p{grid-column:2;margin:0}.shell .attention hr{display:none}.shell .attention button{grid-column:3;grid-row:1/5;margin:0}.shell .payment{padding:15px}.shell .paymentHeader{gap:8px}}
+@media(max-width:1100px){.shell .bottomGrid{grid-template-columns:1fr}.shell .workspace main{padding:24px;padding-bottom:100px}.shell .pageHead{align-items:flex-start;flex-wrap:wrap}.shell .attention{min-height:280px}}
+@media(max-width:700px){.shell .workspace main{padding:20px 14px 110px}.shell .topbar{height:68px;padding:0 14px}.shell .pageHead{gap:14px}.shell .pageHead h1{font-size:25px}.shell .pageHead p{font-size:12px}.shell .sidebar nav button{font-size:14px}.shell .workspace main>section.settingsCard:has(>.excelImportButton){grid-template-columns:1fr;padding:18px;gap:5px}.shell .workspace main>section.settingsCard:has(>.excelImportButton)>.excelImportButton{grid-column:1;grid-row:auto;justify-self:start;margin-top:9px}.shell .statGrid,.shell .paymentGrid{gap:10px;margin-bottom:22px}.shell .stat{padding:16px 13px;min-height:150px}.shell .stat small{font-size:12px}.shell .stat strong{font-size:34px}.shell .stat p{font-size:11px}.shell .stat>div span{padding:7px}.shell .payment{padding:13px 10px}.shell .paymentHeader{flex-wrap:wrap;gap:8px}.shell .paymentHeader strong{font-size:25px}.shell .paymentLogo{width:38px;height:38px;min-width:38px}.shell .paymentHeader b{font-size:12px}.shell .panel{padding:15px}.shell .panelTitle h2{font-size:19px}.shell .panelTitle .secondary{font-size:12px;padding:10px}.shell .sectionHeading h2{font-size:16px}.shell .driverRegisterRow{background:#fff}.shell .driverRegisterRow td::before{font-size:11px}.shell .attention{min-height:300px}}
+@media(prefers-reduced-motion:reduce){.shell .payment,.shell .sidebar nav button{transition:none}}
