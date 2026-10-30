@@ -877,3 +877,141 @@ html[dir="rtl"] .modalBody,html[dir="rtl"] .settingsCard{line-height:1.7}
 .shell .driverRegisterNameStack strong{font-size:15px}
 .shell .bottomGrid>.attention{display:flex;min-height:290px}
 }
+
+
+/* Readable operations pages: equipment, payment accounts, reports and settings. */
+.shell .opsPanel{padding:28px;border:1px solid #dbe4ee;border-radius:22px;box-shadow:0 8px 28px #17314c08}
+.shell .opsPanelHeader{padding:0 0 24px;gap:20px;border-color:#dfe7ef}
+.shell .opsHeaderIcon,.shell .opsSettingsIntroIcon{width:58px;height:58px;flex-basis:58px;background:#fff0e6;border-color:#f6d6c3;color:#c65323;border-radius:16px}
+.shell .opsEyebrow{font-size:11px;font-weight:700;color:#a94825;line-height:1.6}
+.shell .opsPanelHeader h2{font-size:28px;line-height:1.5;color:#182f49}
+.shell .opsPanelHeader p{font-size:14px;color:#5b6f85;line-height:1.8}
+.shell .opsTotal{min-width:90px;padding:14px 20px;background:#edf3f9;border:1px solid #d8e3ee}
+.shell .opsTotal strong{font-size:30px;color:#233d5b}
+.shell .opsTotal small{font-size:12px;color:#536b84}
+.shell .opsMetrics{gap:16px;margin-top:24px}
+.shell .opsMetric{min-height:112px;padding:20px;gap:15px;border-color:#dce5ee;background:#f7f9fc;border-radius:16px}
+.shell .opsMetricIcon{width:48px;height:48px;flex-basis:48px;background:#fff0e7;color:#be4f25}
+.shell .opsMetric small{font-size:14px;line-height:1.6;color:#4d647c}
+.shell .opsMetric strong{font-size:30px;line-height:1.3}
+.shell .opsMetric strong span{font-size:14px;color:#64798e}
+.shell .opsMiniTrack{height:5px;background:#e5ecf3}
+.shell .opsMetric:nth-child(2) .opsMiniTrack i{background:#2886a3}
+.shell .opsMetric:nth-child(3) .opsMiniTrack i{background:#2d8a64}
+.shell .opsSectionTop{margin:30px 0 18px;gap:16px}
+.shell .opsSectionTop h3{font-size:21px;line-height:1.5;color:#203953}
+.shell .opsSectionTop p{font-size:13px;line-height:1.8;color:#61758b}
+.shell .opsSubCount{font-size:12px;padding:10px 14px;color:#216448;background:#eaf6ef;border:1px solid #cce4d5}
+.shell .opsSearchToolbar{padding:14px;border:1px solid #e0e7ef;border-radius:14px;background:#f5f8fb;margin-bottom:14px}
+.shell .opsSearch{width:min(530px,100%);height:48px;border-color:#cfdbe7;background:#fff;color:#536d87;border-radius:10px}
+.shell .opsSearch input{font-size:14px;color:#243c56}
+.shell .opsSearch input::placeholder{color:#687d92}
+.shell .opsSearchResult{font-size:13px;color:#526a82}
+.shell .opsSearchResult b{color:#b64821}
+.shell .opsFilterChips{gap:9px;margin-bottom:22px}
+.shell .opsFilterChips button{min-height:40px;padding:9px 18px;font-size:13px;color:#4c647b;border-color:#d5e0ea}
+.shell .opsFilterChips button.active{background:#203c59;color:#fff;border-color:#203c59}
+.shell .opsDriverCards{grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.shell .opsDriverCard{padding:20px;border-radius:17px;border-color:#d5e1ec;box-shadow:0 4px 16px #19365207}
+.shell .opsDriverCard:hover{border-color:#9db7cf;box-shadow:0 7px 22px #19365210}
+.shell .opsIdentity{gap:13px;padding-bottom:17px;border-color:#e2e9f1}
+.shell .opsDriverAvatar{height:48px;width:48px;flex-basis:48px;border-radius:14px;background:#fff0e5;border:1px solid #f2d0b9;color:#b64c21;box-shadow:none}
+.shell .opsIdentityText strong{font-size:17px;color:#203a54;line-height:1.6}
+.shell .opsIdentityText small{font-size:12px;color:#60788f}
+.shell .opsProfileArrow{color:#667f97}
+.shell .opsCardFlags{gap:9px;margin-top:17px}
+.shell .opsFlag{min-height:49px;padding:12px 14px;border-color:#dbe4ed;background:#f5f8fb;border-radius:10px}
+.shell .opsFlag>span{font-size:14px;color:#526b82}
+.shell .opsFlag.isOn{background:#edf7f1;border-color:#c7e4d3}
+.shell .opsFlag.isOn>span{color:#216347}
+.shell .opsFlag input{height:21px;width:21px;flex-basis:21px}
+.shell .opsCardFooter{margin-top:17px;padding-top:15px;border-color:#e2e9f1}
+.shell .opsCardState{font-size:12px;padding:7px 10px;line-height:1.5}
+.shell .opsCardState.isGood{color:#236647;background:#e9f6ef}
+.shell .opsCardState.isWaiting{color:#905a24;background:#fff2df}
+.shell .opsCardFooter button{font-size:12px;color:#af471e;min-height:36px}
+.shell .opsPaymentSummary{gap:14px;margin-top:24px}
+.shell .opsProviderSummary{position:relative;flex-wrap:wrap;gap:12px;padding:18px;border:1px solid #d7e2ed;background:#f7f9fc;border-radius:15px;min-height:105px}
+.shell .opsProviderSummary.selected{background:#edf5fc;border-color:#416e98;box-shadow:0 0 0 1px #416e98}
+.shell .opsProviderLogo{width:46px;height:46px;flex-basis:46px;border-color:#dce5ed}
+.shell .opsProviderSummary small{font-size:13px;color:#3d5872}
+.shell .opsProviderSummary strong{font-size:27px;line-height:1.3}
+.shell .opsProviderSummary strong span{font-size:13px;color:#647b92}
+.shell .opsProviderPercent{font-size:12px;color:#526f8b;background:#e8eef5;padding:5px 7px;border-radius:7px}
+.shell .opsPaymentMethods{gap:10px;margin-top:17px}
+.shell .opsMethod{padding:12px;gap:9px;min-height:76px;border-color:#dce5ed;background:#f6f8fb}
+.shell .opsMethod.isActive{background:#edf8f1;border-color:#c4e3d0}
+.shell .opsMethodLogo{height:35px;width:35px;flex-basis:35px}
+.shell .opsMethodInfo strong{font-size:13px;color:#304d65}
+.shell .opsMethodInfo span{font-size:12px;line-height:1.6;color:#60758a}
+.shell .opsMethod.isActive .opsMethodInfo span{color:#236144;font-size:14px;font-weight:700;font-variant-numeric:tabular-nums}
+.shell .opsSwitch{width:36px;height:24px;flex-basis:36px}
+.shell .opsSwitch>span{width:36px;height:24px;background:#9aaec0}
+.shell .opsSwitch>span:before{width:18px;height:18px;top:3px;left:3px}
+.shell .opsSwitch input:checked+span:before{transform:translateX(12px)}
+.shell .opsSwitch input:checked+span{background:#25835c}
+.shell .opsReportSummary{padding:25px 28px;border-radius:17px;background:#203b58;margin-top:24px;min-height:145px}
+.shell .opsReportSummary span{font-size:15px;color:#d5e4f1}
+.shell .opsReportSummary strong{font-size:52px;margin:6px 0}
+.shell .opsReportSummary p{font-size:13px;color:#c7d7e6}
+.shell .opsReportMetrics{gap:16px;margin-top:20px}
+.shell .opsReportMetric{padding:22px;border-color:#dce5ef;border-top:3px solid var(--metric);border-radius:16px;background:#fcfdff;box-shadow:none}
+.shell .opsReportMetricTop small{font-size:17px;font-weight:800}
+.shell .opsReportMetric h3{font-size:16px;line-height:1.6;color:#3c546c;margin:20px 0 8px}
+.shell .opsReportMetric p strong{font-size:36px;color:#213a55}
+.shell .opsReportMetric p span{font-size:14px;color:#64798d}
+.shell .opsMetricProgress{height:8px;background:#e6edf4}
+.shell .opsReportBreakdown{margin-top:28px;padding-top:2px;border-color:#dce5ef}
+.shell .opsBreakdownItem{padding:18px;border-color:#dce5ee;background:#f8fafd;gap:15px}
+.shell .opsBreakdownItem img{width:46px;height:46px}
+.shell .opsBreakdownItem strong{font-size:14px}
+.shell .opsBreakdownItem>span{font-size:14px;color:#405d78}
+.shell .opsBreakdownTrack{height:7px;background:#e4ebf2}
+.shell .opsReportExport{background:#f2f6fa;border:1px solid #dce6ef;border-radius:13px;padding:18px;margin-top:24px}
+.shell .opsReportExport>span{font-size:14px;color:#3f5872}
+.shell .opsSettingsPage{gap:20px;max-width:1220px;margin-inline:auto}
+.shell .opsSettingsIntro{padding:24px;border-color:#d8e3ee;background:#edf3f9;border-radius:18px}
+.shell .opsSettingsIntro h2{font-size:26px;line-height:1.5;color:#1e3853}
+.shell .opsSettingsIntro p{font-size:14px;color:#536b83;line-height:1.8}
+.shell .opsSettingsPage .settingsCard,.shell .opsSettingsPage .settingsLanguageCard{padding:26px;border-radius:17px;border-color:#d6e2ed;box-shadow:0 5px 18px #17314c06}
+.shell .opsSettingsPage .settingsCardHead{gap:15px;padding-bottom:18px;border-bottom:1px solid #e2e9f1;margin-bottom:21px}
+.shell .opsSettingsPage .settingsCardHead h3,.shell .opsSettingsPage .settingsLanguageCard h3{font-size:20px;line-height:1.5;color:#243f5a}
+.shell .opsSettingsPage .settingsCardHead p,.shell .opsSettingsPage .settingsLanguageCard p{font-size:13px;line-height:1.9;color:#5d7289}
+.shell .opsSettingsPage .settingsField{font-size:14px;gap:10px;color:#3f5973;margin-bottom:18px}
+.shell .opsSettingsPage .settingsField input{min-height:49px;font-size:16px;background:#f8fafc;border-color:#cddce8;border-radius:10px;color:#233e59}
+.shell .opsSettingsPage .settingsField input:focus{background:#fff;border-color:#4477a4;box-shadow:0 0 0 3px #4477a417}
+.shell .opsSettingsPage .excelCloudStatus{font-size:14px;padding:16px;line-height:1.8;border:1px solid #cde2d5;border-radius:11px}
+.shell .opsSettingsPage .cloudFootnote{font-size:13px;color:#60758a;line-height:1.9;margin-top:18px}
+.shell .opsSettingsPage .prestoSheetsGuide{font-size:13px;color:#365f85;text-underline-offset:4px}
+.shell .opsSettingsPage .primary,.shell .opsSettingsPage .secondary{min-height:47px;font-size:13px}
+.shell .opsSettingsPage .opsDangerCard{background:#fffafb;border-color:#ebced1;box-shadow:none}
+.shell .opsSettingsPage .opsDangerCard .settingsCardHead{border-bottom:0;padding-bottom:0;margin-bottom:15px}
+.shell .opsSettingsPage .settingsDangerButton{font-size:13px;min-height:45px;background:#fff;border-color:#e6bcc0;color:#a93642}
+.shell .opsSettingsPage .prestoLanguagePicker button{min-width:64px;min-height:39px;font-size:14px}
+@media(min-width:1450px){.shell .opsDriverCards{grid-template-columns:repeat(3,minmax(0,1fr))}.shell .opsPaymentMethods{grid-template-columns:1fr}.shell .opsReportMetrics{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media(max-width:1100px){.shell .opsDriverCards{grid-template-columns:1fr}.shell .opsPaymentSummary{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:760px){
+.shell .opsPanel{padding:18px 14px;border-radius:17px}
+.shell .opsPanelHeader{gap:12px;padding-bottom:18px}.shell .opsPanelHeaderIntro{gap:10px}
+.shell .opsHeaderIcon,.shell .opsSettingsIntroIcon{width:42px;height:42px;flex-basis:42px;border-radius:12px}
+.shell .opsPanelHeader h2{font-size:21px}.shell .opsPanelHeader p{font-size:12px}.shell .opsEyebrow{font-size:10px}
+.shell .opsTotal{min-width:60px;padding:10px}.shell .opsTotal strong{font-size:24px}.shell .opsTotal small{font-size:11px}
+.shell .opsMetrics{gap:8px;margin-top:18px}.shell .opsMetric{padding:13px 10px;gap:9px;min-height:145px;flex-direction:column;align-items:flex-start}
+.shell .opsMetricIcon{width:36px;height:36px;flex-basis:36px}.shell .opsMetric small{font-size:12px}.shell .opsMetric strong{font-size:24px}.shell .opsMetric strong span{font-size:12px}
+.shell .opsSectionTop{flex-wrap:wrap;gap:10px;margin-top:24px}.shell .opsSectionTop h3{font-size:19px}.shell .opsSectionTop p{font-size:12px}
+.shell .opsSearchToolbar{padding:10px;align-items:stretch}.shell .opsSearch{width:100%}
+.shell .opsFilterChips{gap:7px}.shell .opsFilterChips button{padding:8px 13px;font-size:12px}
+.shell .opsDriverCard{padding:16px}.shell .opsIdentityText strong{font-size:16px}
+.shell .opsPaymentSummary{gap:9px}.shell .opsProviderSummary{padding:12px;gap:9px}.shell .opsProviderSummary strong{font-size:23px}
+.shell .opsProviderPercent{font-size:11px}.shell .opsProviderLogo{width:38px;height:38px;flex-basis:38px}.shell .opsProviderLogo img{width:33px;height:33px}
+.shell .opsPaymentMethods{grid-template-columns:1fr}.shell .opsMethod{min-height:65px;padding:12px}
+.shell .opsReportMetrics{gap:10px}.shell .opsReportMetric{padding:15px}.shell .opsReportMetric h3{font-size:14px}.shell .opsReportMetric p strong{font-size:30px}
+.shell .opsReportMetricTop small{font-size:14px}.shell .opsReportSummary{padding:22px;min-height:135px}
+.shell .opsBreakdownGrid{grid-template-columns:1fr}.shell .opsBreakdownItem{padding:15px}
+.shell .opsSettingsPage{grid-template-columns:1fr;gap:15px}
+.shell .opsSettingsIntro{padding:18px;align-items:flex-start}.shell .opsSettingsIntro h2{font-size:22px}.shell .opsSettingsIntro p{font-size:13px}
+.shell .opsSettingsPage .settingsCard,.shell .opsSettingsPage .settingsLanguageCard{padding:19px}
+.shell .opsSettingsPage .settingsCardHead h3,.shell .opsSettingsPage .settingsLanguageCard h3{font-size:18px}
+.shell .opsSettingsPage .prestoSheetsActions{grid-template-columns:1fr}
+.shell .opsSettingsPage .opsDangerCard{grid-column:auto}
+}
