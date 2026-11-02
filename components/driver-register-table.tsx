@@ -7,9 +7,11 @@ export type DriverRegisterRecord={
  bag:boolean;shirt:boolean;verified:boolean;
  bankily:boolean;masrvi:boolean;sedad:boolean;click:boolean;
  bankily_account:string;masrvi_account:string;sedad_account:string;click_account:string;
+ city?:string;vehicle_type?:string;app_code?:string;driver_photo_path?:string;vehicle_photo_path?:string;
 };
 type Props={
  items:DriverRegisterRecord[];
+ photoUrls?:Record<string,string>;
  ranks:ReadonlyMap<number,number>;
  language:'ar'|'fr';
  preview?:boolean;
@@ -22,7 +24,7 @@ const activeCount=(d:DriverRegisterRecord)=>Number(d.bankily)+Number(d.masrvi)+N
 const isComplete=(d:DriverRegisterRecord)=>d.bag&&d.shirt&&d.verified&&activeCount(d)>0;
 const firstLetter=(name:string)=>Array.from(name.trim())[0]||'•';
 
-export default function DriverRegisterTable({items,ranks,language,preview=false,editable=false,onOpen,onEdit,onDelete}:Props){
+export default function DriverRegisterTable({items,ranks,language,preview=false,editable=false,onOpen,onEdit,onDelete,photoUrls={}}:Props){
  const ar=language==='ar';
  const L=(a:string,f:string)=>ar?a:f;
  return <div className={'driverRegisterWrap '+(preview?'isPreview':'')} dir={ar?'rtl':'ltr'}>
@@ -48,8 +50,8 @@ export default function DriverRegisterTable({items,ranks,language,preview=false,
       return <tr key={d.id} className="driverRegisterRow">
        <td data-label={L('الرقم','N°')}><span className="driverRegisterNumber" dir="ltr">{position}</span></td>
        <td data-label={L('السائق','Livreur')} className="driverRegisterIdentityCell"><button type="button" onClick={()=>onOpen(d.id)} className="driverRegisterIdentity">
-        <span className="driverRegisterAvatar" aria-hidden="true">{firstLetter(d.name)}</span>
-        <span className="driverRegisterNameStack"><strong>{d.name}</strong><small>{L('عرض ملف السائق','Voir la fiche du livreur')}</small></span>
+        <span className="driverRegisterAvatar" aria-hidden="true">{d.driver_photo_path&&photoUrls[d.driver_photo_path]?<img src={photoUrls[d.driver_photo_path]} alt="" className="driverRegisterAvatarPhoto"/>:firstLetter(d.name)}</span>
+        <span className="driverRegisterNameStack"><strong>{d.name}</strong><small>{[d.city,d.vehicle_type&&({motorcycle:L('دراجة نارية','Moto'),car:L('سيارة','Voiture'),bicycle:L('دراجة هوائية','Vélo'),scooter:L('سكوتر','Scooter'),other:L('مركبة أخرى','Autre véhicule')} as Record<string,string>)[d.vehicle_type]].filter(Boolean).join(' · ')||L('عرض ملف السائق','Voir la fiche du livreur')}</small></span>
        </button></td>
        <td data-label={L('التاريخ','Date')}><span className="driverRegisterDate"><CalendarDays size={14}/><span dir="ltr">{d.delivery_date||'—'}</span></span></td>
        <td data-label={L('الهاتف','Téléphone')}><span className="driverRegisterPhone" dir="ltr"><Phone size={14}/><span>{d.phone||'—'}</span></span></td>
