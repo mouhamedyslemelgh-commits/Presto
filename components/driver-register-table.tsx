@@ -18,6 +18,7 @@ type Props={
  mode?:'equipment'|'registration';
  editable?:boolean;
  onOpen:(id:number)=>void;
+ onCard:(id:number)=>void;
  onEdit?:(driver:DriverRegisterRecord)=>void;
  onDelete?:(id:number)=>void;
 };
@@ -25,9 +26,10 @@ const activeCount=(d:DriverRegisterRecord)=>Number(d.bankily)+Number(d.masrvi)+N
 const isComplete=(d:DriverRegisterRecord)=>d.bag&&d.shirt&&d.verified&&activeCount(d)>0;
 const firstLetter=(name:string)=>Array.from(name.trim())[0]||'•';
 
-export default function DriverRegisterTable({items,ranks,language,preview=false,mode='equipment',editable=false,onOpen,onEdit,onDelete,photoUrls={}}:Props){
+export default function DriverRegisterTable({items,ranks,language,preview=false,mode='equipment',editable=false,onOpen,onCard,onEdit,onDelete,photoUrls={}}:Props){
  const ar=language==='ar';
  const L=(a:string,f:string)=>ar?a:f;
+ const cardLink=(id:number)=><button type="button" className="equipmentCardLink" onClick={()=>onCard(id)}>{L('بطاقة التعريف','Carte du livreur')}</button>;
  if(mode==='registration')return <div className="driverRegisterWrap driverVehicleRegisterWrap" dir={ar?'rtl':'ltr'}>
   <table className="driverRegisterTable driverVehicleRegisterTable">
    <thead><tr>
@@ -36,7 +38,7 @@ export default function DriverRegisterTable({items,ranks,language,preview=false,
    <tbody>{items.length===0?<tr className="driverRegisterEmptyRow"><td colSpan={8}><UserRound size={24}/><strong>{L('لم يتم تسجيل سائقين ومركبات بعد','Aucun livreur et véhicule enregistré')}</strong><span>{L('استخدم زر تسجيل سائق ومركبة لإضافة السجل الأول.','Utilisez le bouton Enregistrer un livreur et véhicule.')}</span></td></tr>:
     items.map(d=><tr key={d.id} className="driverRegisterRow">
      <td data-label={L('الرقم','N°')}><span className="driverRegisterNumber" dir="ltr">{ranks.get(d.id)??d.id}</span></td>
-     <td data-label={L('السائق','Livreur')} className="driverRegisterIdentityCell"><button type="button" onClick={()=>onOpen(d.id)} className="driverRegisterIdentity"><span className="driverRegisterAvatar">{d.driver_photo_path&&photoUrls[d.driver_photo_path]?<img src={photoUrls[d.driver_photo_path]} alt="" className="driverRegisterAvatarPhoto"/>:firstLetter(d.name)}</span><span className="driverRegisterNameStack"><strong>{d.name}</strong><small>{L('عرض الملف الشخصي','Voir la fiche personnelle')}</small></span></button></td>
+     <td data-label={L('السائق','Livreur')} className="driverRegisterIdentityCell"><button type="button" onClick={()=>onOpen(d.id)} className="driverRegisterIdentity"><span className="driverRegisterAvatar">{d.driver_photo_path&&photoUrls[d.driver_photo_path]?<img src={photoUrls[d.driver_photo_path]} alt="" className="driverRegisterAvatarPhoto"/>:firstLetter(d.name)}</span><span className="driverRegisterNameStack"><strong>{d.name}</strong><small>{L('عرض الملف الشخصي','Voir la fiche personnelle')}</small></span></button>{cardLink(d.id)}</td>
      <td data-label={L('الهاتف','Téléphone')}><span className="driverRegisterPhone" dir="ltr"><Phone size={14}/>{d.phone||'—'}</span></td>
      <td data-label={L('المدينة','Ville')}>{d.city||'—'}</td>
      <td data-label={L('المركبة','Véhicule')}>{d.vehicle_type?({motorcycle:L('دراجة نارية','Moto'),car:L('سيارة','Voiture'),bicycle:L('دراجة هوائية','Vélo'),scooter:L('سكوتر','Scooter'),other:L('أخرى','Autre')} as Record<string,string>)[d.vehicle_type]||d.vehicle_type:'—'}</td>
@@ -71,7 +73,7 @@ export default function DriverRegisterTable({items,ranks,language,preview=false,
        <td data-label={L('السائق','Livreur')} className="driverRegisterIdentityCell"><button type="button" onClick={()=>onOpen(d.id)} className="driverRegisterIdentity">
         <span className="driverRegisterAvatar" aria-hidden="true">{d.driver_photo_path&&photoUrls[d.driver_photo_path]?<img src={photoUrls[d.driver_photo_path]} alt="" className="driverRegisterAvatarPhoto"/>:firstLetter(d.name)}</span>
         <span className="driverRegisterNameStack"><strong>{d.name}</strong><small>{[d.city,d.vehicle_type&&({motorcycle:L('دراجة نارية','Moto'),car:L('سيارة','Voiture'),bicycle:L('دراجة هوائية','Vélo'),scooter:L('سكوتر','Scooter'),other:L('مركبة أخرى','Autre véhicule')} as Record<string,string>)[d.vehicle_type]].filter(Boolean).join(' · ')||L('عرض ملف السائق','Voir la fiche du livreur')}</small></span>
-       </button></td>
+       </button>{cardLink(d.id)}</td>
        <td data-label={L('التاريخ','Date')}><span className="driverRegisterDate"><CalendarDays size={14}/><span dir="ltr">{d.delivery_date||'—'}</span></span></td>
        <td data-label={L('الهاتف','Téléphone')}><span className="driverRegisterPhone" dir="ltr"><Phone size={14}/><span>{d.phone||'—'}</span></span></td>
        <td data-label={L('التجهيزات','Équipement')}><div className="driverRegisterEquipment">

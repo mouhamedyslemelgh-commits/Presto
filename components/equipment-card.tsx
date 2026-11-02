@@ -87,3 +87,17 @@ export default function EquipmentCard({driver,photo,ar,maskPhone}:Props){
   {error&&<p role="alert">{ar?'تعذر إنشاء البطاقة. حاول مجددًا.':'Impossible de créer la carte. Réessayez.'}</p>}
  </section>;
 }
+
+export function EquipmentCardDialog({onClose,...props}:Props & {onClose:()=>void}){
+ const dialog=useRef<HTMLDialogElement>(null);
+ useEffect(()=>{
+  const element=dialog.current;
+  element?.showModal();
+  return ()=>element?.close();
+ },[]);
+ return <dialog ref={dialog} className="standaloneEquipmentCard" dir={props.ar?'rtl':'ltr'} aria-labelledby="equipment-card-title" onCancel={onClose}>
+  <header><h2 id="equipment-card-title">{props.ar?'بطاقة تعريف السائق':'Carte du livreur'}</h2>
+  <button type="button" autoFocus onClick={onClose}>{props.ar?'إغلاق':'Fermer'}</button></header>
+  <EquipmentCard {...props}/>
+ </dialog>;
+}
