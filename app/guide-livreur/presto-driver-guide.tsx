@@ -13,7 +13,7 @@ type Scene={
  view:'intro'|'customer'|'order'|'restaurantMap'|'restaurant'|'pickup'|'customerMap'|'arrival'|'delivery'|'money'|'support'|'finish';
 };
 
-const scenes:Scene[]=[
+const sceneTemplates:Scene[]=[
  {id:'welcome',titleAr:'مرحباً بك في PRESTO',titleFr:'Bienvenue chez PRESTO',subtitleAr:'تطبيق للزبون وتطبيق خاص بك أنت السائق',subtitleFr:'Une application client et une application livreur',duration:15,view:'intro',
  speakAr:'أهلاً بك في بريستو! قبل أن تبدأ أول رحلة، دعني أشرح لك كيف تعمل الخدمة. بريستو فيها تطبيق للزبون يطلب منه الطعام أو المنتجات، وتطبيق آخر خاص بك أنت السائق، تصلك فيه الطلبات وتتابعها خطوة بخطوة.',
  speakFr:'Bienvenue chez Presto ! Presto comporte une application pour les clients, qui passent leurs commandes, et une autre application spécialement pour toi, le livreur, pour recevoir et suivre chaque course.'},
@@ -49,8 +49,8 @@ const scenes:Scene[]=[
  speakFr:'S’il manque un article, signale-le au restaurant avant de partir. Adresse incorrecte ou client qui refuse ? Contacte le support de l’application. Ne modifie pas la commande et ne partage pas ton compte.'},
  {id:'end',titleAr:'أنت الآن جاهز للانطلاق!',titleFr:'Tu es prêt à livrer !',subtitleAr:'كل زر في وقته، وكل رحلة باحتراف',subtitleFr:'Chaque bouton au bon moment',duration:12,view:'finish',
  speakAr:'وهكذا اكتملت الرحلة! تذكّر جيداً: الزبون يطلب من تطبيقه، وأنت تدير التوصيل من تطبيق السائق. اضغط اسم المطعم لفتح الخريطة، وبعد الاستلام اضغط الزبون لفتح خريطته. أكّد كل خطوة فقط عندما تحدث فعلاً. نتمنى لك رحلات آمنة وناجحة مع بريستو!',
- speakFr:'Voilà toute la course ! Le client commande dans son application et tu suis la livraison dans la tienne. Le restaurant ouvre la première carte et le client la deuxième. Confirme chaque étape au bon moment. Bonne route avec Presto !'}
-].map(scene=>({...scene,duration:Math.max(scene.duration,Math.ceil(scene.speakAr.trim().split(/\\s+/).length/2)+6,Math.ceil(scene.speakFr.trim().split(/\\s+/).length/2)+6)}));
+ speakFr:'Voilà toute la course ! Le client commande dans son application et tu suis la livraison dans la tienne. Le restaurant ouvre la première carte et le client la deuxième. Confirme chaque étape au bon moment. Bonne route avec Pre ];
+const scenes:Scene[]=sceneTemplates.map(scene=>({...scene,duration:Math.max(scene.duration,Math.ceil(scene.speakAr.trim().split(' ').filter(Boolean).length/2)+6,Math.ceil(scene.speakFr.trim().split(' ').filter(Boolean).length/2)+6)}));)+6)}));
 
 const labels={
  ar:{guide:'دليل السائق التفاعلي',presto:'PRESTO ACADEMY',home:'العودة إلى PRESTO',watch:'ابدأ الشرح',pause:'إيقاف مؤقت',resume:'متابعة الشرح',replay:'إعادة من البداية',audio:'التعليق الصوتي',step:'المشهد',auto:'تشغيل تلقائي',language:'Français',subtitle:'شرح جديد بالرسوم المتحركة · صوت حسب إعدادات جهازك',map:'فتح الخريطة',start:'بدء الرحلة',restaurant:'مطعم الأمل',customer:'الزبون',arrivedRestaurant:'وصلت للمطعم',pickup:'تأكيد الاستلام',arrivedClient:'وصلت للزبون',delivered:'تم التوصيل للزبون',order:'طلب جديد',support:'دعم السائقين',next:'المشهد التالي',previous:'السابق',tip:'اضغط على التشغيل لسماع الشرح بصوت المتصفح. يمكنك الانتقال إلى أي مشهد.',demo:'محاكاة توضيحية — ليست واجهة التطبيق الحقيقية'},
