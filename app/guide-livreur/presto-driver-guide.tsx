@@ -50,7 +50,7 @@ const scenes:Scene[]=[
  {id:'end',titleAr:'أنت الآن جاهز للانطلاق!',titleFr:'Tu es prêt à livrer !',subtitleAr:'كل زر في وقته، وكل رحلة باحتراف',subtitleFr:'Chaque bouton au bon moment',duration:12,view:'finish',
  speakAr:'وهكذا اكتملت الرحلة! تذكّر جيداً: الزبون يطلب من تطبيقه، وأنت تدير التوصيل من تطبيق السائق. اضغط اسم المطعم لفتح الخريطة، وبعد الاستلام اضغط الزبون لفتح خريطته. أكّد كل خطوة فقط عندما تحدث فعلاً. نتمنى لك رحلات آمنة وناجحة مع بريستو!',
  speakFr:'Voilà toute la course ! Le client commande dans son application et tu suis la livraison dans la tienne. Le restaurant ouvre la première carte et le client la deuxième. Confirme chaque étape au bon moment. Bonne route avec Presto !'}
-];
+].map(scene=>({...scene,duration:Math.max(scene.duration,Math.ceil(scene.speakAr.trim().split(/\\s+/).length/2)+6,Math.ceil(scene.speakFr.trim().split(/\\s+/).length/2)+6)}));
 
 const labels={
  ar:{guide:'دليل السائق التفاعلي',presto:'PRESTO ACADEMY',home:'العودة إلى PRESTO',watch:'ابدأ الشرح',pause:'إيقاف مؤقت',resume:'متابعة الشرح',replay:'إعادة من البداية',audio:'التعليق الصوتي',step:'المشهد',auto:'تشغيل تلقائي',language:'Français',subtitle:'شرح جديد بالرسوم المتحركة · صوت حسب إعدادات جهازك',map:'فتح الخريطة',start:'بدء الرحلة',restaurant:'مطعم الأمل',customer:'الزبون',arrivedRestaurant:'وصلت للمطعم',pickup:'تأكيد الاستلام',arrivedClient:'وصلت للزبون',delivered:'تم التوصيل للزبون',order:'طلب جديد',support:'دعم السائقين',next:'المشهد التالي',previous:'السابق',tip:'اضغط على التشغيل لسماع الشرح بصوت المتصفح. يمكنك الانتقال إلى أي مشهد.',demo:'محاكاة توضيحية — ليست واجهة التطبيق الحقيقية'},
@@ -130,10 +130,10 @@ export default function PrestoDriverGuide(){
  const scene=scenes[index],t=labels[language];
  const durationTotal=useMemo(()=>scenes.reduce((a,s)=>a+s.duration,0),[]);
  const elapsed=scenes.slice(0,index).reduce((a,s)=>a+s.duration,0)+seconds;
- const speak=useCallback((step:number,lang:Lang)=>{
+ const speak=useCallback((step:number,lang:Lang,force=false)=>{
   if(typeof window==='undefined'||!('speechSynthesis' in window)){setVoiceAvailable(false);return;}
   window.speechSynthesis.cancel();
-  if(!voice)return;
+  if(!voice&&!force)return;
   const utter=new SpeechSynthesisUtterance(lang==='ar'?scenes[step].speakAr:scenes[step].speakFr);
   const all=window.speechSynthesis.getVoices();
   const wanted=lang==='ar'?'ar':'fr';
@@ -176,7 +176,7 @@ export default function PrestoDriverGuide(){
  };
  const toggle=()=>{if(playing)pause();else if(index===scenes.length-1&&seconds>=scene.duration)transition(0,true);else resume();};
  const swapLanguage=()=>{const next=language==='ar'?'fr':'ar';setLanguage(next);transition(index,playing,next);};
- const toggleVoice=()=>{if(typeof window!=='undefined'&&'speechSynthesis' in window)window.speechSynthesis.cancel();setVoice(v=>!v);if(!voice&&playing){const lang=language;setTimeout(()=>speak(index,lang),0);}};
+ const toggleVoice=()=>{if(typeof window!=='undefined'&&'speechSynthesis' in window)window.speechSynthesis.cancel();setVoice(v=>!v);if(!voice&&playing)speak(index,language,true);};
  const format=(s:number)=>Math.floor(s/60)+':'+String(Math.round(s%60)).padStart(2,'0');
  return <main className={styles.shell} dir={language==='ar'?'rtl':'ltr'}>
   <header className={styles.header}><a className={styles.logo} href="/"><span className={styles.brandDot}>P</span><span><strong>PRESTO</strong><small>ACADEMY</small></span></a><div className={styles.headerActions}><button type="button" onClick={swapLanguage}><Globe2 size={17}/>{t.language}</button><a href="/"><span>{t.home}</span>{language==='ar'?<ArrowLeft size={17}/>:<ArrowRight size={17}/>}</a></div></header>
