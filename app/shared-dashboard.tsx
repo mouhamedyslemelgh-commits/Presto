@@ -17,7 +17,7 @@ import ExcelImporter from '../components/excel-importer';
 import ExcelExportDialog,{type ExcelExportScope} from '../components/excel-export-dialog';
 import {downloadPrestoXlsx} from '../lib/presto-excel-export';
 import {normalizeHeader,type ImportedDriver,type ImportMode} from '../lib/presto-excel';
-import {LayoutDashboard,Users,Package,Wallet,ChartNoAxesColumn,Settings,Video,Bike,ArrowUpRight,Download,Plus,Search,Edit3,Trash2,Menu,X,Check,ShieldAlert,LogIn,LogOut,RefreshCw} from 'lucide-react';
+import {LayoutDashboard,Users,Package,Wallet,ChartNoAxesColumn,Settings,Video,Play,Bike,ArrowUpRight,Download,Plus,Search,Edit3,Trash2,Menu,X,Check,ShieldAlert,LogIn,LogOut,RefreshCw} from 'lucide-react';
 type Pay='bankily'|'masrvi'|'sedad'|'click';
 type Row={id:number;name:string;phone:string;bag:boolean;shirt:boolean;verified:boolean;bankily:boolean;masrvi:boolean;sedad:boolean;click:boolean;bankily_account:string;masrvi_account:string;sedad_account:string;click_account:string;delivery_date:string;observations:string;city:string;vehicle_type:string;app_code:string;driver_photo_path:string;vehicle_photo_path:string};
 const profileData=(d:Row)=>({id:d.id,name:d.name,phone:d.phone,bag:d.bag,shirt:d.shirt,verified:d.verified,payments:{bankily:d.bankily,masrvi:d.masrvi,sedad:d.sedad,click:d.click},paymentNumbers:{bankily:d.bankily_account,masrvi:d.masrvi_account,sedad:d.sedad_account,click:d.click_account},deliveryDate:d.delivery_date,observations:d.observations,city:d.city,vehicleType:d.vehicle_type,appCode:d.app_code,driverPhotoPath:d.driver_photo_path,vehiclePhotoPath:d.vehicle_photo_path});
