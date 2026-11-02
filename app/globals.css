@@ -1233,3 +1233,13 @@ html[dir="rtl"] .modalBody,html[dir="rtl"] .settingsCard{line-height:1.7}
 .driverProfileNoPhoto{height:170px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;border-radius:10px;background:#eff3f8;color:#9cabbc;font-size:12px}
 .driverProfileFields select{background:#fff;border:1px solid #dce5ec;border-radius:9px;padding:10px;color:#25374a;min-height:42px;width:100%}
 @media(max-width:620px){.driverEditorDialog{max-height:97dvh}.driverVehiclePhotos{gap:9px}.driverVehiclePhotoPicker{padding:9px}.driverVehiclePhotoPreview,.driverVehiclePhotoPlaceholder{height:113px}.driverProfileVehiclePhotos img,.driverProfileNoPhoto{height:125px}}
+
+/* Distinct driver and vehicle register: separate from delivery inventory. */
+.driverVehicleRegisterPanel .driverRegisterPanelTitle{background:linear-gradient(115deg,#ffffff,#f5faff)}
+.driverVehicleRegisterWrap{width:100%;overflow-x:auto}
+.driverVehicleRegisterTable{min-width:880px}
+.driverVehicleRegisterTable td{vertical-align:middle}
+.driverVehicleListPhoto{display:block;width:72px;height:56px;object-fit:cover;border-radius:10px;border:1px solid #dce4ed;box-shadow:0 4px 10px #172f4b0d}
+.driverVehicleNoPhoto{display:inline-flex;min-height:43px;align-items:center;border-radius:9px;background:#f4f6f9;color:#8b98a8;font-size:11px;padding:8px 11px;white-space:nowrap}
+.driverVehicleAppCode{display:inline-flex;background:#f0f5fa;border:1px solid #dce5ee;color:#334c61;padding:7px 10px;border-radius:9px;font-size:12px;direction:ltr;unicode-bidi:plaintext;max-width:190px;overflow-wrap:anywhere}
+@media(max-width:760px){.driverVehicleRegisterPanel .driverRegisterPanelTitle{align-items:flex-start}.driverVehicleListPhoto{width:62px;height:52px}}
