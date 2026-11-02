@@ -23,6 +23,7 @@ type Props={
  values:DriverRegistrationValues;
  language:'ar'|'fr';
  isEdit:boolean;
+ mode?:'all'|'registration'|'legacy';
  onChange:(next:DriverRegistrationValues)=>void;
  onClose:()=>void;
  onSave:(photos:{person?:File;vehicle?:File})=>void|Promise<void>;
@@ -52,7 +53,7 @@ function normalizeDate(raw:string){
  if(local)return validISO(Number(local[3]),Number(local[2]),Number(local[1]));
  return '';
 }
-export default function DriverRegistrationDialog({values,language,isEdit,onChange,onClose,onSave,photoUrls}:Props){
+export default function DriverRegistrationDialog({values,language,isEdit,mode='all',onChange,onClose,onSave,photoUrls}:Props){
  const ar=language==='ar';
  const [busy,setBusy]=useState(false);
  const [error,setError]=useState('');
@@ -78,7 +79,7 @@ export default function DriverRegistrationDialog({values,language,isEdit,onChang
  const submit=async(event:FormEvent<HTMLFormElement>)=>{
   event.preventDefault();
   if(busy)return;
-  if(!values.name.trim()||!values.city?.trim()||!values.phone.trim()||!values.vehicleType?.trim()||!values.appCode?.trim()){
+  if(!values.name.trim()||(mode!=='legacy'&&(!values.city?.trim()||!values.phone.trim()||!values.vehicleType?.trim()||!values.appCode?.trim()))){
    setError(L('يرجى تعبئة الاسم والمدينة ونوع المركبة ورقم الهاتف وكود التطبيق.','Veuillez compléter le nom, la ville, le véhicule, le téléphone et le code d’application.'));return;
   }
   setError('');setBusy(true);
@@ -92,8 +93,8 @@ export default function DriverRegistrationDialog({values,language,isEdit,onChang
     <div className="driverEditorHeading">
      <span className="driverEditorHeroIcon"><UserRound size={23}/></span>
      <div><span className="driverEditorEyebrow">PRESTO · {L('إدارة السائقين','Gestion des livreurs')}</span>
-      <h2 id="driver-editor-title">{isEdit?L('تعديل بيانات السائق','Modifier le livreur'):L('تسجيل سائق ومركبة','Enregistrer un livreur et son véhicule')}</h2>
-      <p>{L('أضف بيانات السائق وصورته ومركبته في ملف واحد منظم.','Ajoutez le livreur, ses photos et son véhicule dans une seule fiche.')}</p>
+      <h2 id="driver-editor-title">{mode==='legacy'?L('سجل تسليم المعدات وحسابات الدفع','Registre des remises et paiements'):isEdit?L('تعديل بيانات السائق والمركبة','Modifier le livreur et le véhicule'):L('تسجيل سائق ومركبة','Enregistrer un livreur et son véhicule')}</h2>
+      <p>{mode==='legacy'?L('هذا القسم للمستلزمات والمدفوعات فقط، منفصل عن تسجيل المركبة.','Cette fiche concerne les équipements et les paiements, séparément du véhicule.'):L('أضف بيانات السائق وصورته ومركبته في ملف واحد منظم.','Ajoutez le livreur, ses photos et son véhicule dans une seule fiche.')}</p>
      </div>
     </div>
     <button type="button" className="driverEditorClose" onClick={onClose} aria-label={L('إغلاق','Fermer')} disabled={busy}><X size={19}/></button>
@@ -101,22 +102,22 @@ export default function DriverRegistrationDialog({values,language,isEdit,onChang
    <form className="driverEditorForm" onSubmit={submit}>
     <div className="modalBody driverEditorBody">
      <div className="driverEditorSection">
-      <div className="driverEditorSectionHead"><span className="driverEditorSectionIcon"><UserRound size={18}/></span><div><h3>{L('معلومات السائق','Informations du livreur')}</h3><p>{L('البيانات الأساسية وتاريخ التسليم','Coordonnées et date de remise')}</p></div></div>
+      <div className="driverEditorSectionHead"><span className="driverEditorSectionIcon"><UserRound size={18}/></span><div><h3>{L('معلومات السائق','Informations du livreur')}</h3><p>{mode==='registration'?L('الاسم والهاتف والمدينة وكود التطبيق','Nom, téléphone, ville et identifiant application'):L('البيانات الأساسية وتاريخ التسليم','Coordonnées et date de remise')}</p></div></div>
       <div className="driverEditorFieldGrid">
        <label className="driverEditorField"><span>{L('اسم السائق','Nom du livreur')} <b>*</b></span><div className="driverEditorInputWrap"><UserRound size={17}/><input required autoFocus maxLength={100} placeholder={L('الاسم الكامل للسائق','Nom complet du livreur')} value={values.name} onChange={e=>update('name',e.target.value)}/></div></label>
        <label className="driverEditorField"><span>{L('رقم الهاتف','Numéro de téléphone')}</span><div className="driverEditorInputWrap"><Phone size={17}/><input type="tel" dir="ltr" maxLength={30} placeholder="22 00 00 00" value={values.phone} onChange={e=>update('phone',e.target.value)}/></div></label>
-       <label className="driverEditorField"><span>{L('المدينة','Ville')} <b>*</b></span><div className="driverEditorInputWrap"><MapPin size={17}/><input required maxLength={90} placeholder={L('اختر أو أدخل المدينة','Saisissez la ville')} list="presto-cities" value={values.city||''} onChange={e=>update('city',e.target.value)}/><datalist id="presto-cities"><option value="نواكشوط"/><option value="نواذيبو"/><option value="Nouakchott"/><option value="Nouadhibou"/></datalist></div></label>
-       <label className="driverEditorField"><span>{L('كود التطبيق','Code application')} <b>*</b></span><div className="driverEditorInputWrap"><KeyRound size={17}/><input required maxLength={80} dir="ltr" autoComplete="off" placeholder={L('معرّف السائق في التطبيق (ليس كلمة المرور)','Identifiant du livreur (pas un mot de passe)')} value={values.appCode||''} onChange={e=>update('appCode',e.target.value)}/></div></label>
-       <div className="driverEditorField driverEditorDateField">
+       {mode!=='legacy'&&<label className="driverEditorField"><span>{L('المدينة','Ville')} <b>*</b></span><div className="driverEditorInputWrap"><MapPin size={17}/><input required maxLength={90} placeholder={L('اختر أو أدخل المدينة','Saisissez la ville')} list="presto-cities" value={values.city||''} onChange={e=>update('city',e.target.value)}/><datalist id="presto-cities"><option value="نواكشوط"/><option value="نواذيبو"/><option value="Nouakchott"/><option value="Nouadhibou"/></datalist></div></label>}
+       {mode!=='legacy'&&<label className="driverEditorField"><span>{L('كود التطبيق','Code application')} <b>*</b></span><div className="driverEditorInputWrap"><KeyRound size={17}/><input required maxLength={80} dir="ltr" autoComplete="off" placeholder={L('معرّف السائق في التطبيق (ليس كلمة المرور)','Identifiant du livreur (pas un mot de passe)')} value={values.appCode||''} onChange={e=>update('appCode',e.target.value)}/></div></label>}
+       {mode!=='registration'&&<div className="driverEditorField driverEditorDateField">
         <span>{L('تاريخ التسليم','Date de remise')}</span>
         <div className="driverEditorDateRow"><div className="driverEditorInputWrap driverEditorDateInput"><CalendarDays size={18}/><input ref={calendarRef} type="date" lang={ar?'ar':'fr'} dir="ltr" aria-label={L('تاريخ التسليم','Date de remise')} value={isoDate} onFocus={()=>{if(!isoDate)markToday()}} onClick={openPicker} onChange={e=>update('deliveryDate',e.target.value)}/></div><button className="driverEditorTodayBtn" type="button" onClick={markToday}><CalendarDays size={15}/>{L('اليوم','Aujourd’hui')}</button></div>
         <small>{L('اضغط على التاريخ لعرض تاريخ اليوم أو اختيار تاريخ آخر.','Cliquez pour afficher aujourd’hui ou choisir une autre date.')}</small>
         {values.deliveryDate&&!isoDate&&<small className="driverEditorDateLegacy">{L('التاريخ السابق: ','Ancienne date : ')}{values.deliveryDate}</small>}
-       </div>
-       <label className="driverEditorField driverEditorNotes"><span>{L('الملاحظات','Observations')}</span><div className="driverEditorInputWrap driverEditorTextArea"><FileText size={17}/><textarea maxLength={1000} rows={2} placeholder={L('ملاحظات إضافية (اختياري)','Remarques complémentaires (facultatif)')} value={values.observations} onChange={e=>update('observations',e.target.value)}/></div></label>
+       </div>}
+       {mode!=='registration'&&<label className="driverEditorField driverEditorNotes"><span>{L('الملاحظات','Observations')}</span><div className="driverEditorInputWrap driverEditorTextArea"><FileText size={17}/><textarea maxLength={1000} rows={2} placeholder={L('ملاحظات إضافية (اختياري)','Remarques complémentaires (facultatif)')} value={values.observations} onChange={e=>update('observations',e.target.value)}/></div></label>}
       </div>
      </div>
-     <div className="driverEditorSection driverVehicleSection">
+     {mode!=='legacy'&&<div className="driverEditorSection driverVehicleSection">
       <div className="driverEditorSectionHead"><span className="driverEditorSectionIcon"><Bike size={19}/></span><div><h3>{L('المركبة والصور','Véhicule et photos')}</h3><p>{L('الصور المحفوظة تظهر لاحقًا في الملف الشخصي','Les photos apparaissent dans la fiche personnelle')}</p></div></div>
       <label className="driverEditorField driverVehicleSelect"><span>{L('نوع المركبة','Type de véhicule')} <b>*</b></span><div className="driverEditorInputWrap"><Bike size={17}/><select required value={values.vehicleType||''} onChange={e=>update('vehicleType',e.target.value)}>
        <option value="">{L('اختر نوع المركبة','Choisir le véhicule')}</option>
@@ -138,8 +139,8 @@ export default function DriverRegistrationDialog({values,language,isEdit,onChang
        </label>)}
       </div>
       <p className="driverVehiclePhotoHelp">{L('JPG أو PNG أو WEBP · بحد أقصى 5 MB للصورة. كود التطبيق هو معرّف السائق وليس كلمة مرور الدخول.','JPG, PNG ou WEBP · maximum 5 Mo par photo. Le code d’application est un identifiant, pas un mot de passe.')}</p>
-     </div>
-     <div className="driverEditorSection">
+     </div>}
+     {mode!=='registration'&&<div className="driverEditorSection">
       <div className="driverEditorSectionHead"><span className="driverEditorSectionIcon"><ClipboardList size={18}/></span><div><h3>{L('المعدات والملف','Équipements et dossier')}</h3><p>{L('حدّد العناصر التي تم تسليمها أو توثيقها','Cochez les éléments remis ou vérifiés')}</p></div></div>
       <div className="driverEditorChecks">
        {([
@@ -148,8 +149,8 @@ export default function DriverRegistrationDialog({values,language,isEdit,onChang
         ['verified',L('ملف موثّق','Dossier vérifié')]
        ] as const).map(([k,label])=><label key={k} className={'driverEditorCheck '+(values[k]?'isChecked':'')}><span className="driverEditorCheckIcon"><CheckCircle2 size={17}/></span><span>{label}</span><input type="checkbox" checked={values[k]} onChange={e=>update(k,e.target.checked)} /></label>)}
       </div>
-     </div>
-     <div className="driverEditorSection">
+     </div>}
+     {mode!=='registration'&&<div className="driverEditorSection">
       <div className="driverEditorSectionHead"><span className="driverEditorSectionIcon"><Wallet size={18}/></span><div><h3>{L('الدفع الإلكتروني','Paiement électronique')}</h3><p>{L('كل وسيلة دفع لها رقم مستقل','Un numéro distinct pour chaque service')}</p></div><span className="driverEditorCount">{chosen}/4</span></div>
       <div className="driverEditorPayments">
        {paymentList.map(p=><div key={p.key} className={'driverEditorPayCard '+(values.payments[p.key]?'isActive':'')}>
@@ -160,12 +161,12 @@ export default function DriverRegistrationDialog({values,language,isEdit,onChang
         }}/></label>
        </div>)}
       </div>
-     </div>
+     </div>}
     </div>
     <footer className="modalActions driverEditorActions">
      <div className="driverEditorFooterHint"><CheckCircle2 size={16}/><span>{L('تُحفظ البيانات عند الضغط على حفظ','Enregistrement après validation')}</span></div>
      {error&&<span className="driverEditorError" role="alert">{error}</span>}
-     <div className="driverEditorFooterButtons"><button type="button" className="driverEditorCancel" disabled={busy} onClick={onClose}>{L('إلغاء','Annuler')}</button><button type="submit" className="driverEditorSave" disabled={busy||!values.name.trim()||!values.city?.trim()||!values.phone.trim()||!values.vehicleType?.trim()||!values.appCode?.trim()}><Check size={18}/>{busy?L('جار الحفظ...','Enregistrement...'):isEdit?L('حفظ التعديلات','Enregistrer les modifications'):L('حفظ السائق','Enregistrer le livreur')}</button></div>
+     <div className="driverEditorFooterButtons"><button type="button" className="driverEditorCancel" disabled={busy} onClick={onClose}>{L('إلغاء','Annuler')}</button><button type="submit" className="driverEditorSave" disabled={busy||!values.name.trim()||(mode!=='legacy'&&(!values.city?.trim()||!values.phone.trim()||!values.vehicleType?.trim()||!values.appCode?.trim()))}><Check size={18}/>{busy?L('جار الحفظ...','Enregistrement...'):isEdit?L('حفظ التعديلات','Enregistrer les modifications'):L('حفظ السائق','Enregistrer le livreur')}</button></div>
     </footer>
    </form>
   </section>
