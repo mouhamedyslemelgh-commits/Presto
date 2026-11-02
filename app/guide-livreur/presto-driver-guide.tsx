@@ -28,7 +28,7 @@ const selectNarrator=(available:SpeechSynthesisVoice[],uri:string)=>
 // Breaking long paragraphs into sentences avoids the robotic, uninterrupted monotone
 // and also makes narration more stable in Safari and on mobile devices.
 const speechPhrases=(text:string)=>{
- const sentences=text.replace(/\\s+/g,' ').trim().replace(/([.!؟؛])\\s+/g,'$1\\n').split('\\n').filter(Boolean);
+ const sentences=text.replace(/\s+/g,' ').trim().replace(/([.!؟؛])\s+/g,'$1\n').split('\n').filter(Boolean);
  const parts:string[]=[];
  for(const sentence of sentences){
   if(sentence.length<=185){parts.push(sentence);continue;}
