@@ -2,6 +2,7 @@
 import {useEffect,useRef,useState} from 'react';
 import {ArrowLeft,ArrowRight,BookOpen,Check,CheckCircle2,ChevronLeft,ChevronRight,CircleHelp,Clock3,Coins,Headphones,MapPin,Maximize2,Pause,Play,RefreshCw,ShieldCheck,Smartphone,Volume2,VolumeX,X,Route,Bike,PackageCheck,Wallet,AlertTriangle,GraduationCap,RotateCcw,Truck,Video,ClipboardCheck} from 'lucide-react';
 import {useLanguage} from './presto-language';
+import './presto-driver-training.css';
 
 type Scene={
  icon:string; ar:string;fr:string; arSub:string;frSub:string;
