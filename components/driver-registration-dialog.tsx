@@ -88,7 +88,36 @@ export default function DriverRegistrationDialog({values,language,isEdit,mode='a
   finally{setBusy(false);}
  };
  return <div className="modalWrap driverEditorOverlay" dir={ar?'rtl':'ltr'} onMouseDown={e=>{if(e.target===e.currentTarget&&!busy)onClose()}}>
-  <section className="modal driverEditorDialog" role="dialog" aria-modal="true" aria-labelledby="driver-editor-title">
+  <section data-registration={mode==='registration' || undefined} className="modal driverEditorDialog" role="dialog" aria-modal="true" aria-labelledby="driver-editor-title">
+   <style jsx global>{`
+    .driverEditorDialog[data-registration] .driverEditorHead {
+      background: #163b3b;
+      color: white;
+      border-bottom: 4px solid #ef784b;
+    }
+    .driverEditorDialog[data-registration] .driverEditorHead h2 {color: white}
+    .driverEditorDialog[data-registration] .driverEditorHead p,
+    .driverEditorDialog[data-registration] .driverEditorEyebrow {color: #d5e9e5}
+    .driverEditorDialog[data-registration] .driverEditorBody {background: #f3f7f6; counter-reset: registration-section}
+    .driverEditorDialog[data-registration] .driverEditorSection {background: white; border: 1px solid #d9e5e1; counter-increment: registration-section}
+    .driverEditorDialog[data-registration] .driverEditorSectionHead::after {
+      content: counter(registration-section, decimal-leading-zero);
+      margin-inline-start: auto;
+      color: #416a62;
+      font: 700 14px/1.5 system-ui;
+      letter-spacing: .08em;
+    }
+    .driverEditorDialog[data-registration] .driverEditorInputWrap:focus-within,
+    .driverEditorDialog[data-registration] .driverVehiclePhotoPicker:focus-within {outline: 2px solid #227566; outline-offset: 2px}
+    .driverEditorDialog[data-registration] .driverVehiclePhotoPreview {object-fit: contain; background: #eef4f2}
+    .driverEditorDialog[data-registration] .driverVehiclePhotoPlaceholder {background: #edf5f2; color: #47655e}
+    @media (max-width: 600px) {
+      .driverEditorDialog[data-registration] .driverEditorFieldGrid {grid-template-columns: minmax(0,1fr)}
+      .driverEditorDialog[data-registration] .driverEditorInputWrap :is(input,select) {font-size: 16px}
+      .driverEditorDialog[data-registration] .driverEditorFooterButtons {width: 100%}
+      .driverEditorDialog[data-registration] .driverEditorSave {flex: 1; min-height: 46px}
+    }
+   `}</style>
    <header className="modalHead driverEditorHead">
     <div className="driverEditorHeading">
      <span className="driverEditorHeroIcon"><UserRound size={23}/></span>
@@ -105,7 +134,7 @@ export default function DriverRegistrationDialog({values,language,isEdit,mode='a
       <div className="driverEditorSectionHead"><span className="driverEditorSectionIcon"><UserRound size={18}/></span><div><h3>{L('معلومات السائق','Informations du livreur')}</h3><p>{mode==='registration'?L('الاسم والهاتف والمدينة وكود التطبيق','Nom, téléphone, ville et identifiant application'):L('البيانات الأساسية وتاريخ التسليم','Coordonnées et date de remise')}</p></div></div>
       <div className="driverEditorFieldGrid">
        <label className="driverEditorField"><span>{L('اسم السائق','Nom du livreur')} <b>*</b></span><div className="driverEditorInputWrap"><UserRound size={17}/><input required autoFocus maxLength={100} placeholder={L('الاسم الكامل للسائق','Nom complet du livreur')} value={values.name} onChange={e=>update('name',e.target.value)}/></div></label>
-       <label className="driverEditorField"><span>{L('رقم الهاتف','Numéro de téléphone')}</span><div className="driverEditorInputWrap"><Phone size={17}/><input type="tel" dir="ltr" maxLength={30} placeholder="22 00 00 00" value={values.phone} onChange={e=>update('phone',e.target.value)}/></div></label>
+       <label className="driverEditorField"><span>{L('رقم الهاتف','Numéro de téléphone')} {mode==='registration'&&<b>*</b>}</span><div className="driverEditorInputWrap"><Phone size={17}/><input required={mode==='registration'} type="tel" dir="ltr" maxLength={30} placeholder="22 00 00 00" value={values.phone} onChange={e=>update('phone',e.target.value)}/></div></label>
        {mode!=='legacy'&&<label className="driverEditorField"><span>{L('المدينة','Ville')} <b>*</b></span><div className="driverEditorInputWrap"><MapPin size={17}/><input required maxLength={90} placeholder={L('اختر أو أدخل المدينة','Saisissez la ville')} list="presto-cities" value={values.city||''} onChange={e=>update('city',e.target.value)}/><datalist id="presto-cities"><option value="نواكشوط"/><option value="نواذيبو"/><option value="Nouakchott"/><option value="Nouadhibou"/></datalist></div></label>}
        {mode!=='legacy'&&<label className="driverEditorField"><span>{L('كود التطبيق','Code application')} <b>*</b></span><div className="driverEditorInputWrap"><KeyRound size={17}/><input required maxLength={80} dir="ltr" autoComplete="off" placeholder={L('معرّف السائق في التطبيق (ليس كلمة المرور)','Identifiant du livreur (pas un mot de passe)')} value={values.appCode||''} onChange={e=>update('appCode',e.target.value)}/></div></label>}
        {mode!=='registration'&&<div className="driverEditorField driverEditorDateField">
