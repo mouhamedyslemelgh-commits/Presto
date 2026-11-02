@@ -1,13 +1,13 @@
 'use client';
 import {useEffect,useState} from 'react';
-import {X,UserRound,Phone,CalendarDays,PackageCheck,Shirt,ClipboardCheck,Edit3,Save,Check,ShieldCheck,Wallet,Hash,StickyNote,ArrowUpRight} from 'lucide-react';
+import {X,UserRound,Phone,CalendarDays,PackageCheck,Shirt,ClipboardCheck,Edit3,Save,Check,ShieldCheck,Wallet,Hash,StickyNote,ArrowUpRight,Bike,MapPin,KeyRound} from 'lucide-react';
 import {useLanguage} from './presto-language';
 export type ProfilePayment='bankily'|'masrvi'|'sedad'|'click';
 export type ProfileDriver={
  id:number;name:string;phone:string;bag:boolean;shirt:boolean;verified:boolean;
  payments:Record<ProfilePayment,boolean>;
  paymentNumbers?:Partial<Record<ProfilePayment,string>>;
- deliveryDate?:string;observations?:string;
+ deliveryDate?:string;observations?:string;city?:string;vehicleType?:string;appCode?:string;driverPhotoPath?:string;vehiclePhotoPath?:string;
 };
 const providers:{key:ProfilePayment;name:string;accent:string;logo:string}[]=[
  {key:'bankily',name:'Bankily',accent:'#168f99',logo:'/logos/bankily.webp'},
@@ -15,8 +15,8 @@ const providers:{key:ProfilePayment;name:string;accent:string;logo:string}[]=[
  {key:'sedad',name:'Sedad',accent:'#26976a',logo:'/logos/sedad.webp'},
  {key:'click',name:'CLICK',accent:'#1681ad',logo:'/logos/click.webp'}
 ];
-type Props={driver:ProfileDriver;displayNumber?:number;onSave:(next:ProfileDriver)=>void|Promise<void>;onClose:()=>void;readOnly?:boolean;maskPhone?:boolean};
-export default function DriverProfile({driver,displayNumber,onSave,onClose,readOnly=false,maskPhone=false}:Props){
+type Props={driver:ProfileDriver;displayNumber?:number;onSave:(next:ProfileDriver)=>void|Promise<void>;onClose:()=>void;readOnly?:boolean;maskPhone?:boolean;photoUrls?:Record<string,string>};
+export default function DriverProfile({driver,displayNumber,onSave,onClose,readOnly=false,maskPhone=false,photoUrls={}}:Props){
  const {language,t}=useLanguage(),ar=language==='ar';
  const [draft,setDraft]=useState<ProfileDriver>({...driver,payments:{...driver.payments},paymentNumbers:{...driver.paymentNumbers}});
  const [editing,setEditing]=useState(false),[saving,setSaving]=useState(false),[error,setError]=useState('');
@@ -46,7 +46,7 @@ export default function DriverProfile({driver,displayNumber,onSave,onClose,readO
   <div className="driverProfileHero">
    <div className="driverProfileHeroGlow"/>
    <div className="driverProfileHeroTop"><span className="driverProfileEyebrow"><UserRound size={14}/>{ar?'ملف السائق الشخصي':'FICHE PERSONNELLE DU LIVREUR'}</span><button className="driverProfileClose" onClick={onClose} aria-label={ar?'إغلاق الملف':'Fermer la fiche'}><X size={20}/></button></div>
-   <div className="driverProfileHeroMain"><div className="driverProfileAvatar" style={{background:'#fff',overflow:'hidden'}}><img src="/images/presto-driver-standing.jpeg" alt={ar?'سائق بريستو مع الدراجة':'Livreur Presto avec sa moto'} width={1456} height={1080} style={{width:'100%',height:'100%',objectFit:'contain',display:'block'}}/></div><div className="driverProfileHeroText"><div className="driverProfileCode"><Hash size={12}/> PRESTO · {String(rank).padStart(2,'0')}</div><h2 id="driver-profile-heading">{draft.name}</h2><span className={'driverProfileState '+(complete?'complete':'pending')}><span className="driverProfileDot"/>{complete?(ar?'الملف مكتمل':'Dossier complet'):(ar?'يحتاج إلى متابعة':'Dossier à compléter')}</span></div></div>
+   <div className="driverProfileHeroMain"><div className="driverProfileAvatar" style={{background:'#fff',overflow:'hidden'}}><img src={(draft.driverPhotoPath&&photoUrls[draft.driverPhotoPath])||"/images/presto-driver-standing.jpeg"} alt={ar?'صورة السائق':'Photo du livreur'} width={1456} height={1080} style={{width:'100%',height:'100%',objectFit:draft.driverPhotoPath?'cover':'contain',display:'block'}}/></div><div className="driverProfileHeroText"><div className="driverProfileCode"><Hash size={12}/> PRESTO · {String(rank).padStart(2,'0')}</div><h2 id="driver-profile-heading">{draft.name}</h2><span className={'driverProfileState '+(complete?'complete':'pending')}><span className="driverProfileDot"/>{complete?(ar?'الملف مكتمل':'Dossier complet'):(ar?'يحتاج إلى متابعة':'Dossier à compléter')}</span></div></div>
    <div className="driverProfileHeroStats"><span><Wallet size={15}/>{ar?'حسابات نشطة':'Comptes actifs'} <strong>{active} / 4</strong></span><span><ShieldCheck size={15}/>{ar?'المعدات المسلّمة':'Équipements remis'} <strong>{Number(draft.bag)+Number(draft.shirt)} / 2</strong></span></div>
   </div>
   <div className="driverProfileBody">
@@ -54,12 +54,23 @@ export default function DriverProfile({driver,displayNumber,onSave,onClose,readO
    {editing?<div className="driverProfileFields">
     <label>{ar?'اسم السائق':'Nom du livreur'}<input maxLength={100} value={draft.name} onChange={e=>change('name',e.target.value)}/></label>
     <label>{ar?'رقم الهاتف الأساسي':'Téléphone principal'}<input dir="ltr" maxLength={30} value={draft.phone} onChange={e=>change('phone',e.target.value)}/></label>
+    <label>{ar?'المدينة':'Ville'}<input maxLength={90} value={draft.city||''} onChange={e=>change('city',e.target.value)}/></label>
+    <label>{ar?'كود التطبيق':'Code application'}<input dir="ltr" maxLength={80} value={draft.appCode||''} onChange={e=>change('appCode',e.target.value)}/></label>
+    <label>{ar?'نوع المركبة':'Véhicule'}<select value={draft.vehicleType||''} onChange={e=>change('vehicleType',e.target.value)}><option value="">{ar?'غير محدد':'Non précisé'}</option><option value="motorcycle">{ar?'دراجة نارية':'Moto'}</option><option value="car">{ar?'سيارة':'Voiture'}</option><option value="bicycle">{ar?'دراجة هوائية':'Vélo'}</option><option value="scooter">{ar?'سكوتر':'Scooter'}</option><option value="other">{ar?'مركبة أخرى':'Autre'}</option></select></label>
     <label>{ar?'تاريخ التسليم':'Date de remise'}<input value={draft.deliveryDate||''} onChange={e=>change('deliveryDate',e.target.value)} placeholder={ar?'يوم/شهر/سنة':'JJ/MM/AAAA'}/></label>
    </div>:<div className="driverProfileInfoGrid">
     {info('رقم الهاتف الأساسي','Téléphone principal',maskPhone&&draft.phone?'•••• ••••':draft.phone)}
+    {info('المدينة','Ville',draft.city||'')}
+    {info('المركبة','Véhicule',draft.vehicleType?({motorcycle:ar?'دراجة نارية':'Moto',car:ar?'سيارة':'Voiture',bicycle:ar?'دراجة هوائية':'Vélo',scooter:ar?'سكوتر':'Scooter',other:ar?'مركبة أخرى':'Autre'} as Record<string,string>)[draft.vehicleType]||draft.vehicleType:'')}
+    {info('كود التطبيق','Code application',draft.appCode||'')}
     {info('تاريخ التسليم','Date de remise',draft.deliveryDate||'')}
     {info('الترتيب في السجل','Rang du livreur',String(rank))}
    </div>}
+   <div className="driverProfileSectionTitle"><div className="driverProfileMiniIcon"><Bike size={18}/></div><div><h3>{ar?'السائق والمركبة':'Livreur et véhicule'}</h3><p>{ar?'الصور مرتبطة بسجل هذا السائق':'Photos associées à cette fiche'}</p></div></div>
+   <div className="driverProfileVehiclePhotos">
+    <div><span>{ar?'صورة السائق':'Photo du livreur'}</span>{draft.driverPhotoPath&&photoUrls[draft.driverPhotoPath]?<img src={photoUrls[draft.driverPhotoPath]} alt={ar?'السائق':'Livreur'}/>:<div className="driverProfileNoPhoto"><UserRound size={28}/>{ar?'لم تُرفع صورة':'Aucune photo'}</div>}</div>
+    <div><span>{ar?'صورة المركبة':'Photo du véhicule'}</span>{draft.vehiclePhotoPath&&photoUrls[draft.vehiclePhotoPath]?<img src={photoUrls[draft.vehiclePhotoPath]} alt={ar?'المركبة':'Véhicule'}/>:<div className="driverProfileNoPhoto"><Bike size={28}/>{ar?'لم تُرفع صورة':'Aucune photo'}</div>}</div>
+   </div>
    <div className="driverProfileSectionTitle"><div className="driverProfileMiniIcon"><PackageCheck size={18}/></div><div><h3>{ar?'المعدات والملف':'Équipements et dossier'}</h3><p>{ar?'حالة تسليم المستلزمات والتحقق من الملف':'Remise du matériel et vérification du dossier'}</p></div></div>
    <div className="driverProfileEquipment">{features.map(item=><div className={'driverProfileEquipmentCard '+(draft[item.key]?'isYes':'isNo')} key={item.key}><item.icon size={22}/><span>{ar?item.ar:item.fr}</span>{editing?<input type="checkbox" aria-label={ar?item.ar:item.fr} checked={draft[item.key]} onChange={e=>change(item.key,e.target.checked)}/>:<strong>{draft[item.key]?(ar?'تم':'Oui'):(ar?'لم يتم':'Non')}</strong>}</div>)}</div>
    <div className="driverProfileSectionTitle"><div className="driverProfileMiniIcon"><Wallet size={18}/></div><div><h3>{ar?'حسابات الدفع الإلكتروني':'Comptes Mobile Money'}</h3><p>{ar?'يمكن أن يكون لكل خدمة رقم حساب مختلف':'Chaque service peut avoir un numéro différent'}</p></div><span className="driverProfileCount">{active} / 4</span></div>
