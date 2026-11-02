@@ -4,6 +4,7 @@ import {useCallback,useEffect,useState} from 'react';
 import {prestoCloud} from '../lib/presto-cloud';
 import {savePrestoExcelSnapshot,downloadSavedPrestoExcel} from '../lib/presto-excel-cloud';
 import DriverProfile from '../components/driver-profile';
+import PrestoDriverTraining from '../components/presto-driver-training';
 import {usePrestoDashboardMotion} from '../components/motion/use-presto-dashboard-motion';
 import AnimatedMetric from '../components/motion/animated-metric';
 import PrestoSpotlightCard from '../components/ui/presto-spotlight-card';
@@ -15,7 +16,7 @@ import ExcelImporter from '../components/excel-importer';
 import ExcelExportDialog,{type ExcelExportScope} from '../components/excel-export-dialog';
 import {downloadPrestoXlsx} from '../lib/presto-excel-export';
 import {normalizeHeader,type ImportedDriver,type ImportMode} from '../lib/presto-excel';
-import {LayoutDashboard,Users,Package,Wallet,ChartNoAxesColumn,Settings,Bike,ArrowUpRight,Download,Plus,Search,Edit3,Trash2,Menu,X,Check,ShieldAlert,LogIn,LogOut,RefreshCw} from 'lucide-react';
+import {LayoutDashboard,Users,Package,Wallet,ChartNoAxesColumn,Settings,Video,Bike,ArrowUpRight,Download,Plus,Search,Edit3,Trash2,Menu,X,Check,ShieldAlert,LogIn,LogOut,RefreshCw} from 'lucide-react';
 type Pay='bankily'|'masrvi'|'sedad'|'click';
 type Row={id:number;name:string;phone:string;bag:boolean;shirt:boolean;verified:boolean;bankily:boolean;masrvi:boolean;sedad:boolean;click:boolean;bankily_account:string;masrvi_account:string;sedad_account:string;click_account:string;delivery_date:string;observations:string;city:string;vehicle_type:string;app_code:string;driver_photo_path:string;vehicle_photo_path:string};
 type View='dashboard'|'drivers'|'registration'|'equipment'|'mobile'|'reports'|'settings';
@@ -37,6 +38,7 @@ export default function SharedDashboard(){
  const [photoUrls,setPhotoUrls]=useState<Record<string,string>>({});
  const [rows,setRows]=useState<Row[]>([]),[view,setView]=useState<View>('dashboard'),[openMenu,setOpenMenu]=useState(false);
  const [selectedId,setSelectedId]=useState<number|null>(null);
+ const [showDriverTraining,setShowDriverTraining]=useState(false);
  const [loading,setLoading]=useState(true),[msg,setMsg]=useState(''),[search,setSearch]=useState(''),[editing,setEditing]=useState<Row|null>(null);
  const [dialogMode,setDialogMode]=useState<'registration'|'legacy'>('registration');
  const motionRoot=usePrestoDashboardMotion(view,loading);
@@ -290,7 +292,7 @@ export default function SharedDashboard(){
  const table=(items:Row[],preview=false,mode:'equipment'|'registration'='equipment')=> <DriverRegisterTable photoUrls={photoUrls} items={items} ranks={mode==='registration'?registrationPositions:positions} language={language} preview={preview} mode={mode} editable={admin} onOpen={setSelectedId} onEdit={d=>openEditor(d,mode==='registration'?'registration':'legacy')} onDelete={id=>void del(id)}/>;
  const titles:Record<View,string>={dashboard:'Pilotage des livreurs',drivers:'Registre des remises',registration:'Livreurs et véhicules',equipment:'Suivi des équipements',mobile:'Comptes Mobile Money',reports:'Rapports & analyses',settings:'Paramètres'};
  return <div ref={motionRoot} className="shell" dir={language==='ar'?'rtl':'ltr'}>
-  <aside className={'sidebar '+(openMenu?'open':'')}><div className="brand"><div className="brandImageFrame"><img src="/logos/presto.webp" alt="PRESTO بريستو" width={310} height={170}/></div><span className="brandSub">{t("OPERATIONS · LIVREURS")}</span></div><div className="sideCaption">{t("ESPACE DE TRAVAIL")}</div><nav>{menus.map(([v,title,Icon])=><button key={v} className={view===v?'selected':''} onClick={()=>go(v)}><Icon size={17}/>{t(title)}</button>)}</nav><div className="sideFoot"><small>{t("BASE PARTAGÉE")}</small><strong>{city}</strong><small>{company} · {t('Cloud Sync')}</small></div></aside>
+  <aside className={'sidebar '+(openMenu?'open':'')}><div className="brand"><div className="brandImageFrame"><img src="/logos/presto.webp" alt="PRESTO بريستو" width={310} height={170}/></div><span className="brandSub">{t("OPERATIONS · LIVREURS")}</span></div><div className="sideCaption">{t("ESPACE DE TRAVAIL")}</div><nav>{menus.map(([v,title,Icon])=><button key={v} className={view===v?'selected':''} onClick={()=>go(v)}><Icon size={17}/>{t(title)}</button>)}<button type="button" className="prestoAcademyNav" onClick={()=>{setShowDriverTraining(true);setOpenMenu(false)}}><Video size={18}/>{language==='ar'?'شرح استخدام تطبيق السائق':'Guide vidéo du livreur'}<span className="prestoAcademyNavMark">▶</span></button></nav><div className="sideFoot"><small>{t("BASE PARTAGÉE")}</small><strong>{city}</strong><small>{company} · {t('Cloud Sync')}</small></div></aside>
   {openMenu&&<div className="shade" onClick={()=>setOpenMenu(false)}/>}
   <div className="workspace"><header className="topbar"><button className="menuButton" onClick={()=>setOpenMenu(x=>!x)} aria-label={t("Ouvrir la navigation")}><Menu size={20}/></button><img className="mobileBrandLogo" src="/logos/presto.webp" alt="PRESTO" width={80} height={48}/><div>{t("Opérations /")}<b>{t("Tableau de bord")}</b></div><div className="topRight"><LanguageSwitcher/><span className="date">{t("Données partagées")}</span><span className="avatar">{t("OP")}</span></div></header>
   <main><div className="pageHead"><div><h1>{t(titles[view])}</h1><p>{t('Informations synchronisées entre tous les visiteurs')} · {t(loading?'Chargement...':'Actualisées automatiquement')}</p></div><div className="headActions">{view!=='registration'&&<ExcelImporter onImport={importDrivers} publicSite/>}{view==='drivers'&&<button className="primary" onClick={()=>openEditor(null,'legacy')}><Plus size={16}/>{language==='ar'?'إضافة سجل تسليم':'Ajouter une remise'}</button>}{view==='registration'&&<button className="primary" onClick={()=>openEditor(null,'registration')}><Plus size={16}/>{language==='ar'?'تسجيل سائق ومركبة':'Enregistrer livreur et véhicule'}</button>}{view!=='registration'&&<ExcelExportDialog drivers={rows} busy={exporting} onExport={exportXlsx}/>}</div></div>
@@ -332,5 +334,6 @@ export default function SharedDashboard(){
   bankily_account:next.paymentNumbers.bankily,masrvi_account:next.paymentNumbers.masrvi,
   sedad_account:next.paymentNumbers.sedad,click_account:next.paymentNumbers.click
  })} onClose={()=>setEditing(null)} onSave={save}/>}
+ {showDriverTraining&&<PrestoDriverTraining onClose={()=>setShowDriverTraining(false)}/>}
  </div>;
 }
