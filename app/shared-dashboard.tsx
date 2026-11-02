@@ -17,11 +17,11 @@ import {downloadPrestoXlsx} from '../lib/presto-excel-export';
 import {normalizeHeader,type ImportedDriver,type ImportMode} from '../lib/presto-excel';
 import {LayoutDashboard,Users,Package,Wallet,ChartNoAxesColumn,Settings,ArrowUpRight,Download,Plus,Search,Edit3,Trash2,Menu,X,Check,ShieldAlert,LogIn,LogOut,RefreshCw} from 'lucide-react';
 type Pay='bankily'|'masrvi'|'sedad'|'click';
-type Row={id:number;name:string;phone:string;bag:boolean;shirt:boolean;verified:boolean;bankily:boolean;masrvi:boolean;sedad:boolean;click:boolean;bankily_account:string;masrvi_account:string;sedad_account:string;click_account:string;delivery_date:string;observations:string};
+type Row={id:number;name:string;phone:string;bag:boolean;shirt:boolean;verified:boolean;bankily:boolean;masrvi:boolean;sedad:boolean;click:boolean;bankily_account:string;masrvi_account:string;sedad_account:string;click_account:string;delivery_date:string;observations:string;city:string;vehicle_type:string;app_code:string;driver_photo_path:string;vehicle_photo_path:string};
 type View='dashboard'|'drivers'|'equipment'|'mobile'|'reports'|'settings';
 const pays:[Pay,string,string,string][]=[['bankily','Bankily','BPM','#228e99'],['masrvi','Masrvi','BMCI','#6949a7'],['sedad','Sedad','BMI','#22966a'],['click','CLICK','BNM','#2480a9']];
 const menus:[View,string,typeof Users][]=[['dashboard',"Vue d’ensemble",LayoutDashboard],['drivers','Livreurs',Users],['equipment','Équipements',Package],['mobile','Mobile Money',Wallet],['reports','Rapports',ChartNoAxesColumn],['settings','Paramètres',Settings]];
-const emptyRow=():Row=>({id:0,name:'',phone:'',bag:false,shirt:false,verified:false,bankily:false,masrvi:false,sedad:false,click:false,bankily_account:'',masrvi_account:'',sedad_account:'',click_account:'',delivery_date:'',observations:''});
+const emptyRow=():Row=>({id:0,name:'',phone:'',bag:false,shirt:false,verified:false,bankily:false,masrvi:false,sedad:false,click:false,bankily_account:'',masrvi_account:'',sedad_account:'',click_account:'',delivery_date:'',observations:'',city:'',vehicle_type:'',app_code:'',driver_photo_path:'',vehicle_photo_path:''});
 const hasPay=(d:Row)=>d.bankily||d.masrvi||d.sedad||d.click;
 const complete=(d:Row)=>d.bag&&d.shirt&&d.verified&&hasPay(d);
 const mask=(e:unknown)=>String(e??'').replaceAll('"','""');
@@ -34,6 +34,7 @@ function downloadCSV(data:Row[]){
 }
 export default function SharedDashboard(){
  const {t,language}=useLanguage();
+ const [photoUrls,setPhotoUrls]=useState<Record<string,string>>({});
  const [rows,setRows]=useState<Row[]>([]),[view,setView]=useState<View>('dashboard'),[openMenu,setOpenMenu]=useState(false);
  const [selectedId,setSelectedId]=useState<number|null>(null);
  const [loading,setLoading]=useState(true),[msg,setMsg]=useState(''),[search,setSearch]=useState(''),[editing,setEditing]=useState<Row|null>(null);
@@ -49,7 +50,7 @@ export default function SharedDashboard(){
   if(!prestoCloud)return;
   const all:Row[]=[];
   for(let i=0;i<10000;i+=1000){
-   const {data,error}=await prestoCloud.from('presto_drivers').select('id,name,phone,bag,shirt,verified,bankily,masrvi,sedad,click,bankily_account,masrvi_account,sedad_account,click_account,delivery_date,observations').order('id',{ascending:true}).range(i,i+999);
+   const {data,error}=await prestoCloud.from('presto_drivers').select('id,name,phone,bag,shirt,verified,bankily,masrvi,sedad,click,bankily_account,masrvi_account,sedad_account,click_account,delivery_date,observations,city,vehicle_type,app_code,driver_photo_path,vehicle_photo_path').order('id',{ascending:true}).range(i,i+999);
    if(error){setMsg(t('Erreur de synchronisation : ')+error.message);setLoading(false);return;}
    const chunk=(data??[]) as Row[];all.push(...chunk);
    if(chunk.length<1000)break;
@@ -71,6 +72,27 @@ export default function SharedDashboard(){
   const interval=setInterval(()=>{void load()},5000);
   return ()=>{active=false;clearInterval(interval);listener.subscription.unsubscribe()};
  },[load]);
+ useEffect(()=>{
+  if(!prestoCloud)return;
+  let active=true;
+  const paths=[...new Set(rows.flatMap(d=>[d.driver_photo_path,d.vehicle_photo_path]).filter(Boolean))].filter(path=>!photoUrls[path]);
+  if(paths.length)void Promise.all(paths.map(async path=>{
+   const {data,error}=await prestoCloud.storage.from('presto-driver-photos').createSignedUrl(path,86400);
+   return {path,url:error?'':(data?.signedUrl||'')};
+  })).then(result=>{
+   if(active)setPhotoUrls(previous=>({...previous,...Object.fromEntries(result.filter(r=>r.url).map(r=>[r.path,r.url]))}));
+  });
+  return ()=>{active=false};
+ },[rows,photoUrls]);
+ const uploadDriverPhoto=async(file:File,kind:'drivers'|'vehicles')=>{
+  if(!prestoCloud)throw Error('Connexion à la base indisponible.');
+  if(!['image/jpeg','image/png','image/webp'].includes(file.type)||file.size>5*1024*1024)throw Error('Photo non valide (5 Mo maximum).');
+  const ext=file.type==='image/png'?'png':file.type==='image/webp'?'webp':'jpg';
+  const path=kind+'/'+crypto.randomUUID()+'.'+ext;
+  const {error}=await prestoCloud.storage.from('presto-driver-photos').upload(path,file,{contentType:file.type,upsert:false});
+  if(error)throw Error('Erreur lors de l’envoi de la photo : '+error.message);
+  return path;
+ };
  const mirrorExcel=async()=>{
   setExcelStatus('saving');
   try{
@@ -97,16 +119,18 @@ export default function SharedDashboard(){
   if(!admin){setMsg('Connexion administrateur obligatoire pour modifier les données.');return;}
   try{const {error}=await job();if(error){setMsg(t('Échec de sauvegarde : ')+error.message);return;}await load();await mirrorExcel();}catch(e){setMsg(t('Impossible de contacter la base partagée.'))}
  };
- const save=async()=>{
-  if(!editing?.name.trim()||!admin||!prestoCloud)return;
+ const save=async(photos:{person?:File;vehicle?:File}={})=>{
+  if(!editing||!admin||!prestoCloud)throw Error('Connexion requise.');
+  if(!editing.name.trim()||!editing.phone.trim()||!editing.city.trim()||!editing.vehicle_type.trim()||!editing.app_code.trim())throw Error(language==='ar'?'أكمل بيانات السائق والمركبة المطلوبة.':'Complétez les informations obligatoires.');
   const {id,...rest}=editing;
-  const data={...rest,name:rest.name.trim()};
-  let ok=false;
-  await mutate(async()=>{
-   const result=id?await prestoCloud.from('presto_drivers').update(data).eq('id',id):await prestoCloud.from('presto_drivers').insert(data);
-   ok=!result.error;return result;
-  });
-  if(ok)setEditing(null);
+  const data={...rest,name:rest.name.trim(),phone:rest.phone.trim(),city:rest.city.trim(),app_code:rest.app_code.trim()};
+  if(photos.person)data.driver_photo_path=await uploadDriverPhoto(photos.person,'drivers');
+  if(photos.vehicle)data.vehicle_photo_path=await uploadDriverPhoto(photos.vehicle,'vehicles');
+  const response=id?await prestoCloud.from('presto_drivers').update(data).eq('id',id):await prestoCloud.from('presto_drivers').insert(data);
+  if(response.error)throw Error(response.error.message);
+  setEditing(null);
+  await load();
+  void mirrorExcel();
  };
  const importDrivers=async(items:ImportedDriver[],mode:ImportMode)=>{
   if(!prestoCloud||!admin)throw Error('Connexion administrateur obligatoire.');
@@ -256,9 +280,9 @@ export default function SharedDashboard(){
  const pct=(v:number)=>totals.all?Math.round(v/totals.all*1000)/10:0;
  const orderedRows=[...rows].sort((a,b)=>a.id-b.id);
  const positions=new Map<number,number>(orderedRows.map((d,i)=>[d.id,i+1]));
- const filtered=orderedRows.filter(d=>[d.name,d.phone,positions.get(d.id)].join(' ').toLowerCase().includes(search.trim().toLowerCase()));
+ const filtered=orderedRows.filter(d=>[d.name,d.phone,d.city,d.vehicle_type,d.app_code,positions.get(d.id)].join(' ').toLowerCase().includes(search.trim().toLowerCase()));
  const go=(v:View)=>{setView(v);setOpenMenu(false);setSearch('')};
- const table=(items:Row[],preview=false)=> <DriverRegisterTable items={items} ranks={positions} language={language} preview={preview} editable={admin} onOpen={setSelectedId} onEdit={d=>setEditing({...d})} onDelete={id=>void del(id)}/>;
+ const table=(items:Row[],preview=false)=> <DriverRegisterTable photoUrls={photoUrls} items={items} ranks={positions} language={language} preview={preview} editable={admin} onOpen={setSelectedId} onEdit={d=>setEditing({...d})} onDelete={id=>void del(id)}/>;
  const titles:Record<View,string>={dashboard:'Pilotage des livreurs',drivers:'Registre des livreurs',equipment:'Suivi des équipements',mobile:'Comptes Mobile Money',reports:'Rapports & analyses',settings:'Paramètres'};
  return <div ref={motionRoot} className="shell" dir={language==='ar'?'rtl':'ltr'}>
   <aside className={'sidebar '+(openMenu?'open':'')}><div className="brand"><div className="brandImageFrame"><img src="/logos/presto.webp" alt="PRESTO بريستو" width={310} height={170}/></div><span className="brandSub">{t("OPERATIONS · LIVREURS")}</span></div><div className="sideCaption">{t("ESPACE DE TRAVAIL")}</div><nav>{menus.map(([v,title,Icon])=><button key={v} className={view===v?'selected':''} onClick={()=>go(v)}><Icon size={17}/>{t(title)}</button>)}</nav><div className="sideFoot"><small>{t("BASE PARTAGÉE")}</small><strong>{city}</strong><small>{company} · {t('Cloud Sync')}</small></div></aside>
@@ -288,13 +312,14 @@ export default function SharedDashboard(){
 
   <section className="settingsCard opsDangerCard"><div className="settingsCardHead"><span className="settingsIcon"><RefreshCw size={20}/></span><div><h3>{t("Effacer le registre partagé")}</h3><p>{t("Cette action supprime les fiches pour tous les visiteurs.")}</p></div></div><button className="settingsDangerButton" disabled={!admin} onClick={()=>{if(!prestoCloud||!window.confirm(t('Effacer TOUS les livreurs pour TOUS les visiteurs ?')))return;void mutate(()=>prestoCloud.from('presto_drivers').delete().gte('id',1))}}><Trash2 size={16}/>{t("Supprimer tous les livreurs")}</button></section></div>}
   </main></div>
-  {selectedId!==null&&rows.some(d=>d.id===selectedId)&&(()=>{const d=rows.find(x=>x.id===selectedId)!;return <DriverProfile key={d.id} displayNumber={positions.get(d.id)||d.id} driver={{id:d.id,name:d.name,phone:d.phone,bag:d.bag,shirt:d.shirt,verified:d.verified,payments:{bankily:d.bankily,masrvi:d.masrvi,sedad:d.sedad,click:d.click},paymentNumbers:{bankily:d.bankily_account,masrvi:d.masrvi_account,sedad:d.sedad_account,click:d.click_account},deliveryDate:d.delivery_date,observations:d.observations}} onClose={()=>setSelectedId(null)} readOnly={!admin} onSave={async next=>{if(!prestoCloud||!admin)throw Error("Accès administrateur requis.");const {error}=await prestoCloud.from("presto_drivers").update({name:next.name,phone:next.phone,bag:next.bag,shirt:next.shirt,verified:next.verified,bankily:next.payments.bankily,masrvi:next.payments.masrvi,sedad:next.payments.sedad,click:next.payments.click,bankily_account:next.paymentNumbers?.bankily||"",masrvi_account:next.paymentNumbers?.masrvi||"",sedad_account:next.paymentNumbers?.sedad||"",click_account:next.paymentNumbers?.click||"",delivery_date:next.deliveryDate||"",observations:next.observations||""}).eq("id",next.id);if(error)throw Error(error.message);await load();await mirrorExcel();}}/>})()}
+  {selectedId!==null&&rows.some(d=>d.id===selectedId)&&(()=>{const d=rows.find(x=>x.id===selectedId)!;return <DriverProfile key={d.id} displayNumber={positions.get(d.id)||d.id} driver={{id:d.id,name:d.name,phone:d.phone,bag:d.bag,shirt:d.shirt,verified:d.verified,payments:{bankily:d.bankily,masrvi:d.masrvi,sedad:d.sedad,click:d.click},paymentNumbers:{bankily:d.bankily_account,masrvi:d.masrvi_account,sedad:d.sedad_account,click:d.click_account},deliveryDate:d.delivery_date,observations:d.observations,city:d.city,vehicleType:d.vehicle_type,appCode:d.app_code,driverPhotoPath:d.driver_photo_path,vehiclePhotoPath:d.vehicle_photo_path}} photoUrls={photoUrls} onClose={()=>setSelectedId(null)} readOnly={!admin} onSave={async next=>{if(!prestoCloud||!admin)throw Error("Accès administrateur requis.");const {error}=await prestoCloud.from("presto_drivers").update({name:next.name,phone:next.phone,bag:next.bag,shirt:next.shirt,verified:next.verified,bankily:next.payments.bankily,masrvi:next.payments.masrvi,sedad:next.payments.sedad,click:next.payments.click,bankily_account:next.paymentNumbers?.bankily||"",masrvi_account:next.paymentNumbers?.masrvi||"",sedad_account:next.paymentNumbers?.sedad||"",click_account:next.paymentNumbers?.click||"",delivery_date:next.deliveryDate||"",observations:next.observations||"",city:next.city||"",vehicle_type:next.vehicleType||"",app_code:next.appCode||""}).eq("id",next.id);if(error)throw Error(error.message);await load();await mirrorExcel();}}/>})()}
  {editing&&admin&&<DriverRegistrationDialog language={language} isEdit={editing.id>0} values={{
-  name:editing.name,phone:editing.phone,deliveryDate:editing.delivery_date||'',observations:editing.observations||'',
+  name:editing.name,phone:editing.phone,city:editing.city,vehicleType:editing.vehicle_type,appCode:editing.app_code,driverPhotoPath:editing.driver_photo_path,vehiclePhotoPath:editing.vehicle_photo_path,deliveryDate:editing.delivery_date||'',observations:editing.observations||'',
   bag:editing.bag,shirt:editing.shirt,verified:editing.verified,
   payments:{bankily:editing.bankily,masrvi:editing.masrvi,sedad:editing.sedad,click:editing.click},
   paymentNumbers:{bankily:editing.bankily_account||'',masrvi:editing.masrvi_account||'',sedad:editing.sedad_account||'',click:editing.click_account||''}
- }} onChange={next=>setEditing({...editing,
+ }} photoUrls={{person:photoUrls[editing.driver_photo_path],vehicle:photoUrls[editing.vehicle_photo_path]}} onChange={next=>setEditing({...editing,
+  city:next.city||'',vehicle_type:next.vehicleType||'',app_code:next.appCode||'',
   name:next.name,phone:next.phone,delivery_date:next.deliveryDate,observations:next.observations,
   bag:next.bag,shirt:next.shirt,verified:next.verified,
   bankily:next.payments.bankily,masrvi:next.payments.masrvi,sedad:next.payments.sedad,click:next.payments.click,
