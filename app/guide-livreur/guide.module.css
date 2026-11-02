@@ -224,3 +224,49 @@
 .testVoiceButton:hover{background:#ffe9d5}
 .voiceTestRow p{flex:1;min-width:180px;font-size:11px;line-height:1.75;margin:0;color:#708498}
 @media(max-width:630px){.voiceTestRow{align-items:flex-start;flex-direction:column}.voiceTestRow p{min-width:0}.voiceNoteTag{font-size:9px}}
+
+
+/* PRESTO Academy — wide cinematic step-by-step narrator */
+.playerGrid{max-width:1560px;grid-template-columns:minmax(0,1fr) minmax(270px,315px);gap:20px;align-items:start}
+.player{border-radius:22px;box-shadow:0 24px 65px #132b431c}
+.filmHeader{height:51px;gap:12px;padding:0 20px}
+.filmPosition{margin-inline-start:auto;direction:ltr;white-space:nowrap;color:#d3e1ed}
+.filmHeader .filmAction{border:1px solid #425368;background:#22394d;border-radius:8px;width:31px;height:31px;display:grid;place-items:center;color:#dae6f1;cursor:pointer;flex-shrink:0}
+.filmHeader .filmAction:hover{background:#f47c47;color:#fff;border-color:#fa9d65}
+.cinemaStage{position:relative;overflow:hidden;background:#0d2337}
+.cinemaStage .visualWorld{min-height:555px;background:radial-gradient(ellipse at 52% 34%,#265277 0%,#112a44 48%,#07192a 100%)}
+.cinemaStage .phone{transform:scale(1.2);animation:phoneStageIn .55s cubic-bezier(.2,.9,.2,1) both;box-shadow:0 42px 90px #001123dc,0 0 0 2px #9ca7b166}
+.cinemaStage .callout{max-width:215px;right:30px;bottom:80px;padding:18px;border-radius:16px;box-shadow:0 18px 44px #020e1cb0}
+.cinemaStage .callout strong{font-size:15px}
+.cinemaStage .callout>span:last-child{font-size:11px}
+.cinemaStage .mapPath{animation:route 1.4s ease both,routePulse 3s ease-in-out infinite 1.4s}
+.cinemaStage .financeBoard{transform:scale(1.06);max-width:655px}
+.cinemaStage .twoApps{transform:scale(1.08)}
+.stageLabel{position:absolute;z-index:7;top:21px;left:21px;display:flex;align-items:center;gap:10px;max-width:min(310px,38%);color:#fff;pointer-events:none;background:#061625b5;border:1px solid #ffffff29;padding:10px 14px;border-radius:13px;backdrop-filter:blur(7px);box-shadow:0 8px 23px #0002}
+.stageNumber{width:34px;height:34px;flex-shrink:0;border-radius:10px;display:grid;place-items:center;background:#f27241;font-size:14px;font-weight:950}
+.stageLabel small{color:#acc1d4;display:block;font-size:10px;margin-bottom:4px}
+.stageLabel strong{font-size:12px;line-height:1.5;font-weight:900;display:block}
+.liveCaptions{position:relative;display:flex;align-items:center;gap:15px;padding:18px 24px;background:linear-gradient(115deg,#101f32,#1a344b);border-top:1px solid #435b6c;color:#f9fbfd;min-height:93px}
+.liveCaptions p{flex:1;margin:0;font-weight:800;font-size:15px;line-height:1.85;min-width:0;text-align:center}
+.captionMic{display:grid;place-items:center;flex:0 0 34px;width:34px;height:34px;border-radius:10px;background:#ffffff19;color:#f5a570}
+.audioWaves{display:flex;align-items:center;gap:3px;flex:0 0 auto}
+.audioWaves i{height:13px;width:3px;border-radius:3px;background:#ffae7d;animation:waveCaption 1.25s ease-in-out infinite alternate}
+.audioWaves i:nth-child(2){height:21px;animation-delay:.24s}.audioWaves i:nth-child(3){height:9px;animation-delay:.49s}
+.caption{padding:22px 26px 9px}
+.caption h2{font-size:23px}
+.caption p{font-size:13px;color:#708497}
+.theaterMode{display:flex;flex-direction:column;max-width:1250px;align-items:stretch}
+.theaterMode .player{width:100%}
+.theaterMode .sidePanel{width:100%}
+.theaterMode .playlist{max-height:250px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:3px;padding:10px}
+.theaterMode .cinemaStage .visualWorld{min-height:670px}
+.theaterMode .cinemaStage .phone{animation:phoneStageIn .55s ease both}
+@keyframes phoneStageIn{from{transform:scale(1.05) translateY(15px);opacity:0}to{transform:scale(1.2);opacity:1}}
+@keyframes waveCaption{from{transform:scaleY(.45)}to{transform:scaleY(1.1)}}
+@keyframes routePulse{50%{opacity:.5}}
+@media(max-width:1080px){.playerGrid{grid-template-columns:1fr}.cinemaStage .visualWorld{min-height:535px}.theaterMode .playlist{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:700px){.playerGrid{padding:0 9px}.filmHeader{height:44px;padding:0 12px;gap:8px}.cinemaStage .visualWorld{min-height:460px}.cinemaStage .phone{animation:mobileStageIn .5s ease both}.cinemaStage .callout{right:10px;bottom:35px;max-width:136px;padding:10px}.cinemaStage .callout strong{font-size:11px}.cinemaStage .callout>span:last-child{font-size:9px}.stageLabel{top:10px;left:10px;padding:8px;max-width:47%}.stageLabel strong{font-size:10px}.stageLabel small{font-size:9px}.stageNumber{width:28px;height:28px;font-size:12px}.liveCaptions{padding:13px 12px;min-height:84px;gap:7px}.liveCaptions p{font-size:12px;line-height:1.85}.captionMic{flex-basis:28px;width:28px;height:28px}.theaterMode .cinemaStage .visualWorld{min-height:500px}}
+@media(max-width:400px){.cinemaStage .visualWorld{min-height:445px}.cinemaStage .phone{animation:mobileStageInSmall .45s ease both}.cinemaStage .callout{max-width:110px;bottom:22px}.liveCaptions p{font-size:11px}.theaterMode .playlist{grid-template-columns:1fr}}
+@keyframes mobileStageIn{from{transform:scale(.92) translateY(12px);opacity:0}to{transform:scale(1.03);opacity:1}}
+@keyframes mobileStageInSmall{from{transform:scale(.83) translateY(12px);opacity:0}to{transform:scale(.93);opacity:1}}
+@media(prefers-reduced-motion:reduce){.cinemaStage .phone,.cinemaStage .mapPath,.audioWaves i{animation:none!important}}
