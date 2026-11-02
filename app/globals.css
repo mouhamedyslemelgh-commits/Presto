@@ -1250,3 +1250,8 @@ html[dir="rtl"] .modalBody,html[dir="rtl"] .settingsCard{line-height:1.7}
 .standaloneEquipmentCard h2{margin:0;font-size:1.15rem}
 .standaloneEquipmentCard header button,.equipmentCardLink{border:0;border-radius:8px;padding:6px 10px;cursor:pointer;font:inherit}
 .equipmentCardLink{display:block;margin-block-start:5px;background:#fff0e4;color:#833404;font-size:0.83rem;font-weight:700}
+
+/* Animated driver guide route in sidebar */
+.sidebar nav a.prestoAcademyNav{display:flex;align-items:center;gap:12px;min-height:46px;padding:12px 13px;border-radius:11px;text-decoration:none;font-size:13px;font-weight:800;line-height:1.45;white-space:normal}
+.sidebar nav a.prestoAcademyNav:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.sidebar nav a.prestoAcademyNav svg{flex-shrink:0}
