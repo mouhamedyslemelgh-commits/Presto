@@ -124,12 +124,21 @@ export default function PrestoDriverGuide(){
  const [seconds,setSeconds]=useState(0);
  const [voiceId,setVoiceId]=useState('');
  const [voiceError,setVoiceError]=useState('');
+ const [spokenCaption,setSpokenCaption]=useState('');
+ const [captionVisible,setCaptionVisible]=useState(true);
  const [voices,setVoices]=useState<SpeechSynthesisVoice[]>([]);
  const [speed,setSpeed]=useState(.96);
  const [showScript,setShowScript]=useState(true);
  const [quizOpen,setQuizOpen]=useState(false);
  const [quizAnswers,setQuizAnswers]=useState<Record<number,number>>({});
- const token=useRef(0),active=useRef(false),playHandler=useRef<(n:number,l:GuideLang)=>void>(()=>{});
+
+ // The narrator owns the timeline: a scene advances only after its final spoken
+ // phrase, never because an approximate duration expired.
+ const token=useRef(0),active=useRef(false);
+ const playHandler=useRef<(n:number,l:GuideLang)=>void>(()=>{});
+ const speechMode=useRef<'voice'|'timed'>('timed');
+ const utteranceRef=useRef<SpeechSynthesisUtterance|null>(null);
+ const phraseRef=useRef(0),phraseCountRef=useRef(1);
  const synth=()=>typeof window!=='undefined'&&'speechSynthesis' in window?window.speechSynthesis:null;
  useEffect(()=>{
   const s=synth();if(!s)return;
@@ -139,77 +148,114 @@ export default function PrestoDriverGuide(){
  },[]);
  const filteredVoices=voices.filter(v=>v.lang.toLowerCase().startsWith(lang==='ar'?'ar':'fr')).sort((a,b)=>voiceRank(b)-voiceRank(a));
  const chosenVoice=selectNarrator(filteredVoices,voiceId);
+
  playHandler.current=(next,language)=>{
   const n=Math.max(0,Math.min(next,guideLessons.length-1));
   const thisToken=++token.current;
   const speech=synth();speech?.cancel();
-  setVoiceError('');setIndex(n);setSeconds(0);setPlaying(true);active.current=true;setQuizOpen(false);
-  if(!speech||!speakingEnabled)return;
+  active.current=true;
+  setIndex(n);setSeconds(0);setPlaying(true);setQuizOpen(false);setVoiceError('');
+  const phrases=speechPhrases(trans(language,guideLessons[n].narrationAr,guideLessons[n].narrationFr));
+  phraseRef.current=0;phraseCountRef.current=phrases.length;
+  setSpokenCaption(phrases[0]||'');
+  if(!speech||!speakingEnabled){speechMode.current='timed';return;}
   const available=speech.getVoices().filter(v=>v.lang.toLowerCase().startsWith(language==='ar'?'ar':'fr'));
   const choice=selectNarrator(available,voiceId);
-  const phrases=speechPhrases(trans(language,guideLessons[n].narrationAr,guideLessons[n].narrationFr));
+  speechMode.current='voice';
   let phraseIndex=0;
-  const nextPhrase=()=>{
+  const speakNext=()=>{
    if(thisToken!==token.current||!active.current)return;
+   if(phraseIndex>=phrases.length){
+    if(n+1<guideLessons.length)playHandler.current(n+1,language);
+    else{active.current=false;setPlaying(false);setSeconds(estimatedSeconds[n]);}
+    return;
+   }
+   phraseRef.current=phraseIndex;
+   setSpokenCaption(phrases[phraseIndex]);
    const utter=new SpeechSynthesisUtterance(phrases[phraseIndex]);
+   utteranceRef.current=utter; // keep alive on iOS Safari
    if(choice)utter.voice=choice;
    utter.lang=choice?.lang||(language==='ar'?'ar-SA':'fr-FR');
    utter.rate=speed;utter.pitch=1;utter.volume=1;
-   utter.onend=()=>{
-    if(thisToken!==token.current||!active.current)return;
-    phraseIndex+=1;
-    if(phraseIndex<phrases.length){nextPhrase();return;}
-    if(n+1<guideLessons.length)playHandler.current(n+1,language);
-    else{active.current=false;setPlaying(false);setSeconds(estimatedSeconds[n]);}
+   utter.onboundary=e=>{
+    if(token.current!==thisToken||!active.current)return;
+    const pct=(phraseIndex+Math.min(1,e.charIndex/Math.max(1,phrases[phraseIndex].length)))/phrases.length;
+    setSeconds(v=>Math.max(v,estimatedSeconds[n]*pct));
    };
-   utter.onerror=event=>{
-    if(thisToken!==token.current||!active.current||event.error==='interrupted'||event.error==='canceled')return;
-    setVoiceError(language==='ar'?'تعذر تشغيل الصوت على هذا الجهاز. جرّب صوتاً آخر أو متصفح Edge.':'La voix ne fonctionne pas sur cet appareil. Essaie une autre voix ou Edge.');
-    active.current=false;setPlaying(false);
+   utter.onend=()=>{
+    if(token.current!==thisToken||!active.current)return;
+    setSeconds(v=>Math.max(v,estimatedSeconds[n]*(phraseIndex+1)/phrases.length));
+    phraseIndex++;
+    speakNext();
+   };
+   utter.onerror=e=>{
+    if(token.current!==thisToken||!active.current||e.error==='interrupted'||e.error==='canceled')return;
+    // A browser voice can fail mid-playback. Continue the visual tour
+    // automatically rather than leaving the driver stuck on this scene.
+    speechMode.current='timed';
+    setVoiceError(trans(language,'تعذّر صوت الجهاز؛ سيواصل الشرح المرئي تلقائيًا.','Voix indisponible : la présentation continue automatiquement.'));
    };
    speech.speak(utter);
   };
-  nextPhrase();
+  speakNext();
  };
  const jump=(n:number,autoplay=playing,language=lang)=>{
-  ++token.current;synth()?.cancel();active.current=false;
-  setIndex(Math.max(0,Math.min(guideLessons.length-1,n)));setSeconds(0);
-  if(autoplay)playHandler.current(n,language);else setPlaying(false);
+  ++token.current;
+  active.current=false;utteranceRef.current=null;synth()?.cancel();
+  const target=Math.max(0,Math.min(guideLessons.length-1,n));
+  setIndex(target);setSeconds(0);setSpokenCaption('');
+  if(autoplay)playHandler.current(target,language);
+  else setPlaying(false);
  };
  const togglePlayback=()=>{
-  const s=synth();
-  if(playing){active.current=false;setPlaying(false);s?.pause();return;}
-  if(s?.paused&&s.speaking){active.current=true;s.resume();setPlaying(true);return;}
+  const speech=synth();
+  if(playing){
+   active.current=false;setPlaying(false);
+   if(speechMode.current==='voice')speech?.pause();
+   return;
+  }
+  if(speechMode.current==='voice'&&speech?.paused&&speech.speaking){
+   active.current=true;speech.resume();setPlaying(true);return;
+  }
   playHandler.current(index,lang);
  };
+ // A visual-only fallback uses time. During spoken playback this interval
+ // updates the progress bar but CANNOT skip or interrupt the narration.
  useEffect(()=>{
   if(!playing)return;
-  const started=Date.now()-seconds*1000;
+  let last=Date.now();
   const timer=setInterval(()=>{
-   const current=(Date.now()-started)/1000;
-   const duration=estimatedSeconds[index];
-   if(current>=duration){
-    const s=synth();
-    if(!speakingEnabled||!s||(!s.speaking&&!s.pending)){
-     if(index<guideLessons.length-1)playHandler.current(index+1,lang);
-     else{active.current=false;setPlaying(false);setSeconds(duration);}
-    }else setSeconds(Math.min(duration,current));
-   }else setSeconds(current);
-  },350);
+   const now=Date.now(),delta=(now-last)/1000;last=now;
+   if(speechMode.current==='timed'){
+    setSeconds(current=>{
+     const next=current+delta;
+     if(next>=estimatedSeconds[index]){
+      if(index+1<guideLessons.length)playHandler.current(index+1,lang);
+      else{active.current=false;setPlaying(false);}
+      return estimatedSeconds[index];
+     }
+     return next;
+    });
+   }else{
+    const phraseCap=estimatedSeconds[index]*(phraseRef.current+.95)/Math.max(1,phraseCountRef.current);
+    setSeconds(current=>Math.min(phraseCap,current+delta*.25));
+   }
+  },300);
   return()=>clearInterval(timer);
  },[playing,index,lang,speakingEnabled]);
- useEffect(()=>()=>{active.current=false;token.current++;synth()?.cancel()},[]);
+ useEffect(()=>()=>{active.current=false;token.current++;utteranceRef.current=null;synth()?.cancel()},[]);
  const switchLang=()=>{const other:GuideLang=lang==='ar'?'fr':'ar';setLang(other);setVoiceId('');jump(index,playing,other)};
  const testNarrator=()=>{
-  const speech=synth();if(!speech){setVoiceError(trans(lang,'المتصفح لا يدعم تشغيل الأصوات.','La synthèse vocale est indisponible.'));return;}
-  token.current+=1;active.current=false;setPlaying(false);speech.cancel();setSeconds(0);
+  const speech=synth();
+  if(!speech){setVoiceError(trans(lang,'المتصفح لا يدعم تشغيل الأصوات.','La synthèse vocale est indisponible.'));return;}
+  token.current++;active.current=false;setPlaying(false);utteranceRef.current=null;speech.cancel();setSeconds(0);
   const sample=trans(lang,'أهلاً بك في بريستو. اليوم سأشرح لك كيف تستلم طلبك، وتفتح الخريطة، وتحسب أرباحك. خطوة بخطوة، وبكل وضوح.','Bienvenue chez Presto. Je vais t’expliquer comment recevoir une commande, ouvrir la carte et comprendre tes gains, étape par étape.');
-  const u=new SpeechSynthesisUtterance(sample);
+  const utter=new SpeechSynthesisUtterance(sample);
   const available=speech.getVoices().filter(v=>v.lang.toLowerCase().startsWith(lang==='ar'?'ar':'fr'));
   const choice=selectNarrator(available,voiceId);
-  if(choice)u.voice=choice;
-  u.lang=choice?.lang||(lang==='ar'?'ar-SA':'fr-FR');u.rate=speed;u.pitch=1;u.volume=1;
-  speech.speak(u);
+  if(choice)utter.voice=choice;
+  utter.lang=choice?.lang||(lang==='ar'?'ar-SA':'fr-FR');utter.rate=speed;utter.pitch=1;utter.volume=1;
+  utteranceRef.current=utter;speech.speak(utter);
  };
  const lesson=guideLessons[index];
  const category=chapters.find(c=>c.key===lesson.chapter)!;
