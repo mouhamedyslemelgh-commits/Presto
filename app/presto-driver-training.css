@@ -1,0 +1,166 @@
+/* PRESTO Academy — responsive training theatre */
+.trainingOverlay{position:fixed;inset:0;z-index:9999;background:rgba(7,14,25,.75);backdrop-filter:blur(12px);display:grid;place-items:center;padding:18px}
+.trainingModal{width:min(1400px,100%);height:min(94dvh,980px);background:#f7f8fb;border-radius:24px;overflow:auto;box-shadow:0 38px 110px #02091499;overscroll-behavior:contain}
+.prestoTrainingRoot{--t-orange:#f84e18;--t-navy:#101a29;background:#f7f8fb;color:#142438;min-height:100%;padding:27px clamp(16px,3vw,42px) 16px;font-family:inherit;isolation:isolate}
+.trainingHead{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:24px}
+.trainingBrand{display:flex;align-items:center;gap:19px;min-width:0}
+.trainingBrandLogo{width:74px;height:74px;flex:0 0 74px;display:grid;place-items:center;background:#f84e18;border-radius:18px;overflow:hidden;box-shadow:0 14px 30px #f84e1833}
+.trainingBrandLogo img{width:100%;height:100%;object-fit:contain}
+.trainingOverline{display:block;color:#f25e35;font-size:10px;font-weight:900;letter-spacing:1.4px;text-transform:uppercase;margin-bottom:6px}
+.trainingBrand h1{font-size:clamp(21px,2.1vw,30px);letter-spacing:-.45px;line-height:1.25;margin:0 0 5px;font-weight:900;color:#132439}
+.trainingBrand p{font-size:12px;color:#798799;line-height:1.7;margin:0}
+.trainingClose{height:43px;width:43px;flex:0 0 43px;border-radius:13px;display:grid;place-items:center;background:#fff;border:1px solid #e2e8f0;color:#526679;text-decoration:none;transition:.2s}
+.trainingClose:hover{color:#ea5225;background:#fff4ee;border-color:#ffd8c6}
+.trainingLayout{display:grid;grid-template-columns:minmax(0,1fr) 310px;gap:22px;align-items:start}
+.trainingMain{min-width:0}
+.trainingCinema{background:#0d1421;border-radius:22px;overflow:hidden;box-shadow:0 15px 45px #152b4333;border:1px solid #152334}
+.trainingStage{position:relative;min-height:415px;aspect-ratio:16 / 9;display:flex;flex-direction:column;justify-content:space-between;overflow:hidden;background:radial-gradient(ellipse 85% 95% at 76% 50%,#f86827 0%,#f34412 44%,#d8290c 100%);color:#fff}
+.trainingStageGrid{position:absolute;inset:-20%;background-image:linear-gradient(#fff 1px,transparent 1px),linear-gradient(90deg,#fff 1px,transparent 1px);background-size:65px 65px;opacity:.055;transform:perspective(480px) rotateX(27deg);pointer-events:none}
+.trainingStage::before{content:'';position:absolute;width:48%;aspect-ratio:1;border-radius:100%;right:-12%;top:-38%;border:80px solid #ffffff0d;pointer-events:none}
+.trainingStage::after{content:'';position:absolute;inset:0;background:linear-gradient(95deg,#b1211100 45%,#ffb05015);pointer-events:none}
+.trainingStageTop,.trainingStageBottom{z-index:3;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.trainingStageTop{padding:24px 30px}
+.trainingStageTop span{font-size:11px;font-weight:900;letter-spacing:1.3px;display:inline-flex;align-items:center;gap:9px}
+.trainingStageTop small{font-weight:900;letter-spacing:2px;background:#ffffff24;padding:8px 12px;border-radius:30px;font-size:11px}
+.trainingLiveDot{width:8px;height:8px;border-radius:50%;background:#fff;box-shadow:0 0 0 5px #fff3}
+.trainingStageBottom{padding:14px 30px 22px;background:linear-gradient(transparent,#76200d28);font-weight:800;font-size:10px;letter-spacing:1px}
+.trainingStageBottom span:first-child{display:inline-flex;gap:7px;align-items:center}
+.trainingStageBottom span:last-child{opacity:.7}
+.trainingStageBody{position:relative;z-index:2;display:grid;grid-template-columns:minmax(0,1fr) minmax(240px,43%);align-items:center;gap:12px;min-height:0;padding:0 35px 8px;flex:1}
+.trainingStageCopy{animation:trainingPop .55s both;position:relative;z-index:2}
+.trainingStepEyebrow{display:inline-block;background:#fff2;color:#fff;border:1px solid #ffffff55;font-size:11px;padding:8px 13px;border-radius:100px;font-weight:900;letter-spacing:1px}
+.trainingStageCopy h2{font-size:clamp(26px,3.7vw,49px);font-weight:950;line-height:1.22;max-width:590px;margin:16px 0;color:#fff;letter-spacing:-.7px;text-wrap:balance;text-shadow:0 3px 16px #9b210c42}
+.trainingStageCopy p{font-size:clamp(12px,1.3vw,17px);line-height:1.95;font-weight:650;max-width:570px;margin:0;color:#fffdf0}
+.trainingArt{position:relative;display:grid;place-items:center;height:100%;min-height:255px;pointer-events:none;animation:trainingFly .8s .1s both}
+.trainingHeroArt{position:relative;display:grid;place-items:center;width:270px;height:270px}
+.trainingHeroOrbit{position:absolute;inset:14px;border:1px dashed #ffffff95;border-radius:50%;animation:trainingRotate 34s linear infinite;box-shadow:0 0 0 28px #fff1,0 0 0 55px #fff1}
+.trainingHeroBike{display:grid;place-items:center;gap:4px;width:185px;height:185px;background:linear-gradient(135deg,#fff,#fff5e9);color:#ec4919;border-radius:33px;box-shadow:0 32px 70px #841b1277;transform:rotate(-5deg);animation:trainingFloat 4s ease-in-out infinite}
+.trainingHeroBike span{font-size:20px;font-weight:1000;letter-spacing:2px}
+.trainingHeroBubble{position:absolute;width:50px;height:50px;display:grid;place-items:center;background:#fff;color:#f45622;border-radius:16px;box-shadow:0 10px 24px #741d1959}
+.trainingHeroBubble.b1{top:-2px;left:2px;transform:rotate(-15deg)}
+.trainingHeroBubble.b2{bottom:6px;left:-20px;transform:rotate(15deg)}
+.trainingHeroBubble.b3{top:24px;right:-10px;transform:rotate(14deg)}
+.trainingFlow{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:320px;width:100%}
+.trainingFlowStep{display:grid;place-items:center;position:relative;gap:8px;min-height:98px;border:1px solid #fff7;background:#fff3;border-radius:16px;padding:12px;text-align:center;animation:trainingPop .6s both}
+.trainingFlowStep>span{width:42px;height:42px;background:#fff;color:#f45b2a;border-radius:12px;display:grid;place-items:center}
+.trainingFlowStep small{font-size:11px;font-weight:800}
+.trainingFlowStep b{position:absolute;top:40%;right:-11px;font-size:25px;z-index:2}
+.trainingRates{display:grid;grid-template-columns:92px 1fr;gap:14px;width:min(335px,100%);align-items:stretch}
+.trainingRateHeadline{background:#fff;color:#eb4012;border-radius:19px;display:flex;align-items:center;justify-content:center;flex-direction:column;padding:8px;box-shadow:0 15px 40px #95250e33}
+.trainingRateHeadline strong{font-size:38px;font-weight:1000}
+.trainingRateHeadline span{font-size:12px;font-weight:900}
+.trainingRateRows{display:grid;gap:6px}
+.trainingRateRows>div{display:flex;justify-content:space-between;gap:8px;align-items:center;border:1px solid #fff7;border-radius:9px;background:#fff3;padding:8px 11px;font-size:12px;animation:trainingPop .5s both}
+.trainingRateRows b{color:#fff;white-space:nowrap}
+.trainingPhoneArea{position:relative;min-width:270px;min-height:282px;display:grid;place-items:center}
+.trainingDevice{width:216px;height:318px;background:#fff;color:#15243c;border-radius:27px;box-shadow:0 28px 50px #75180e77;padding:13px 11px;transform:rotate(3deg);position:relative;z-index:2;animation:trainingFloat 5s ease-in-out infinite}
+.trainingPhoneTop{display:flex;justify-content:space-between;color:#eb4217;font-weight:1000;letter-spacing:1.6px;padding:2px 5px 7px;font-size:11px}
+.trainingPhoneTop i{width:44px;height:6px;background:#dee3eb;border-radius:99px}
+.trainingPhoneTitle{font-size:11px;font-weight:950;padding:5px 3px}
+.trainingPhoneItems{display:grid;gap:4px}
+.trainingPhoneItems>div{display:flex;align-items:center;gap:7px;background:#f3f5f8;border:1px solid #f0f2f5;border-radius:7px;padding:7px 6px;font-size:9px}
+.trainingPhoneItems>div span{flex:0 0 17px;height:17px;background:#dce3ed;border-radius:5px;display:grid;place-items:center;font-size:9px;font-weight:900}
+.trainingPhoneItems>div b{font-size:9px;font-weight:800;flex:1}
+.trainingPhoneItems>div.lit{background:#fff0e8;border-color:#ff8f61;color:#eb4315;transform:scale(1.035);box-shadow:0 3px 10px #ef744430}
+.trainingPhoneItems>div.lit span{background:#ee501b;color:#fff}
+.trainingPhoneBottom{width:70px;height:4px;background:#aab4c4;position:absolute;bottom:7px;left:calc(50% - 35px);border-radius:20px}
+.trainingRouteGraph{position:absolute;inset:0;transform:rotate(-15deg);display:flex;align-items:center}
+.trainingRouteGraph i{height:5px;width:76px;background:repeating-linear-gradient(90deg,#fff 0 13px,transparent 13px 23px);opacity:.8}
+.trainingMapPoint{width:37px;height:37px;background:#fff;color:#ec4d19;border-radius:12px;display:grid;place-items:center}
+.trainingMoneyArt{width:100%;max-width:340px;display:grid;gap:20px}
+.trainingMoneyFormula{display:flex;align-items:center;justify-content:space-evenly;background:#fff;border-radius:17px;padding:19px 7px;color:#16314b;box-shadow:0 15px 40px #8a211344;gap:5px;direction:ltr}
+.trainingMoneyFormula span,.trainingMoneyFormula strong{font-size:23px;font-weight:1000;white-space:nowrap}
+.trainingMoneyFormula strong{color:#ee4215}
+.trainingMoneyFormula small{font-size:9px}
+.trainingMoneyNotes{display:flex;gap:9px}
+.trainingMoneyNotes span{flex:1;background:#fff3;border:1px solid #fff5;border-radius:11px;padding:11px;display:grid;place-items:center;text-align:center;gap:8px;font-size:11px;font-weight:900}
+.trainingRulesArt{display:grid;gap:11px;width:100%;max-width:340px}
+.trainingRulesArt>div{display:flex;align-items:center;gap:14px;border-radius:14px;background:#fff3;border:1px solid #fff6;padding:12px;font-size:12px;animation:trainingPop .6s both}
+.trainingRulesArt span{display:grid;place-items:center;border-radius:10px;background:#fff;color:#ec4319;font-size:21px;font-weight:1000;min-width:38px;height:38px}
+.trainingRulesArt strong{font-weight:850}
+.trainingPlayerControls{background:#0f1826;color:#d6dfed;padding:0 21px 13px}
+.trainingSeek{height:16px;position:relative;display:flex;align-items:center}
+.trainingSeek input{width:100%;height:6px;appearance:none;background:#405065;border-radius:6px;cursor:pointer;outline:none;position:relative;z-index:2;opacity:.85}
+.trainingSeek input::-webkit-slider-thumb{appearance:none;width:13px;height:13px;border-radius:100%;background:#ff6b32;border:2px solid white;cursor:pointer}
+.trainingSeek input::-moz-range-thumb{width:11px;height:11px;border:2px solid white;background:#ff6b32;border-radius:50%}
+.trainingSeekFill{position:absolute;z-index:1;background:#f76b38;height:6px;left:0;top:5px;border-radius:6px;pointer-events:none}
+.trainingControlRow{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:9px}
+.trainingControlStart,.trainingControlEnd{display:flex;align-items:center;gap:10px}
+.trainingControlRow button{display:grid;place-items:center;background:transparent;color:#c7d1df;border:0;border-radius:9px;width:34px;height:34px}
+.trainingControlRow button:hover:not(:disabled){background:#263448;color:#fff}
+.trainingControlRow button:disabled{opacity:.28;cursor:not-allowed}
+.trainingControlRow button.trainingPlay{width:42px;height:42px;background:#f25b25;color:#fff;border-radius:13px}
+.trainingTime{font-size:11px;font-variant-numeric:tabular-nums;letter-spacing:.3px;color:#aab6c6;white-space:nowrap}
+.trainingVoicetag{display:inline-flex;align-items:center;gap:5px;font-size:10px;color:#acb9ca}
+.trainingNarration{display:flex;align-items:flex-start;gap:15px;margin-top:16px;padding:18px 20px;border-radius:17px;background:#fff;border:1px solid #e9edf3;box-shadow:0 7px 24px #142f4610}
+.trainingNarrationIcon{flex:0 0 41px;height:41px;display:grid;place-items:center;border-radius:12px;background:#fff0e9;color:#f45f2a}
+.trainingNarration strong{display:block;font-size:13px;margin:2px 0 5px}
+.trainingNarration p{font-size:13px;line-height:1.95;margin:0;color:#64758a}
+.trainingMainBottom{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:15px;flex-wrap:wrap}
+.trainingMainBottom>span{display:inline-flex;gap:8px;align-items:center;font-size:11px;color:#78899a}
+.trainingTakeQuiz{display:inline-flex;gap:9px;align-items:center;justify-content:center;background:#f4531b;color:white;border:0;border-radius:12px;padding:13px 17px;font-weight:900;font-size:12px;box-shadow:0 9px 20px #f4531b2d;transition:.2s;text-decoration:none}
+.trainingTakeQuiz:hover:not(:disabled){background:#e34113;transform:translateY(-1px)}
+.trainingTakeQuiz:disabled{opacity:.45;cursor:not-allowed}
+.trainingSidebar{background:#fff;border:1px solid #e5eaf1;border-radius:18px;padding:17px;box-shadow:0 8px 30px #1731490b}
+.trainingSideTitle{display:flex;align-items:center;justify-content:space-between;margin:2px 3px 14px;color:#f06331}
+.trainingSideTitle h3{margin:0;font-size:17px;color:#24374b}
+.trainingChapters{display:grid;gap:5px;max-height:590px;overflow:auto;scrollbar-width:thin}
+.trainingChapters>button{position:relative;display:flex;align-items:center;text-align:start;gap:11px;border-radius:12px;border:1px solid transparent;padding:11px 10px;background:transparent;color:#273b53;width:100%;transition:.18s}
+.trainingChapters>button:hover{background:#f7f8fb}
+.trainingChapters>button.active{border-color:#ffdfd2;background:#fff2e9}
+.trainingChapterNumber{height:37px;width:37px;flex:0 0 37px;border-radius:10px;background:#f0f3f7;display:grid;place-items:center;color:#95a3b5;font-size:11px;font-weight:900}
+.trainingChapters>button.active .trainingChapterNumber{background:#f35621;color:#fff}
+.trainingChapters>button>span:nth-child(2){min-width:0;flex:1}
+.trainingChapters strong{display:block;font-size:11px;line-height:1.5;font-weight:900}
+.trainingChapters small{display:block;font-size:10px;color:#94a2b2;margin-top:3px;direction:ltr;text-align:start}
+.trainingChapterActive{width:7px;height:7px;border-radius:50%;background:#f55b2a}
+.trainingSideHint{display:flex;gap:9px;align-items:flex-start;padding:14px;background:#f4f7fa;border-radius:11px;margin-top:15px;color:#698095}
+.trainingSideHint svg{flex:0 0 auto;color:#f25a27}
+.trainingSideHint p{font-size:11px;line-height:1.7;margin:0}
+.trainingFooter{display:flex;justify-content:space-between;gap:9px;flex-wrap:wrap;font-size:10px;color:#96a1ae;margin-top:25px;border-top:1px solid #e9edf3;padding-top:13px}
+.trainingQuiz{max-width:1100px;margin:auto}
+.trainingQuizTitle{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:20px}
+.trainingQuizTitle h2{margin:0;font-size:27px}
+.trainingQuizTitle p{margin:8px 0 0;color:#7d8da0;font-size:13px;line-height:1.7}
+.trainingBackVideo{display:inline-flex;align-items:center;gap:8px;background:#fff;color:#274052;border:1px solid #e0e7ef;padding:12px;border-radius:11px;font-weight:850;white-space:nowrap}
+.trainingQuizProgress{display:flex;gap:18px;align-items:center;padding:12px 16px;border-radius:12px;background:#fff;border:1px solid #e5ecf3;margin-bottom:17px}
+.trainingQuizProgress span{white-space:nowrap;font-size:12px;font-weight:900}
+.trainingQuizProgress>div{height:9px;flex:1;background:#ecf1f6;border-radius:10px;overflow:hidden}
+.trainingQuizProgress i{display:block;height:100%;background:#f65b29;transition:width .2s}
+.trainingQuestions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.trainingQuestion{border-radius:16px;padding:17px;background:white;border:1px solid #e5ebf2;box-shadow:0 5px 12px #142a3f0b}
+.trainingQuestion.correct{border-color:#93dfbb}
+.trainingQuestion.incorrect{border-color:#f0bf99}
+.trainingQuestionTitle{display:flex;align-items:flex-start;gap:10px;margin-bottom:13px}
+.trainingQuestionTitle span{width:30px;height:30px;background:#fff0e8;color:#f05b2a;display:grid;place-items:center;flex:0 0 30px;border-radius:10px;font-size:12px;font-weight:1000}
+.trainingQuestionTitle h3{margin:2px 0 0;font-size:14px;line-height:1.7;color:#24384f}
+.trainingOptions{display:grid;gap:6px}
+.trainingOptions button{border:1px solid #e5ebf1;background:#fafbfd;border-radius:10px;text-align:start;padding:9px 11px;display:flex;align-items:center;gap:8px;font-size:12px;color:#405369;line-height:1.5;transition:.15s}
+.trainingOptions button:not(:disabled):hover{background:#fff6f0;border-color:#f7c5ae}
+.trainingOptions button.chosen{border-color:#f58756;background:#fff5ee}
+.trainingOptions button.right{border-color:#65cc9b;background:#eafaf2;color:#186b40}
+.trainingOptions button.wrong{border-color:#ef9393;background:#fff0f0;color:#a42f37}
+.trainingOptions button>span{background:#edf1f6;border-radius:6px;width:24px;height:24px;flex:0 0 24px;display:grid;place-items:center;font-size:11px;font-weight:900}
+.trainingOptions button svg{margin-inline-start:auto;flex:0 0 auto}
+.trainingExplanation{display:flex;gap:7px;align-items:flex-start;margin:13px 0 0;background:#f5f8fb;border-radius:9px;padding:10px;font-size:11px;color:#52687e;line-height:1.8}
+.trainingExplanation svg{flex:0 0 auto}
+.trainingQuizFooter{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-top:20px}
+.trainingQuizFooter>span{font-size:11px;color:#8894a4}
+.trainingQuizResult{display:flex;align-items:center;gap:17px;background:linear-gradient(110deg,#f35822,#ec3216);color:#fff;border-radius:17px;padding:20px;margin-bottom:18px;box-shadow:0 12px 25px #e9492430}
+.trainingQuizResult>div{flex:1}
+.trainingQuizResult small{display:block;font-size:11px;opacity:.85}
+.trainingQuizResult strong{font-size:35px;font-weight:1000}
+.trainingQuizResult p{margin:3px 0 0;font-size:12px;line-height:1.6}
+.trainingQuizResult button{border:1px solid #fff9;color:#fff;background:#fff2;padding:10px 12px;border-radius:10px;font-weight:850;display:flex;align-items:center;gap:8px}
+.trainingFullPageLink{display:flex;align-items:center;gap:8px;padding:12px 14px;border:1px solid #f9d1ba;border-radius:11px;background:#fff4ec;color:#c84c20;text-decoration:none;font-size:12px;font-weight:900;width:max-content}
+[dir=ltr] .trainingControlStart>button:nth-child(2) svg{transform:scaleX(-1)}
+[dir=ltr] .trainingControlStart>button:nth-child(3) svg{transform:scaleX(-1)}
+[dir=rtl] .trainingSeekFill{left:auto;right:0}
+@keyframes trainingPop{from{opacity:0;transform:translateY(19px) scale(.95)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes trainingFly{from{opacity:0;transform:translateX(27px) scale(.94)}to{opacity:1;transform:translateX(0) scale(1)}}
+@keyframes trainingFloat{50%{transform:translateY(-9px) rotate(1deg)}}
+@keyframes trainingRotate{to{transform:rotate(360deg)}}
+@media(max-width:1160px){.trainingLayout{grid-template-columns:minmax(0,1fr) 260px}.trainingStage{min-height:350px}.trainingStageBody{padding:0 22px}.trainingStageCopy h2{font-size:31px}.trainingArt{transform:scale(.85)}.trainingStageTop,.trainingStageBottom{padding-inline:18px}}
+@media(max-width:930px){.trainingLayout{grid-template-columns:1fr}.trainingSidebar{order:-1}.trainingChapters{display:flex;overflow:auto;max-height:none;gap:8px;padding-bottom:8px}.trainingChapters>button{flex:0 0 190px}.trainingSideHint{display:none}.trainingStage{min-height:380px}.trainingArt{transform:none}.trainingStageCopy h2{font-size:35px}}
+@media(max-width:620px){.trainingOverlay{padding:0}.trainingModal{width:100%;height:100dvh;border-radius:0}.prestoTrainingRoot{padding:16px 12px}.trainingBrand{gap:11px}.trainingBrandLogo{width:50px;height:50px;flex-basis:50px;border-radius:12px}.trainingBrand h1{font-size:17px}.trainingBrand p{font-size:10px;line-height:1.4}.trainingOverline{font-size:9px;letter-spacing:.5px}.trainingHead{margin-bottom:15px}.trainingClose{height:38px;width:38px;flex-basis:38px}.trainingSidebar{padding:10px;border-radius:12px}.trainingSideTitle{margin:0 3px 10px}.trainingSideTitle h3{font-size:14px}.trainingChapters>button{flex-basis:160px;padding:8px}.trainingChapterNumber{height:29px;width:29px;flex-basis:29px}.trainingStage{min-height:0;aspect-ratio:1 / 1.07}.trainingStageTop{padding:14px}.trainingStageTop small{font-size:9px;padding:6px}.trainingStageTop span{font-size:9px}.trainingStageBody{display:flex;flex-direction:column;align-items:stretch;justify-content:center;gap:7px;padding:0 16px}.trainingStageCopy h2{font-size:clamp(22px,6vw,29px);margin:9px 0}.trainingStageCopy p{font-size:11px;line-height:1.6}.trainingStepEyebrow{font-size:9px;padding:5px 9px}.trainingArt{min-height:0;height:180px;transform:scale(.75)}.trainingStageBottom{padding:10px 14px;font-size:8px}.trainingHeroArt{transform:scale(.72)}.trainingPhoneArea{transform:scale(.62);margin:-48px 0}.trainingRates{transform:scale(.85)}.trainingFlow{transform:scale(.82)}.trainingMoneyArt{transform:scale(.82)}.trainingRulesArt{transform:scale(.85)}.trainingStageBottom span:last-child{display:none}.trainingPlayerControls{padding:0 10px 9px}.trainingControlStart,.trainingControlEnd{gap:2px}.trainingVoicetag{display:none}.trainingControlRow{gap:4px}.trainingControlRow button{width:30px;height:32px}.trainingControlRow button.trainingPlay{width:38px;height:38px}.trainingTime{font-size:10px}.trainingNarration{padding:12px;gap:8px}.trainingNarrationIcon{flex-basis:32px;height:32px}.trainingNarration p{font-size:11px}.trainingMainBottom{align-items:stretch}.trainingTakeQuiz{width:100%;min-height:45px}.trainingQuestions{grid-template-columns:1fr}.trainingQuizTitle{display:block}.trainingQuizTitle h2{font-size:20px}.trainingBackVideo{margin-top:13px}.trainingQuizResult{flex-wrap:wrap}.trainingQuizResult strong{font-size:28px}.trainingQuizResult button{width:100%;justify-content:center}}
+@media(prefers-reduced-motion:reduce){.trainingStageCopy,.trainingArt,.trainingHeroOrbit,.trainingHeroBike,.trainingFlowStep,.trainingRateRows>div,.trainingDevice,.trainingRulesArt>div{animation:none!important}.trainingTakeQuiz{transition:none}}
