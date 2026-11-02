@@ -1,6 +1,7 @@
 'use client';
 import {useEffect,useState} from 'react';
 import {X,UserRound,Phone,CalendarDays,PackageCheck,Shirt,ClipboardCheck,Edit3,Save,Check,ShieldCheck,Wallet,Hash,StickyNote,ArrowUpRight,Bike,MapPin,KeyRound} from 'lucide-react';
+import EquipmentCard from './equipment-card';
 import {useLanguage} from './presto-language';
 export type ProfilePayment='bankily'|'masrvi'|'sedad'|'click';
 export type ProfileDriver={
@@ -51,6 +52,7 @@ export default function DriverProfile({driver,displayNumber,onSave,onClose,readO
   </div>
   <div className="driverProfileBody">
    <div className="driverProfileToolbar"><div><span className="driverProfileSectionOverline">PRESTO / {ar?'السائقون':'LIVREURS'}</span><h3>{ar?'تفاصيل السائق':'Informations du livreur'}</h3></div>{!readOnly&&<button className={editing?'driverProfileCancel':'driverProfileEdit'} onClick={()=>{setEditing(!editing);setDraft({...driver,payments:{...driver.payments},paymentNumbers:{...driver.paymentNumbers}});setError('')}}><Edit3 size={15}/>{editing?(ar?'إلغاء التعديل':'Annuler'):(ar?'تعديل الملف':'Modifier la fiche')}</button>}</div>
+   {!editing&&<EquipmentCard driver={driver} photo={driver.driverPhotoPath?photoUrls[driver.driverPhotoPath]:undefined} ar={ar} maskPhone={maskPhone}/>}
    {editing?<div className="driverProfileFields">
     <label>{ar?'اسم السائق':'Nom du livreur'}<input maxLength={100} value={draft.name} onChange={e=>change('name',e.target.value)}/></label>
     <label>{ar?'رقم الهاتف الأساسي':'Téléphone principal'}<input dir="ltr" maxLength={30} value={draft.phone} onChange={e=>change('phone',e.target.value)}/></label>

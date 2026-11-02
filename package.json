@@ -16,6 +16,7 @@
     "@supabase/supabase-js": "2.118.0",
     "read-excel-file": "9.3.12",
     "exceljs": "4.4.0",
+    "jspdf": "4.2.1",
     "gsap": "3.15.0",
     "@gsap/react": "2.1.2"
   },
