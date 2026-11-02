@@ -1,6 +1,6 @@
 'use client';
 import {useCallback,useEffect,useRef,useState} from 'react';
-import {ArrowLeft,ArrowRight,Check,CheckCircle2,ChevronLeft,ChevronRight,Globe2,Headphones,MapPin,Navigation,PackageCheck,Pause,Play,RotateCcw,ShieldCheck,Smartphone,Store,Truck,UserRound,Volume2,VolumeX,Wallet,Phone,Clock3,BookOpen,AlertCircle,CreditCard,Bike,Signal,Headset,Mic2,ChevronDown,GraduationCap,ArrowUpRight,Ban,Gift,Menu,Star} from 'lucide-react';
+import {ArrowLeft,ArrowRight,Check,CheckCircle2,ChevronLeft,ChevronRight,Globe2,Headphones,MapPin,Navigation,PackageCheck,Pause,Play,RotateCcw,ShieldCheck,Smartphone,Store,Truck,UserRound,Volume2,VolumeX,Wallet,Phone,Clock3,BookOpen,AlertCircle,CreditCard,Bike,Signal,Headset,Mic2,ChevronDown,GraduationCap,ArrowUpRight,Ban,Gift,Menu,Star,Maximize2,Minimize2,Subtitles} from 'lucide-react';
 import {guideLessons,guideRates,guideQuiz,type GuideChapter,type GuideLang,type GuideView} from './guide-content';
 import styles from './guide.module.css';
 
@@ -126,6 +126,7 @@ export default function PrestoDriverGuide(){
  const [voiceError,setVoiceError]=useState('');
  const [spokenCaption,setSpokenCaption]=useState('');
  const [captionVisible,setCaptionVisible]=useState(true);
+ const [theaterMode,setTheaterMode]=useState(false);
  const [voices,setVoices]=useState<SpeechSynthesisVoice[]>([]);
  const [speed,setSpeed]=useState(.96);
  const [showScript,setShowScript]=useState(true);
@@ -139,6 +140,7 @@ export default function PrestoDriverGuide(){
  const speechMode=useRef<'voice'|'timed'>('timed');
  const utteranceRef=useRef<SpeechSynthesisUtterance|null>(null);
  const phraseRef=useRef(0),phraseCountRef=useRef(1);
+ const elapsedRef=useRef(0);
  const synth=()=>typeof window!=='undefined'&&'speechSynthesis' in window?window.speechSynthesis:null;
  useEffect(()=>{
   const s=synth();if(!s)return;
@@ -154,7 +156,7 @@ export default function PrestoDriverGuide(){
   const thisToken=++token.current;
   const speech=synth();speech?.cancel();
   active.current=true;
-  setIndex(n);setSeconds(0);setPlaying(true);setQuizOpen(false);setVoiceError('');
+  elapsedRef.current=0;setIndex(n);setSeconds(0);setPlaying(true);setQuizOpen(false);setVoiceError('');
   const phrases=speechPhrases(trans(language,guideLessons[n].narrationAr,guideLessons[n].narrationFr));
   phraseRef.current=0;phraseCountRef.current=phrases.length;
   setSpokenCaption(phrases[0]||'');
@@ -180,11 +182,11 @@ export default function PrestoDriverGuide(){
    utter.onboundary=e=>{
     if(token.current!==thisToken||!active.current)return;
     const pct=(phraseIndex+Math.min(1,e.charIndex/Math.max(1,phrases[phraseIndex].length)))/phrases.length;
-    setSeconds(v=>Math.max(v,estimatedSeconds[n]*pct));
+    elapsedRef.current=Math.max(elapsedRef.current,estimatedSeconds[n]*pct);setSeconds(elapsedRef.current);
    };
    utter.onend=()=>{
     if(token.current!==thisToken||!active.current)return;
-    setSeconds(v=>Math.max(v,estimatedSeconds[n]*(phraseIndex+1)/phrases.length));
+    elapsedRef.current=Math.max(elapsedRef.current,estimatedSeconds[n]*(phraseIndex+1)/phrases.length);setSeconds(elapsedRef.current);
     phraseIndex++;
     speakNext();
    };
@@ -203,7 +205,7 @@ export default function PrestoDriverGuide(){
   ++token.current;
   active.current=false;utteranceRef.current=null;synth()?.cancel();
   const target=Math.max(0,Math.min(guideLessons.length-1,n));
-  setIndex(target);setSeconds(0);setSpokenCaption('');
+  elapsedRef.current=0;setIndex(target);setSeconds(0);setSpokenCaption('');
   if(autoplay)playHandler.current(target,language);
   else setPlaying(false);
  };
@@ -227,18 +229,15 @@ export default function PrestoDriverGuide(){
   const timer=setInterval(()=>{
    const now=Date.now(),delta=(now-last)/1000;last=now;
    if(speechMode.current==='timed'){
-    setSeconds(current=>{
-     const next=current+delta;
-     if(next>=estimatedSeconds[index]){
-      if(index+1<guideLessons.length)playHandler.current(index+1,lang);
-      else{active.current=false;setPlaying(false);}
-      return estimatedSeconds[index];
-     }
-     return next;
-    });
+    const next=elapsedRef.current+delta;
+    if(next>=estimatedSeconds[index]){
+     if(index+1<guideLessons.length)playHandler.current(index+1,lang);
+     else{elapsedRef.current=estimatedSeconds[index];setSeconds(estimatedSeconds[index]);active.current=false;setPlaying(false);}
+    }else{elapsedRef.current=next;setSeconds(next);}
    }else{
     const phraseCap=estimatedSeconds[index]*(phraseRef.current+.95)/Math.max(1,phraseCountRef.current);
-    setSeconds(current=>Math.min(phraseCap,current+delta*.25));
+    elapsedRef.current=Math.min(phraseCap,elapsedRef.current+delta*.25);
+    setSeconds(elapsedRef.current);
    }
   },300);
   return()=>clearInterval(timer);
@@ -266,9 +265,13 @@ export default function PrestoDriverGuide(){
   <header className={styles.header}><a className={styles.logo} href="/"><span className={styles.brandDot}>P</span><span><strong>PRESTO</strong><small>ACADEMY</small></span></a><div className={styles.headerActions}><button type="button" onClick={switchLang}><Globe2 size={17}/>{lang==='ar'?'Français':'العربية'}</button><a href="/">{trans(lang,'العودة للموقع','Retour au site')}{lang==='ar'?<ArrowLeft size={17}/>:<ArrowRight size={17}/>}</a></div></header>
   <section className={styles.hero}><span className={styles.eyebrow}>PRESTO MASTERCLASS · GUIDE DU LIVREUR</span><h1>{trans(lang,'من أول طلب إلى أول أرباحك','De la première commande à tes gains')}</h1><p>{trans(lang,'شرح متكامل بالصوت والرسوم المتحركة: التطبيق، الخرائط، الطلبات، الدفع، المشكلات والسلامة','Formation détaillée avec narration, animations, cartes, paiements et sécurité')}</p><div className={styles.highlights}><span><Check size={15}/>{guideLessons.length} {trans(lang,'مشهدًا تفصيليًا','chapitres détaillés')}</span><span><Wallet size={15}/>{trans(lang,'أرباح وعمولة 0%','Gains et 0 % commission')}</span><span><Navigation size={15}/>{trans(lang,'خريطة المطعم والزبون','GPS restaurant et client')}</span></div></section>
   <nav className={styles.chapterNav} aria-label={trans(lang,'أقسام التدريب','Sections du guide')}>{chapters.map(ch=><button type="button" key={ch.key} className={ch.key===lesson.chapter?styles.activeChapter:''} onClick={()=>jump(guideLessons.findIndex(x=>x.chapter===ch.key),false)}><small>{ch.icon}</small><span>{trans(lang,ch.ar,ch.fr)}</span></button>)}</nav>
-  <div className={styles.playerGrid}><section className={styles.player}>
-   <div className={styles.filmHeader}><span className={styles.playingLight}/><span>PRESTO · DRIVER TRAINING</span><span>{String(index+1).padStart(2,'0')} / {guideLessons.length}</span></div>
-   <FilmScene sceneId={lesson.id} view={lesson.view} lang={lang}/>
+  <div className={[styles.playerGrid,theaterMode?styles.theaterMode:""].join(" ")}><section className={styles.player}>
+   <div className={styles.filmHeader}><span className={styles.playingLight}/><span>PRESTO · DRIVER TRAINING</span><span className={styles.filmPosition}>{String(index+1).padStart(2,'0')} / {guideLessons.length}</span><button type="button" className={styles.filmAction} onClick={()=>setCaptionVisible(x=>!x)} title={trans(lang,'إظهار وإخفاء الترجمة المصاحبة','Afficher les sous-titres')} aria-label={trans(lang,'إظهار وإخفاء نص الكلام','Afficher les sous-titres')}><Subtitles size={18}/></button><button type="button" className={styles.filmAction} onClick={()=>setTheaterMode(x=>!x)} title={trans(lang,'توسيع العرض','Mode cinéma')} aria-label={trans(lang,'توسيع العرض','Mode cinéma')}>{theaterMode?<Minimize2 size={18}/>:<Maximize2 size={18}/>}</button></div>
+   <div className={styles.cinemaStage}>
+    <FilmScene sceneId={lesson.id} view={lesson.view} lang={lang}/>
+    <div className={styles.stageLabel}><span className={styles.stageNumber}>{String(index+1).padStart(2,'0')}</span><span><small>{trans(lang,'الخطوة الحالية','Étape actuelle')}</small><strong>{trans(lang,lesson.titleAr,lesson.titleFr)}</strong></span></div>
+   </div>
+   {captionVisible?<div className={styles.liveCaptions} aria-live="off"><span className={styles.captionMic}><Mic2 size={18}/></span><p>{playing&&spokenCaption?spokenCaption:trans(lang,lesson.captionAr,lesson.captionFr)}</p><span className={styles.audioWaves} aria-hidden="true"><i/><i/><i/></span></div>:null}
    <div className={styles.caption}><span>{trans(lang,category.ar,category.fr)} · {trans(lang,'المشهد','Scène')} {index+1}</span><h2>{trans(lang,lesson.titleAr,lesson.titleFr)}</h2><p>{trans(lang,lesson.captionAr,lesson.captionFr)}</p></div>
    <div className={styles.controls}><div className={styles.progressBar} role="progressbar" aria-label={trans(lang,'تقدم العرض','Progression')} aria-valuemin={0} aria-valuemax={totalTime} aria-valuenow={Math.round(passed)}><span style={{width:Math.min(100,passed/totalTime*100)+'%'}}/></div>
     <div className={styles.controlRow}>
