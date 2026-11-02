@@ -15,7 +15,7 @@ const estimatedSeconds=guideLessons.map(s=>Math.max(23,Math.ceil(Math.max(s.narr
 const totalTime=estimatedSeconds.reduce((a,b)=>a+b,0);
 const formatTime=(n:number)=>Math.floor(n/60)+':'+String(Math.floor(n%60)).padStart(2,'0');
 const screenName=(view:GuideView,lang:GuideLang)=>{
- const names:Record<string,[string,string]>={
+ const names:Record<string,string>={
  restaurant:'وصلت للمطعم|Arrivé au restaurant',pickup:'تأكيد الاستلام|Confirmer la réception',
  arrival:'وصلت للزبون|Arrivé chez le client',delivery:'تم التوصيل للزبون|Livraison effectuée',
  order:'بدء الرحلة|Démarrer la course',ready:'أنا متصل|Je suis en ligne'
