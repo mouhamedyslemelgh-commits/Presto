@@ -236,7 +236,7 @@ export default function PrestoDriverGuide(){
     }else{elapsedRef.current=next;setSeconds(next);}
    }else{
     const phraseCap=estimatedSeconds[index]*(phraseRef.current+.95)/Math.max(1,phraseCountRef.current);
-    elapsedRef.current=Math.min(phraseCap,elapsedRef.current+delta*.25);
+    elapsedRef.current=Math.max(elapsedRef.current,Math.min(phraseCap,elapsedRef.current+delta*.25));
     setSeconds(elapsedRef.current);
    }
   },300);
