@@ -15,6 +15,7 @@ type Props={
  ranks:ReadonlyMap<number,number>;
  language:'ar'|'fr';
  preview?:boolean;
+ mode?:'equipment'|'registration';
  editable?:boolean;
  onOpen:(id:number)=>void;
  onEdit?:(driver:DriverRegisterRecord)=>void;
@@ -24,9 +25,27 @@ const activeCount=(d:DriverRegisterRecord)=>Number(d.bankily)+Number(d.masrvi)+N
 const isComplete=(d:DriverRegisterRecord)=>d.bag&&d.shirt&&d.verified&&activeCount(d)>0;
 const firstLetter=(name:string)=>Array.from(name.trim())[0]||'•';
 
-export default function DriverRegisterTable({items,ranks,language,preview=false,editable=false,onOpen,onEdit,onDelete,photoUrls={}}:Props){
+export default function DriverRegisterTable({items,ranks,language,preview=false,mode='equipment',editable=false,onOpen,onEdit,onDelete,photoUrls={}}:Props){
  const ar=language==='ar';
  const L=(a:string,f:string)=>ar?a:f;
+ if(mode==='registration')return <div className="driverRegisterWrap driverVehicleRegisterWrap" dir={ar?'rtl':'ltr'}>
+  <table className="driverRegisterTable driverVehicleRegisterTable">
+   <thead><tr>
+    <th>{L('الرقم','N°')}</th><th>{L('السائق','Livreur')}</th><th>{L('رقم الهاتف','Téléphone')}</th><th>{L('المدينة','Ville')}</th><th>{L('نوع المركبة','Véhicule')}</th><th>{L('صورة المركبة','Photo véhicule')}</th><th>{L('كود التطبيق','Code application')}</th><th>{L('إجراءات','Actions')}</th>
+   </tr></thead>
+   <tbody>{items.length===0?<tr className="driverRegisterEmptyRow"><td colSpan={8}><UserRound size={24}/><strong>{L('لم يتم تسجيل سائقين ومركبات بعد','Aucun livreur et véhicule enregistré')}</strong><span>{L('استخدم زر تسجيل سائق ومركبة لإضافة السجل الأول.','Utilisez le bouton Enregistrer un livreur et véhicule.')}</span></td></tr>:
+    items.map(d=><tr key={d.id} className="driverRegisterRow">
+     <td data-label={L('الرقم','N°')}><span className="driverRegisterNumber" dir="ltr">{ranks.get(d.id)??d.id}</span></td>
+     <td data-label={L('السائق','Livreur')} className="driverRegisterIdentityCell"><button type="button" onClick={()=>onOpen(d.id)} className="driverRegisterIdentity"><span className="driverRegisterAvatar">{d.driver_photo_path&&photoUrls[d.driver_photo_path]?<img src={photoUrls[d.driver_photo_path]} alt="" className="driverRegisterAvatarPhoto"/>:firstLetter(d.name)}</span><span className="driverRegisterNameStack"><strong>{d.name}</strong><small>{L('عرض الملف الشخصي','Voir la fiche personnelle')}</small></span></button></td>
+     <td data-label={L('الهاتف','Téléphone')}><span className="driverRegisterPhone" dir="ltr"><Phone size={14}/>{d.phone||'—'}</span></td>
+     <td data-label={L('المدينة','Ville')}>{d.city||'—'}</td>
+     <td data-label={L('المركبة','Véhicule')}>{d.vehicle_type?({motorcycle:L('دراجة نارية','Moto'),car:L('سيارة','Voiture'),bicycle:L('دراجة هوائية','Vélo'),scooter:L('سكوتر','Scooter'),other:L('أخرى','Autre')} as Record<string,string>)[d.vehicle_type]||d.vehicle_type:'—'}</td>
+     <td data-label={L('صورة المركبة','Photo véhicule')}>{d.vehicle_photo_path&&photoUrls[d.vehicle_photo_path]?<img src={photoUrls[d.vehicle_photo_path]} alt={L('صورة المركبة','Photo du véhicule')} className="driverVehicleListPhoto"/>:<span className="driverVehicleNoPhoto">{L('لا توجد صورة','Sans photo')}</span>}</td>
+     <td data-label={L('كود التطبيق','Code application')}><span className="driverVehicleAppCode" dir="ltr">{d.app_code||'—'}</span></td>
+     <td data-label={L('إجراءات','Actions')}><div className="driverRegisterActions"><button type="button" title={L('عرض الملف','Voir la fiche')} aria-label={L('عرض ملف ','Voir la fiche de ')+d.name} onClick={()=>onOpen(d.id)}><Eye size={16}/></button>{editable&&<button type="button" title={L('تعديل التسجيل','Modifier le dossier')} aria-label={L('تعديل ','Modifier ')+d.name} onClick={()=>onEdit?.(d)}><Edit3 size={15}/></button>}</div></td>
+    </tr>)}</tbody>
+  </table>
+ </div>;
  return <div className={'driverRegisterWrap '+(preview?'isPreview':'')} dir={ar?'rtl':'ltr'}>
   <table className="driverRegisterTable">
    <thead><tr>
