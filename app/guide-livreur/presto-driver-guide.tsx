@@ -14,6 +14,35 @@ const chapters:{key:GuideChapter;ar:string;fr:string;icon:string}[]=[
 const estimatedSeconds=guideLessons.map(s=>Math.max(23,Math.ceil(Math.max(s.narrationAr.split(' ').length,s.narrationFr.split(' ').length)/2.15)+8));
 const totalTime=estimatedSeconds.reduce((a,b)=>a+b,0);
 const formatTime=(n:number)=>Math.floor(n/60)+':'+String(Math.floor(n%60)).padStart(2,'0');
+// Prefer enhanced voices when the browser actually makes them available.
+// This cannot turn a basic system voice into a human recording.
+const voiceRank=(v:SpeechSynthesisVoice)=>{
+ const label=(v.name+' '+v.voiceURI).toLowerCase();
+ return (/natural|neural|premium|enhanced|siri/i.test(label)?100:0)
+   + (/microsoft|google|apple/i.test(label)?30:0)
+   + (/h[oao]med|shakir|majed|zariyah|naayf|maged|amina/i.test(label)?10:0)
+   + (!v.localService?5:0);
+};
+const selectNarrator=(available:SpeechSynthesisVoice[],uri:string)=>
+ available.find(v=>v.voiceURI===uri)||[...available].sort((a,b)=>voiceRank(b)-voiceRank(a))[0];
+// Breaking long paragraphs into sentences avoids the robotic, uninterrupted monotone
+// and also makes narration more stable in Safari and on mobile devices.
+const speechPhrases=(text:string)=>{
+ const sentences=text.replace(/\\s+/g,' ').trim().replace(/([.!؟؛])\\s+/g,'$1\\n').split('\\n').filter(Boolean);
+ const parts:string[]=[];
+ for(const sentence of sentences){
+  if(sentence.length<=185){parts.push(sentence);continue;}
+  const clauses=sentence.split(/([،,])/);
+  let current='';
+  for(let i=0;i<clauses.length;i+=2){
+   const clause=(clauses[i]||'')+(clauses[i+1]||'');
+   if(current.length>95&&current.length+clause.length>175){parts.push(current.trim());current=clause;}
+   else current+=clause;
+  }
+  if(current.trim())parts.push(current.trim());
+ }
+ return parts.length?parts:[text];
+};
 const screenName=(view:GuideView,lang:GuideLang)=>{
  const names:Record<string,string>={
  restaurant:'وصلت للمطعم|Arrivé au restaurant',pickup:'تأكيد الاستلام|Confirmer la réception',
@@ -94,6 +123,7 @@ export default function PrestoDriverGuide(){
  const [speakingEnabled,setSpeakingEnabled]=useState(true);
  const [seconds,setSeconds]=useState(0);
  const [voiceId,setVoiceId]=useState('');
+ const [voiceError,setVoiceError]=useState('');
  const [voices,setVoices]=useState<SpeechSynthesisVoice[]>([]);
  const [speed,setSpeed]=useState(.96);
  const [showScript,setShowScript]=useState(true);
@@ -107,27 +137,39 @@ export default function PrestoDriverGuide(){
   update();s.addEventListener?.('voiceschanged',update);
   return()=>{s.removeEventListener?.('voiceschanged',update);s.cancel()};
  },[]);
- const filteredVoices=voices.filter(v=>v.lang.toLowerCase().startsWith(lang==='ar'?'ar':'fr'));
- const chosenVoice=filteredVoices.find(v=>v.voiceURI===voiceId)||filteredVoices.find(v=>/natural|premium|enhanced|google|siri/i.test(v.name))||filteredVoices[0];
+ const filteredVoices=voices.filter(v=>v.lang.toLowerCase().startsWith(lang==='ar'?'ar':'fr')).sort((a,b)=>voiceRank(b)-voiceRank(a));
+ const chosenVoice=selectNarrator(filteredVoices,voiceId);
  playHandler.current=(next,language)=>{
   const n=Math.max(0,Math.min(next,guideLessons.length-1));
-  const thisToken=++token.current;synth()?.cancel();
-  setIndex(n);setSeconds(0);setPlaying(true);active.current=true;setQuizOpen(false);
-  const speech=synth();
+  const thisToken=++token.current;
+  const speech=synth();speech?.cancel();
+  setVoiceError('');setIndex(n);setSeconds(0);setPlaying(true);active.current=true;setQuizOpen(false);
   if(!speech||!speakingEnabled)return;
-  const utter=new SpeechSynthesisUtterance(trans(language,guideLessons[n].narrationAr,guideLessons[n].narrationFr));
   const available=speech.getVoices().filter(v=>v.lang.toLowerCase().startsWith(language==='ar'?'ar':'fr'));
-  const choice=available.find(v=>v.voiceURI===voiceId)||available.find(v=>/natural|premium|enhanced|google|siri/i.test(v.name))||available[0];
-  if(choice)utter.voice=choice;
-  utter.lang=choice?.lang||(language==='ar'?'ar-SA':'fr-FR');
-  utter.rate=speed;utter.pitch=1;utter.volume=1;
-  utter.onend=()=>{
-   if(token.current!==thisToken||!active.current)return;
-   if(n+1<guideLessons.length)playHandler.current(n+1,language);
-   else{active.current=false;setPlaying(false);setSeconds(estimatedSeconds[n]);}
+  const choice=selectNarrator(available,voiceId);
+  const phrases=speechPhrases(trans(language,guideLessons[n].narrationAr,guideLessons[n].narrationFr));
+  let phraseIndex=0;
+  const nextPhrase=()=>{
+   if(thisToken!==token.current||!active.current)return;
+   const utter=new SpeechSynthesisUtterance(phrases[phraseIndex]);
+   if(choice)utter.voice=choice;
+   utter.lang=choice?.lang||(language==='ar'?'ar-SA':'fr-FR');
+   utter.rate=speed;utter.pitch=1;utter.volume=1;
+   utter.onend=()=>{
+    if(thisToken!==token.current||!active.current)return;
+    phraseIndex+=1;
+    if(phraseIndex<phrases.length){nextPhrase();return;}
+    if(n+1<guideLessons.length)playHandler.current(n+1,language);
+    else{active.current=false;setPlaying(false);setSeconds(estimatedSeconds[n]);}
+   };
+   utter.onerror=event=>{
+    if(thisToken!==token.current||!active.current||event.error==='interrupted'||event.error==='canceled')return;
+    setVoiceError(language==='ar'?'تعذر تشغيل الصوت على هذا الجهاز. جرّب صوتاً آخر أو متصفح Edge.':'La voix ne fonctionne pas sur cet appareil. Essaie une autre voix ou Edge.');
+    active.current=false;setPlaying(false);
+   };
+   speech.speak(utter);
   };
-  utter.onerror=()=>{ /* The visual guide remains usable if voice playback is unavailable. */ };
-  speech.speak(utter);
+  nextPhrase();
  };
  const jump=(n:number,autoplay=playing,language=lang)=>{
   ++token.current;synth()?.cancel();active.current=false;
@@ -158,6 +200,17 @@ export default function PrestoDriverGuide(){
  },[playing,index,lang,speakingEnabled]);
  useEffect(()=>()=>{active.current=false;token.current++;synth()?.cancel()},[]);
  const switchLang=()=>{const other:GuideLang=lang==='ar'?'fr':'ar';setLang(other);setVoiceId('');jump(index,playing,other)};
+ const testNarrator=()=>{
+  const speech=synth();if(!speech){setVoiceError(trans(lang,'المتصفح لا يدعم تشغيل الأصوات.','La synthèse vocale est indisponible.'));return;}
+  token.current+=1;active.current=false;setPlaying(false);speech.cancel();setSeconds(0);
+  const sample=trans(lang,'أهلاً بك في بريستو. اليوم سأشرح لك كيف تستلم طلبك، وتفتح الخريطة، وتحسب أرباحك. خطوة بخطوة، وبكل وضوح.','Bienvenue chez Presto. Je vais t’expliquer comment recevoir une commande, ouvrir la carte et comprendre tes gains, étape par étape.');
+  const u=new SpeechSynthesisUtterance(sample);
+  const available=speech.getVoices().filter(v=>v.lang.toLowerCase().startsWith(lang==='ar'?'ar':'fr'));
+  const choice=selectNarrator(available,voiceId);
+  if(choice)u.voice=choice;
+  u.lang=choice?.lang||(lang==='ar'?'ar-SA':'fr-FR');u.rate=speed;u.pitch=1;u.volume=1;
+  speech.speak(u);
+ };
  const lesson=guideLessons[index];
  const category=chapters.find(c=>c.key===lesson.chapter)!;
  const passed=estimatedSeconds.slice(0,index).reduce((a,b)=>a+b,0)+seconds;
@@ -180,11 +233,11 @@ export default function PrestoDriverGuide(){
      <button className={styles.minor} type="button" title={trans(lang,'إعادة من البداية','Recommencer')} onClick={()=>jump(0,true)}><RotateCcw size={17}/></button>
     </div>
    </div>
-   <div className={styles.voiceStudio}><div className={styles.studioHeading}><Mic2 size={19}/><strong>{trans(lang,'إعدادات صوت الشرح','Paramètres de la voix')}</strong></div><div className={styles.studioControls}>
+   <div className={styles.voiceStudio}><div className={styles.studioHeading}><Mic2 size={19}/><strong>{trans(lang,'صوت المُعلّق الطبيعي','Voix du narrateur')}</strong><span className={styles.voiceNoteTag}>{trans(lang,'إلقاء محسّن','Narration fluide')}</span></div><div className={styles.studioControls}>
     <label className={styles.studioSwitch}><input type="checkbox" checked={speakingEnabled} onChange={e=>{setSpeakingEnabled(e.target.checked);if(playing)jump(index,false)}}/>{trans(lang,'تشغيل التعليق الصوتي','Narration audio')}</label>
-    <label>{trans(lang,'اختر صوتًا متاحًا على جهازك','Voix disponible')}<select value={voiceId} onChange={e=>{setVoiceId(e.target.value);if(playing)jump(index,false)}}><option value="">{chosenVoice?chosenVoice.name:trans(lang,'الصوت الافتراضي','Voix par défaut')}</option>{filteredVoices.map(v=><option key={v.voiceURI} value={v.voiceURI}>{v.name} ({v.lang})</option>)}</select></label>
-    <label>{trans(lang,'سرعة الكلام','Vitesse')}<select value={speed} onChange={e=>{setSpeed(Number(e.target.value));if(playing)jump(index,false)}}><option value={0.87}>{trans(lang,'هادئ وبطيء','Lent')}</option><option value={0.96}>{trans(lang,'طبيعي وواضح','Naturel')}</option><option value={1.05}>{trans(lang,'أسرع قليلاً','Rapide')}</option></select></label>
-   </div><p>{trans(lang,'جودة وطبيعة الصوت تختلفان بحسب الأصوات المثبتة على جهازك. اختر الصوت الأقرب إلى الكلام الطبيعي.','La qualité de la voix dépend des voix disponibles sur ton appareil.')}</p></div>
+    <label>{trans(lang,'اختر صوتًا متاحًا على جهازك','Voix disponible')}<select value={voiceId} onChange={e=>{setVoiceId(e.target.value);if(playing)jump(index,false)}}><option value="">{chosenVoice?trans(lang,'الصوت الأنسب تلقائياً: ','Voix recommandée : ')+chosenVoice.name:trans(lang,'الصوت الافتراضي','Voix par défaut')}</option>{filteredVoices.map(v=><option key={v.voiceURI} value={v.voiceURI}>{v.name} ({v.lang})</option>)}</select></label>
+    <label>{trans(lang,'سرعة الكلام','Vitesse')}<select value={speed} onChange={e=>{setSpeed(Number(e.target.value));if(playing)jump(index,false)}}><option value={0.87}>{trans(lang,'هادئ وواضح','Calme')}</option><option value={0.96}>{trans(lang,'طبيعي ومريح','Naturel')}</option><option value={1.05}>{trans(lang,'أسرع قليلاً','Plus rapide')}</option></select></label>
+   </div><div className={styles.voiceTestRow}><button type="button" className={styles.testVoiceButton} onClick={testNarrator}><Play size={16}/>{trans(lang,'جرّب صوت المُعلّق','Écouter un exemple')}</button><p>{voiceError||trans(lang,'يُقرأ الشرح بجمل قصيرة ووقفات طبيعية. هذا صوت الجهاز وليس تسجيلاً بشرياً، وتعتمد جودته على الأصوات المتاحة فيه.','Lecture par phrases courtes et pauses naturelles. Il s’agit toujours de la voix du navigateur, et non d’un enregistrement humain.')}</p></div></div>
    <div className={styles.scriptPanel}><button type="button" className={styles.scriptToggle} onClick={()=>setShowScript(!showScript)}><BookOpen size={19}/><strong>{trans(lang,'النص الكامل الذي يشرحه الصوت','Texte intégral de la narration')}</strong><ChevronDown size={19}/></button>{showScript?<div className={styles.scriptBody}><p>{trans(lang,lesson.narrationAr,lesson.narrationFr)}</p><div className={styles.keyTakeaways}>{(lang==='ar'?lesson.takeawaysAr:lesson.takeawaysFr).map(text=><span key={text}><CheckCircle2 size={16}/>{text}</span>)}</div></div>:null}</div>
   </section>
   <aside className={styles.sidePanel}><div className={styles.sideTitle}><div><span>CHAPTERS · PRESTO ACADEMY</span><h3>{trans(lang,'جميع مراحل التدريب','Toutes les leçons')}</h3></div><span className={styles.duration}><Clock3 size={15}/>{formatTime(totalTime)}</span></div><div className={styles.playlist}>{guideLessons.map((s,i)=><button type="button" key={s.id} className={[styles.chapter,i===index?styles.selected:'',i<index?styles.completed:''].join(' ')} onClick={()=>jump(i,playing)}><span className={styles.chapterNumber}>{i<index?<Check size={14}/>:String(i+1).padStart(2,'0')}</span><span><strong>{trans(lang,s.titleAr,s.titleFr)}</strong><small>{trans(lang,s.captionAr,s.captionFr)}</small></span></button>)}</div><div className={styles.voiceNote}><Headphones size={20}/><p>{trans(lang,'شغّل العرض من البداية، أو انتقل إلى أي خطوة. تعلّم متى تضغط كل زر ولماذا.','Lis le guide ou va directement à une étape précise.')}</p></div>
