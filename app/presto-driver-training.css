@@ -168,3 +168,21 @@
 .sidebar nav button.prestoAcademyNav{margin-top:10px;padding:14px 12px;background:linear-gradient(120deg,#ff5a23,#e93e13);color:#fff;border:1px solid #ff9a734a;box-shadow:0 9px 20px #f24c2430;font-weight:900;font-size:12px;display:flex;align-items:center;gap:9px;text-align:start;width:100%;border-radius:12px}
 .sidebar nav button.prestoAcademyNav:hover{background:linear-gradient(120deg,#ff713d,#f24d20);color:#fff}
 .prestoAcademyNavMark{margin-inline-start:auto;background:#fff3;border-radius:7px;padding:4px 7px;font-size:10px;direction:ltr}
+
+
+/* Dashboard academy entry and shareable stand-alone guide */
+.prestoTrainingBanner{display:flex;align-items:center;gap:20px;flex-wrap:wrap;border-radius:20px;padding:24px;background:linear-gradient(114deg,#12283a,#224155 62%,#315464);color:#fff;margin-bottom:23px;box-shadow:0 16px 32px #1932492e;position:relative;overflow:hidden}
+.prestoTrainingBanner:after{content:"";position:absolute;right:-90px;top:-155px;width:330px;height:330px;border:1px solid #ffffff20;border-radius:50%;pointer-events:none}
+.prestoTrainingBannerSymbol{display:grid;place-items:center;flex:0 0 63px;height:63px;border-radius:18px;background:linear-gradient(140deg,#ff9049,#f15427);box-shadow:0 8px 22px #fa542b50}
+.prestoTrainingBannerCopy{flex:1;min-width:200px;position:relative;z-index:1}
+.prestoTrainingBannerCopy>span{font-size:10px;color:#ffcbb6;font-weight:900;letter-spacing:1.5px}
+.prestoTrainingBannerCopy h2{color:#fff;font-size:22px;margin:4px 0 7px;font-weight:850}
+.prestoTrainingBannerCopy p{color:#cee0e8;font-size:12px;line-height:1.75;margin:0;max-width:640px}
+.prestoTrainingBannerActions{display:flex;align-items:stretch;flex-direction:column;gap:9px;position:relative;z-index:1;min-width:212px}
+.prestoTrainingBannerButton,.prestoTrainingBannerPublic{display:inline-flex;align-items:center;justify-content:center;gap:9px;text-align:center;line-height:1.5;font-weight:850;border-radius:11px;padding:12px 17px;cursor:pointer;font-size:12px;text-decoration:none;white-space:normal}
+.prestoTrainingBannerButton{border:1px solid #fa754e;background:linear-gradient(130deg,#fb7950,#f2542e);color:#fff;box-shadow:0 7px 15px #ff4a313b}
+.prestoTrainingBannerPublic{border:1px solid #ffffff4a;background:#ffffff17;color:#fff}
+.prestoTrainingBannerPublic:hover{background:#ffffff32;color:#fff}
+.trainingVideoFallback{background:#fff3e9;color:#a84c2c;border:1px solid #f7cbb6;border-radius:11px;padding:14px 18px;font-weight:700;font-size:12px;line-height:1.8;margin-bottom:12px}
+@media(max-width:720px){.prestoTrainingBanner{gap:13px;padding:19px;border-radius:15px}.prestoTrainingBannerSymbol{flex-basis:48px;height:48px;border-radius:12px}.prestoTrainingBannerCopy h2{font-size:17px}.prestoTrainingBannerActions{width:100%;flex-direction:row}.prestoTrainingBannerButton,.prestoTrainingBannerPublic{flex:1;min-width:0;padding:11px 9px;font-size:11px}}
+@media(max-width:400px){.prestoTrainingBannerActions{flex-direction:column}}
