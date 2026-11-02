@@ -75,7 +75,6 @@ const ar:Record<string,string>={
   "LIVREURS ENREGISTRÉS": "السائقون المسجلون",
   "MOYENS DE PAIEMENT": "وسائل الدفع",
   "Répartition des comptes enregistrés": "توزيع الحسابات المسجلة",
-  "Registre des remises": "سجل التسليم",
   "Aperçu des derniers livreurs enregistrés": "آخر السائقين المسجلين",
   "Voir le registre": "عرض السجل",
   "POINT D’ATTENTION": "تنبيه مهم",
