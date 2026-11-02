@@ -1202,3 +1202,34 @@ html[dir="rtl"] .modalBody,html[dir="rtl"] .settingsCard{line-height:1.7}
 .shell .track{margin-top:12px}
 }
 @media(prefers-reduced-motion:reduce){.shell :is(.primary,.secondary,.payment,.sidebar nav button){transition:none}}
+
+
+/* PRESTO — driver + vehicle enrollment, 2026 */
+.driverEditorDialog{width:min(850px,100%);max-width:850px}
+.driverEditorHead{background:linear-gradient(110deg,#fff,#fff4ed);border-bottom-color:#ffe6d8}
+.driverEditorHeroIcon{background:#f06739;color:#fff;box-shadow:0 8px 20px #ed674234}
+.driverEditorSection{border-radius:17px;box-shadow:0 7px 26px #142d4510}
+.driverEditorInputWrap select{width:100%;min-width:0;min-height:47px;border:0;outline:none;background:transparent;color:#283a4f;font-family:inherit;font-size:13px;font-weight:600}
+.driverVehicleSection{border-color:#f8dacb;background:linear-gradient(135deg,#fff,#fffcfa)}
+.driverVehicleSection .driverEditorSectionIcon{background:#e8f5ef;color:#248563}
+.driverVehicleSelect{max-width:415px;margin-bottom:18px}
+.driverVehiclePhotos{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}
+.driverVehiclePhotoPicker{display:flex;flex-direction:column;gap:10px;min-width:0;cursor:pointer;padding:13px;background:#fcfdfd;border:1.5px dashed #cad5df;border-radius:16px;transition:background .18s,border-color .18s}
+.driverVehiclePhotoPicker:hover,.driverVehiclePhotoPicker:focus-within{background:#fff5ed;border-color:#ed9068}
+.driverVehiclePhotoTitle{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:800;color:#30435a}
+.driverVehiclePhotoTitle svg{color:#e66a3c}
+.driverVehiclePhotoPlaceholder{height:142px;border-radius:12px;background:linear-gradient(135deg,#f0f5fa,#f7f9fb);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:#93a4b8}
+.driverVehiclePhotoPlaceholder small{font-size:11px;font-weight:700}
+.driverVehiclePhotoPreview{height:142px;width:100%;object-fit:cover;border-radius:12px;display:block}
+.driverVehicleUploadLabel{align-self:center;display:flex;align-items:center;gap:6px;background:#fff0e8;border:1px solid #f9dcc9;color:#db683a;border-radius:10px;padding:9px 13px;font-size:11px;font-weight:800}
+.driverVehiclePhotoPicker input[type=file]{position:absolute;width:1px;height:1px;opacity:0;overflow:hidden}
+.driverVehiclePhotoHelp{margin:13px 0 0;color:#8492a2;font-size:11px;line-height:1.8}
+.driverRegisterAvatar{overflow:hidden}
+.driverRegisterAvatarPhoto{width:100%;height:100%;object-fit:cover;display:block}
+.driverProfileVehiclePhotos{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:12px 0 23px}
+.driverProfileVehiclePhotos>div{min-width:0;border:1px solid #e5ecf2;background:#fbfcfe;border-radius:15px;overflow:hidden;padding:10px}
+.driverProfileVehiclePhotos>div>span{display:block;padding:0 2px 9px;font-size:12px;color:#617286;font-weight:800}
+.driverProfileVehiclePhotos img{width:100%;height:170px;object-fit:cover;display:block;border-radius:10px}
+.driverProfileNoPhoto{height:170px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;border-radius:10px;background:#eff3f8;color:#9cabbc;font-size:12px}
+.driverProfileFields select{background:#fff;border:1px solid #dce5ec;border-radius:9px;padding:10px;color:#25374a;min-height:42px;width:100%}
+@media(max-width:620px){.driverEditorDialog{max-height:97dvh}.driverVehiclePhotos{gap:9px}.driverVehiclePhotoPicker{padding:9px}.driverVehiclePhotoPreview,.driverVehiclePhotoPlaceholder{height:113px}.driverProfileVehiclePhotos img,.driverProfileNoPhoto{height:125px}}
