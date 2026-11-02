@@ -145,6 +145,7 @@ export default function PrestoAuthGate({children}:{children:ReactNode}){
    <img src="/logos/presto.webp" width={122} height={66} alt="PRESTO"/>
    <div><strong>PRESTO</strong><small>{ar?'نظام إدارة السائقين':'Gestion des livreurs'}</small></div>
   </div>
+  <a className="presto-public-guide-link" href="/guide-livreur"><span className="presto-public-guide-icon">▶</span><span>{ar?'شاهد شرح تطبيق السائق خطوة بخطوة — دون تسجيل دخول':'Guide du livreur : voir le tutoriel sans connexion'}</span></a>
   {stage==='checking'?<div className="presto-auth-loading" role="status">{ar?'جار التحقق من الحساب...':'Vérification de votre session...'}</div>:
   <div className="presto-auth-scene">
    <div className={'presto-auth-flip'+(mode==='signup'&&!recovering?' flipped':'')}>
