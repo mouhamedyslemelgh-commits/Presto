@@ -50,7 +50,8 @@ const sceneTemplates:Scene[]=[
  speakFr:'S’il manque un article, signale-le au restaurant avant de partir. Adresse incorrecte ou client qui refuse ? Contacte le support de l’application. Ne modifie pas la commande et ne partage pas ton compte.'},
  {id:'end',titleAr:'أنت الآن جاهز للانطلاق!',titleFr:'Tu es prêt à livrer !',subtitleAr:'كل زر في وقته، وكل رحلة باحتراف',subtitleFr:'Chaque bouton au bon moment',duration:12,view:'finish',
  speakAr:'وهكذا اكتملت الرحلة! تذكّر جيداً: الزبون يطلب من تطبيقه، وأنت تدير التوصيل من تطبيق السائق. اضغط اسم المطعم لفتح الخريطة، وبعد الاستلام اضغط الزبون لفتح خريطته. أكّد كل خطوة فقط عندما تحدث فعلاً. نتمنى لك رحلات آمنة وناجحة مع بريستو!',
- speakFr:'Voilà toute la course ! Le client commande dans son application et tu suis la livraison dans la tienne. Le restaurant ouvre la première carte et le client la deuxième. Confirme chaque étape au bon moment. Bonne route avec Pre ];
+ speakFr:'Voilà toute la course ! Le client commande dans son application et tu suis la livraison dans la tienne. Le restaurant ouvre la première carte et le client la deuxième. Confirme chaque étape au bon moment. Bonne route avec Presto !'}
+];
 const scenes:Scene[]=sceneTemplates.map(scene=>({...scene,duration:Math.max(scene.duration,Math.ceil(scene.speakAr.trim().split(' ').filter(Boolean).length/2)+6,Math.ceil(scene.speakFr.trim().split(' ').filter(Boolean).length/2)+6)}));
 
 const labels={
