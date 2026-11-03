@@ -344,3 +344,12 @@ body {font-family:Inter,"Segoe UI",Tahoma,Arial,sans-serif;-webkit-font-smoothin
 @media(prefers-reduced-motion:reduce){
   .presto-auth-page :is(button,a,input) {animation:none!important}
 }
+
+/* PRESTO: explicit, one-tap Excel download and upload controls. */
+.shell .headActions .excelQuickDownload{display:inline-flex;align-items:center;justify-content:center;gap:9px;min-height:44px;padding:11px 17px;border:1px solid #b9e2ce;border-radius:11px;background:#e6f6ed;color:#176c45;font:700 13px/1.4 inherit;white-space:nowrap;cursor:pointer;transition:background .18s ease,border-color .18s ease,transform .18s ease}
+.shell .headActions .excelQuickDownload:hover:not(:disabled){background:#d4eedf;border-color:#7dc79d;transform:translateY(-1px)}
+.shell .headActions .excelQuickDownload:focus-visible,.shell .headActions .excelImportButton:focus-visible{outline:3px solid #3d9d6d;outline-offset:3px}
+.shell .headActions .excelQuickDownload:disabled{opacity:.5;cursor:not-allowed}
+.shell .headActions .excelImportButton{min-height:44px;border:1px solid #d8e5e1;border-radius:11px;font-weight:700;white-space:nowrap}
+@media(max-width:700px){.shell .headActions .excelQuickDownload,.shell .headActions .excelImportButton{min-height:48px;padding:10px 8px;font-size:12px;white-space:normal;text-align:center}}
+@media(prefers-reduced-motion:reduce){.shell .headActions .excelQuickDownload{transition:none}}
