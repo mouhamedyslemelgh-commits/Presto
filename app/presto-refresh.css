@@ -281,3 +281,66 @@ body {font-family:Inter,"Segoe UI",Tahoma,Arial,sans-serif;-webkit-font-smoothin
   .shell .topbar {backdrop-filter:none;-webkit-backdrop-filter:none}
   .shell .shade {backdrop-filter:none}
 }
+
+
+/* Sign-in and account surfaces: retain the original 3-D flip and touch fallback. */
+.presto-auth-page {
+  --auth-base:#edf2f2;
+  --auth-red:#de6335;
+  color:#243e4d;
+  background:radial-gradient(ellipse 640px 360px at 15% 8%,rgba(238,150,105,.13),transparent 75%),
+             radial-gradient(ellipse 620px 380px at 90% 95%,rgba(32,105,106,.095),transparent 72%),#edf2f2;
+}
+.presto-auth-brand {margin-bottom:17px}
+.presto-auth-brand strong {color:#203c4a;letter-spacing:.02em}
+.presto-auth-brand small,.presto-auth-heading p {color:#718692}
+.presto-auth-face {
+  background:#edf2f2;
+  box-shadow:-22px -22px 44px #fff,22px 22px 52px #cbd8d9,
+    inset -1px -1px 1px rgba(255,255,255,.9)
+}
+.presto-auth-heading h1 {color:#203b49;text-shadow:none;font-weight:850}
+.presto-auth-heading>svg,.presto-auth-field:focus-within svg {color:#d96536}
+.presto-auth-field {
+  background:#edf2f2;
+  box-shadow:inset -5px -5px 10px #fff,inset 5px 5px 10px #cad6d8;
+  border:1px solid rgba(255,255,255,.5)
+}
+.presto-auth-field:focus-within {
+  box-shadow:inset 2px 2px 6px rgba(215,103,61,.14),
+    inset -2px -2px 6px rgba(255,255,255,.85),0 0 0 3px rgba(236,109,60,.11)
+}
+.presto-auth-field input {color:#243d4b}
+.presto-auth-field input::placeholder {color:#8799a1}
+.presto-auth-submit {
+  background:linear-gradient(125deg,#f17b48,#dc5b2e);
+  box-shadow:0 11px 22px rgba(201,87,45,.22),-3px -3px 10px rgba(255,255,255,.65);
+  border-radius:13px
+}
+.presto-auth-submit:hover:not(:disabled) {
+  background:linear-gradient(125deg,#e76d3c,#ce4f25);
+  box-shadow:0 13px 28px rgba(201,87,45,.30)
+}
+.presto-auth-toggle button,.presto-auth-forgot:hover {color:#bd552d}
+.presto-auth-messages {color:#bd552d}
+.presto-auth-language .prestoLanguagePicker {background:rgba(255,255,255,.8);border:1px solid #dfe7e8}
+.presto-auth-page :is(button,input,a):focus-visible {
+  outline:3px solid rgba(235,115,70,.65);outline-offset:3px
+}
+.presto-auth-password-dialog,.presto-auth-profile {
+  border:1px solid #e3e9ed;border-radius:20px;
+  box-shadow:0 24px 76px rgba(17,40,55,.19)
+}
+.presto-auth-password-dialog h2 {color:#203a49}
+.presto-auth-password-dialog button[type=submit] {background:#db6235}
+.presto-auth-password-dialog input:focus {border-color:#e77d53;box-shadow:0 0 0 3px #e77d531b}
+@media(max-width:600px){
+  .presto-auth-page {padding-inline:13px}
+  .presto-auth-face {box-shadow:-12px -12px 28px #fff,12px 12px 32px #cad7d9}
+  .presto-auth-scene {max-width:min(430px,100%)}
+  .presto-auth-brand {margin-bottom:9px}
+  .presto-auth-field input {font-size:16px}
+}
+@media(prefers-reduced-motion:reduce){
+  .presto-auth-page :is(button,a,input) {animation:none!important}
+}
