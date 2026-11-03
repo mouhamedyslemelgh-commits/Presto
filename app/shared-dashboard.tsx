@@ -1,6 +1,6 @@
 // @ts-nocheck
 'use client';
-import {useCallback,useEffect,useState} from 'react';
+import {useCallback,useEffect,useRef,useState} from 'react';
 import {prestoCloud} from '../lib/presto-cloud';
 import {savePrestoExcelSnapshot,downloadSavedPrestoExcel} from '../lib/presto-excel-cloud';
 import {EquipmentCardDialog} from '../components/equipment-card';
@@ -42,7 +42,7 @@ export default function SharedDashboard(){
  const [cardId,setCardId]=useState<number|null>(null);
  const cardRow=rows.find(d=>d.id===cardId);
  const [selectedId,setSelectedId]=useState<number|null>(null);
- const [loading,setLoading]=useState(true),[msg,setMsg]=useState(''),[search,setSearch]=useState(''),[editing,setEditing]=useState<Row|null>(null);
+ const [loading,setLoading]=useState(true),[msg,setMsg]=useState(''),[syncError,setSyncError]=useState(''),[search,setSearch]=useState(''),[editing,setEditing]=useState<Row|null>(null);
  const [dialogMode,setDialogMode]=useState<'registration'|'legacy'>('registration');
  const motionRoot=usePrestoDashboardMotion(view,loading);
  const [userId,setUserId]=useState<string|null>(null),[admin,setAdmin]=useState(true);
@@ -57,21 +57,46 @@ export default function SharedDashboard(){
   window.addEventListener('keydown',onKeyDown);
   return ()=>window.removeEventListener('keydown',onKeyDown);
  },[]);
+ const loadSequence=useRef(0);
  const load=useCallback(async()=>{
-  if(!prestoCloud)return;
-  const all:Row[]=[];
-  for(let i=0;i<10000;i+=1000){
-   const {data,error}=await prestoCloud.from('presto_drivers').select('id,name,phone,bag,shirt,verified,bankily,masrvi,sedad,click,bankily_account,masrvi_account,sedad_account,click_account,delivery_date,observations,city,vehicle_type,app_code,driver_photo_path,vehicle_photo_path').order('id',{ascending:true}).range(i,i+999);
-   if(error){setMsg(t('Erreur de synchronisation : ')+error.message);setLoading(false);return;}
-   const chunk=(data??[]) as Row[];all.push(...chunk);
-   if(chunk.length<1000)break;
+  if(!prestoCloud){setLoading(false);return;}
+  const requestId=++loadSequence.current;
+  try{
+   const all:Row[]=[];
+   for(let i=0;i<10000;i+=1000){
+    const {data,error}=await prestoCloud.from('presto_drivers')
+     .select('id,name,phone,bag,shirt,verified,bankily,masrvi,sedad,click,bankily_account,masrvi_account,sedad_account,click_account,delivery_date,observations,city,vehicle_type,app_code,driver_photo_path,vehicle_photo_path')
+     .order('id',{ascending:true}).range(i,i+999);
+    if(error)throw Error(error.message);
+    const chunk=(data??[]) as Row[];
+    all.push(...chunk);
+    if(chunk.length<1000)break;
+   }
+   // A slower, older response must never overwrite more recent shared records.
+   if(requestId!==loadSequence.current)return;
+   setRows(previous=>previous.length===all.length&&previous.every((row,i)=>JSON.stringify(row)===JSON.stringify(all[i]))?previous:all);
+   setSyncError('');
+   setLoading(false);
+  }catch(error){
+   if(requestId!==loadSequence.current)return;
+   setLoading(false);
+   setSyncError((language==='ar'?'تعذر تحديث السجلات. ستتم إعادة المحاولة تلقائيًا: ':'Synchronisation indisponible. Nouvelle tentative automatique : ')+(error instanceof Error?error.message:'Erreur réseau'));
   }
-  setRows(all);setLoading(false);
  },[language]);
  useEffect(()=>{
   if(!prestoCloud)return;
   let active=true;
-  void load();
+  const refresh=()=>{
+   if(!navigator.onLine){
+    setLoading(false);
+    setSyncError(language==='ar'?'لا يوجد اتصال بالإنترنت. ستُحدَّث البيانات عند عودة الاتصال.':'Vous êtes hors ligne. Les données seront actualisées à la reconnexion.');
+    return;
+   }
+   if(document.visibilityState==='visible')void load();
+  };
+  refresh();
+  window.addEventListener('online',refresh);
+  document.addEventListener('visibilitychange',refresh);
   try{
    const raw=localStorage.getItem('presto-ops-live-v1');
    const data=raw?JSON.parse(raw):[];
@@ -80,9 +105,9 @@ export default function SharedDashboard(){
   void prestoCloud.from('presto_profile').select('company,city').eq('id',1).maybeSingle().then(({data})=>{if(active&&data){setCompany(data.company);setCity(data.city)}});
   void prestoCloud.auth.getSession().then(({data})=>{if(active)setUserId(data.session?.user.id??null)});
   const {data:listener}=prestoCloud.auth.onAuthStateChange((_event,session)=>{if(active)setUserId(session?.user.id??null)});
-  const interval=setInterval(()=>{void load()},5000);
-  return ()=>{active=false;clearInterval(interval);listener.subscription.unsubscribe()};
- },[load]);
+  const interval=setInterval(refresh,5000);
+  return ()=>{active=false;loadSequence.current++;clearInterval(interval);window.removeEventListener('online',refresh);document.removeEventListener('visibilitychange',refresh);listener.subscription.unsubscribe()};
+ },[load,language]);
  useEffect(()=>{
   if(!prestoCloud)return;
   let active=true;
@@ -314,6 +339,7 @@ export default function SharedDashboard(){
     <button type="button" onClick={()=>go('registration')}><Bike size={17}/>{language==='ar'?'تسجيل السائقين':'Enregistrer un livreur'}</button>
    </div>
   </section>}
+  {syncError&&<div className="syncNotice" role="alert">{syncError}</div>}
   {msg&&<div className="syncNotice" role="status">{msg}<button onClick={()=>setMsg('')} aria-label={t("Fermer")}><X size={15}/></button></div>}
   {view==='dashboard'&&<><div className="statGrid">{[['LIVREURS',totals.all,'+ Total enregistré','orange'],['SACS REMIS',totals.bags,pct(totals.bags)+' % '+t('de remise'),'blue'],['CHEMISES',totals.shirts,pct(totals.shirts)+' % '+t('distribuées'),'cyan'],['DOSSIERS COMPLETS',totals.complete,pct(totals.complete)+' % '+t('des livreurs'),'green']].map(s=><PrestoSpotlightCard className={'stat '+s[3]} key={s[0]}><small>{t(String(s[0]))}</small><div><strong><AnimatedMetric value={Number(s[1])} locale={language==='ar'?'ar-MR':'fr-FR'}/></strong><span><ArrowUpRight size={22}/></span></div><p>{t(String(s[2]))}</p></PrestoSpotlightCard>)}</div><div className="dashboardQuickLinks" aria-label={language==='ar'?'اختصارات العمليات':'Accès rapides'}>
    {([
