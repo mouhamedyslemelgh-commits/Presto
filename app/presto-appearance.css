@@ -1,0 +1,201 @@
+/* PRESTO appearance controls: per-device theme, accent and visual brightness. */
+:root {
+ --presto-accent:#f26c3c;
+ --presto-screen-dim:0;
+ --presto-screen-light:0;
+}
+body::before,body::after{
+ content:"";position:fixed;inset:0;pointer-events:none;z-index:2147483000;
+}
+body::before{background:rgba(0,0,0,var(--presto-screen-dim))}
+body::after{background:rgba(255,255,255,var(--presto-screen-light))}
+
+.shell{--presto-orange:var(--presto-accent);--orange:var(--presto-accent)}
+.shell .primary,.shell .attention button,.shell .driverProfileSave{
+ background:var(--presto-accent);
+}
+.shell .primary:hover,.shell .attention button:hover{background:color-mix(in srgb,var(--presto-accent) 82%,#171717)}
+.shell .sidebar nav button.selected{border-color:color-mix(in srgb,var(--presto-accent) 35%,transparent);background:linear-gradient(105deg,color-mix(in srgb,var(--presto-accent) 24%,transparent),color-mix(in srgb,var(--presto-accent) 7%,transparent));box-shadow:inset 3px 0 0 var(--presto-accent)}
+.shell[dir=rtl] .sidebar nav button.selected{box-shadow:inset -3px 0 0 var(--presto-accent)}
+.shell .sidebar nav button.selected svg{color:var(--presto-accent)}
+.shell .dashboardWelcomeTag:before{background:var(--presto-accent)}
+.shell :is(.settingsIcon,.opsSettingsIntroIcon){color:var(--presto-accent)}
+.shell :is(.primary,.smallBtn,.secondary):focus-visible{outline:3px solid color-mix(in srgb,var(--presto-accent) 50%,transparent);outline-offset:3px}
+
+.prestoAppearanceControl{position:relative;display:flex;align-items:center;z-index:40}
+.prestoAppearanceTrigger{
+ display:inline-flex;align-items:center;justify-content:center;gap:7px;
+ padding:9px 11px;border:1px solid #dae4e9;border-radius:12px;
+ color:#365567;background:#f7fafb;font-size:12px;font-weight:750;
+ min-height:38px;white-space:nowrap;transition:background .2s,border-color .2s,transform .2s
+}
+.prestoAppearanceTrigger:hover,.prestoAppearanceTrigger.isOpen{border-color:var(--presto-accent);background:color-mix(in srgb,var(--presto-accent) 9%,white)}
+.prestoAppearanceTrigger svg:first-child{color:var(--presto-accent)}
+.prestoAppearanceTrigger:focus-visible{outline:3px solid var(--presto-accent);outline-offset:2px}
+.prestoAppearancePopover{
+ position:absolute;top:calc(100% + 14px);inset-inline-end:0;width:min(370px,calc(100vw - 24px));
+ background:#fff;border:1px solid #e3e8ef;border-radius:22px;
+ color:#1b3343;box-shadow:0 24px 70px #152d3a36,0 4px 15px #152d3a10;
+ padding:20px;z-index:100;text-align:start;max-height:min(78vh,700px);overflow-y:auto;overscroll-behavior:contain
+}
+.prestoAppearancePopoverHead{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:0 0 16px;border-bottom:1px solid #edf1f5}
+.prestoAppearanceEyebrow{font-size:10px;font-weight:900;letter-spacing:.16em;color:var(--presto-accent)}
+.prestoAppearancePopoverHead h3{margin:5px 0 4px;font-size:18px;line-height:1.35;color:#183248}
+.prestoAppearancePopoverHead p{margin:0;font-size:12px;line-height:1.6;color:#6c7f8c}
+.prestoAppearanceHeadIcon{display:grid;place-items:center;flex:0 0 43px;height:43px;border-radius:14px;background:color-mix(in srgb,var(--presto-accent) 12%,white);color:var(--presto-accent)}
+.prestoAppearanceFields{display:grid;gap:19px;padding-top:18px;text-align:start;color:#243d4c}
+.prestoAppearanceGroup{display:grid;gap:12px}
+.prestoAppearanceLabel{display:flex;align-items:center;gap:8px;color:#243c4c}
+.prestoAppearanceLabel svg{color:var(--presto-accent);flex-shrink:0}
+.prestoAppearanceLabel strong{font-size:13px;font-weight:800}
+.prestoAppearanceModes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+.prestoAppearanceModes button{
+ display:flex;align-items:center;justify-content:center;gap:6px;
+ background:#f6f8fa;border:1px solid #e3e9ef;border-radius:12px;
+ min-height:42px;padding:8px 6px;color:#657987;font-size:12px;font-weight:700;
+ transition:background .2s,border-color .2s,color .2s
+}
+.prestoAppearanceModes button.active{
+ border-color:var(--presto-accent);color:var(--presto-accent);
+ background:color-mix(in srgb,var(--presto-accent) 8%,white);
+ box-shadow:0 0 0 1px color-mix(in srgb,var(--presto-accent) 20%,transparent)
+}
+.prestoAppearanceModes button:hover{border-color:var(--presto-accent)}
+.prestoAppearancePalette{display:flex;flex-wrap:wrap;gap:9px}
+.prestoAppearanceSwatch{
+ width:32px;height:32px;border-radius:50%;border:2px solid #fff;
+ display:grid;place-items:center;color:white;
+ box-shadow:0 0 0 1px #d4dce3,0 2px 7px #0f2e4019;
+ transition:transform .16s,box-shadow .16s
+}
+.prestoAppearanceSwatch[aria-pressed=true]{box-shadow:0 0 0 2px var(--presto-accent),0 3px 9px #0f2e4026;transform:scale(1.06)}
+.prestoAppearanceSwatch:hover{transform:translateY(-2px)}
+.prestoAppearanceCustom{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:12px;color:#637785;flex-wrap:wrap}
+.prestoAppearanceColorInput{display:flex;align-items:center;gap:6px;border:1px solid #e0e7ec;background:#f8fafc;border-radius:10px;padding:5px 8px;color:#405d71;font-size:11px;font-weight:700}
+.prestoAppearanceColorInput input{width:30px;height:25px;border:0;padding:0;background:transparent;cursor:pointer}
+.prestoAppearanceOutput{margin-inline-start:auto;color:var(--presto-accent);font-weight:850;font-size:13px}
+.prestoAppearanceBrightness{display:flex;align-items:center;gap:12px}
+.prestoAppearanceBrightness button{width:33px;height:33px;flex:0 0 33px;border:1px solid #e1e8ed;border-radius:10px;display:grid;place-items:center;color:#486779;background:#f7f9fb}
+.prestoAppearanceBrightness button:disabled{opacity:.35;cursor:not-allowed}
+.prestoAppearanceBrightness input[type=range]{flex:1;min-width:0;accent-color:var(--presto-accent);cursor:pointer}
+.prestoAppearanceHint{font-size:11px;line-height:1.65;color:#8797a2;margin:-3px 0 0}
+.prestoAppearanceFooter{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:15px;border-top:1px solid #e9edf2}
+.prestoAppearanceFooter>span{font-size:11px;color:#7d8d99;line-height:1.5}
+.prestoAppearanceFooter button{display:inline-flex;align-items:center;gap:5px;border:0;background:transparent;color:var(--presto-accent);font-size:11px;font-weight:800;white-space:nowrap;padding:6px}
+.prestoAppearanceFields :is(button,input):focus-visible{outline:2px solid var(--presto-accent);outline-offset:3px}
+.shell .prestoAppearanceSettings{display:grid;gap:15px}
+.shell .prestoAppearanceSettings .prestoAppearanceFields{max-width:570px}
+.shell .prestoAppearanceSettings .prestoAppearancePalette{gap:13px}
+.shell .prestoAppearanceSettings .prestoAppearanceSwatch{width:36px;height:36px}
+
+html[data-presto-theme=dark]{color-scheme:dark}
+html[data-presto-theme=dark] body{background:#0b151d;color:#e7f1f7}
+html[data-presto-theme=dark] .shell{
+ --presto-ink:#e7f1f7;--ink:#e7f1f7;
+ --presto-muted:#a0b2c0;--muted:#a0b2c0;
+ --presto-stroke:#314352;--border:#314352;
+ --presto-page:#101d27;--bg:#101d27;--navy:#08131a;
+ background:radial-gradient(ellipse 900px 500px at 85% -5%,color-mix(in srgb,var(--presto-accent) 11%,transparent),transparent),#101d27;color:#e7f1f7
+}
+html[data-presto-theme=dark] .shell .sidebar{background:linear-gradient(160deg,#061018,#101f2a);border-color:#293d4a}
+html[data-presto-theme=dark] .shell .topbar{
+ background:rgba(13,27,36,.96);color:#a0b3c0;border-color:#2b3e4b
+}
+html[data-presto-theme=dark] .shell .topbar b{color:#eaf4fa}
+html[data-presto-theme=dark] .shell .topbar .date{background:#192d39;border-color:#314755;color:#bfd2de}
+html[data-presto-theme=dark] .shell .avatar{background:#34251f;border-color:#614637;color:#fcb58d}
+html[data-presto-theme=dark] .shell .menuButton{color:#cbdce5}
+html[data-presto-theme=dark] .shell .menuButton:hover{background:#243644}
+
+html[data-presto-theme=dark] .shell :is(
+ .pageHead,.dashboardWelcome,.stat,.payment,.panel,.settingsCard,.opsPanel,
+ .settingsLanguageCard,.opsSettingsIntro,.driverRegisterPanel,.opsMetric,.opsDriverCard,
+ .opsProviderSummary,.opsLanguageCard,.settingsIntro,.reportCard,.reportBox
+){
+ background:#192a36!important;border-color:#344957!important;color:#e9f3f9!important;
+ box-shadow:0 8px 28px #01080f30
+}
+html[data-presto-theme=dark] .shell .pageHead{
+ background:linear-gradient(105deg,#182b38 58%,#29312e)!important
+}
+html[data-presto-theme=dark] .shell .dashboardWelcome{background:linear-gradient(120deg,#192f3b,#252b32)!important}
+html[data-presto-theme=dark] .shell :is(.pageHead h1,.dashboardWelcome h2,.stat strong,.paymentHeader b,.panelTitle h2,.settingsCard h3,.settingsIntro h2,.opsSettingsIntro h2,.opsPanel h2,.driverRegisterPanel h2,.sectionHeading h2,.settingsLanguageCard h3){
+ color:#f1f7fb!important
+}
+html[data-presto-theme=dark] .shell :is(.pageHead p,.dashboardWelcome p,.stat small,.stat p,.sectionHeading small,.paymentHeader small,.panelTitle p,.settingsCard p,.settingsLanguageCard p,.opsSettingsIntro p,.opsPanel p,.driverRegisterNameStack small,.settingsHint){
+ color:#aec1cc!important
+}
+html[data-presto-theme=dark] .shell :is(.secondary,.smallBtn,.dashboardQuickLinks button,.dashboardWelcomeActions button,.opsFilterChips button,.driverRegisterActions button){
+ background:#263b48;border-color:#3a5464;color:#dbeaf2
+}
+html[data-presto-theme=dark] .shell :is(.secondary,.smallBtn,.dashboardQuickLinks button,.opsFilterChips button):hover{background:#324e60}
+html[data-presto-theme=dark] .shell :is(.stat>div span,.settingsIcon,.opsSettingsIntroIcon,.opsSettingsSectionIcon){
+ background:color-mix(in srgb,var(--presto-accent) 18%,#182a36);color:var(--presto-accent)
+}
+html[data-presto-theme=dark] .shell .attention{background:linear-gradient(150deg,#263943,#142a36);color:#f0f8fc;border-color:#415364}
+html[data-presto-theme=dark] .shell .attention :is(h3,p,span,small,strong){color:#e4eff6}
+html[data-presto-theme=dark] .shell .track{background:#334957}
+html[data-presto-theme=dark] .shell :is(.controls label,.driverRegisterSearch label:first-child,.opsSearch,.settingsField input,.driverEditorInputWrap,.driverVehiclePhotoPicker){
+ background:#12232e!important;border-color:#344b5a!important;color:#e8f3f9!important
+}
+html[data-presto-theme=dark] .shell :is(input:not([type=checkbox]):not([type=radio]):not([type=color]):not([type=range]),textarea,select){
+ background-color:#132632;color:#edf5f9;border-color:#39515f
+}
+html[data-presto-theme=dark] .shell :is(input,textarea)::placeholder{color:#96a8b4}
+html[data-presto-theme=dark] .shell .tableOverflow{background:#192b36;border-color:#364b59}
+html[data-presto-theme=dark] .shell :is(table,.driverRegisterTable){color:#eaf2f7}
+html[data-presto-theme=dark] .shell :is(th,.driverRegisterTable th){
+ background:#263b49!important;color:#c7d9e3!important;border-color:#374c59!important
+}
+html[data-presto-theme=dark] .shell :is(td,.driverRegisterTable td){
+ background:#1a2d39;color:#dceaf1;border-color:#354954
+}
+html[data-presto-theme=dark] .shell :is(tr:hover td,.driverRegisterTable tr:hover td){background:#243c49!important}
+html[data-presto-theme=dark] .shell :is(.driverRegisterNameStack strong,.driverRegisterPhone,.driverRegisterIdentity,.driverNameButton,.num,.name){
+ color:#eaf2f7
+}
+html[data-presto-theme=dark] .shell :is(.driverRegisterAvatar,.driverRegisterNumber,.driverRegisterRecordCount,.opsMetric,.opsDriverCard,.opsProviderSummary){
+ background:#253a47;border-color:#385160;color:#eaf2f7
+}
+html[data-presto-theme=dark] .shell :is(.settingsField,.settingsSwitchRow,.settingsBackupSummary,.settingsPrivacy,.settingsHint){
+ color:#c9dbe5;border-color:#364956
+}
+html[data-presto-theme=dark] .shell :is(.settingsSwitchRow,.settingsBackupSummary>div,.reportLine,.opsLanguageCard){
+ border-color:#354a58
+}
+html[data-presto-theme=dark] .shell .syncNotice{background:#223b46;color:#dcecf4;border-color:#41606b}
+html[data-presto-theme=dark] .shell :is(.driverEditorDialog,.driverProfileDialog,.driverRegistrationDialog,.prestoModal,.excelImportDialog,.excelExportDialog){
+ background:#1b2d39;color:#e7f1f8;border-color:#3a5260
+}
+html[data-presto-theme=dark] .shell :is(.driverProfileBody,.driverProfileInfo,.driverProfileEquipmentCard,.driverProfilePaymentCard,.driverEditorSection,.driverProfileNotes,.driverProfileToolbar){
+ background:#223745;color:#ecf6fa;border-color:#3c5360
+}
+html[data-presto-theme=dark] .shell .driverProfileDialog :is(h2,h3,strong){color:#f0f8fc}
+html[data-presto-theme=dark] .shell .driverProfileDialog :is(p,small,span){color:#c0d2dc}
+
+html[data-presto-theme=dark] .prestoAppearancePopover{background:#182b37;border-color:#3a5362;color:#e6f2f8;box-shadow:0 26px 80px #0009}
+html[data-presto-theme=dark] .prestoAppearancePopoverHead{border-color:#344956}
+html[data-presto-theme=dark] .prestoAppearancePopoverHead h3{color:#f1f8fc}
+html[data-presto-theme=dark] .prestoAppearancePopoverHead p{color:#afc4cf}
+html[data-presto-theme=dark] .prestoAppearanceFields{color:#e1eff6}
+html[data-presto-theme=dark] .prestoAppearanceLabel{color:#dcebf3}
+html[data-presto-theme=dark] .prestoAppearanceTrigger{background:#203744;border-color:#395261;color:#e1f0f8}
+html[data-presto-theme=dark] .prestoAppearanceTrigger:hover{background:#29424f}
+html[data-presto-theme=dark] .prestoAppearanceModes button{background:#223745;border-color:#38505d;color:#c3d5df}
+html[data-presto-theme=dark] .prestoAppearanceModes button.active{background:color-mix(in srgb,var(--presto-accent) 19%,#182b37);color:#f4f6f7;border-color:var(--presto-accent)}
+html[data-presto-theme=dark] .prestoAppearanceCustom{color:#b8cbd4}
+html[data-presto-theme=dark] .prestoAppearanceColorInput{background:#203845;color:#e3eef5;border-color:#3d5360}
+html[data-presto-theme=dark] .prestoAppearanceBrightness button{background:#263e4b;color:#ddeaf2;border-color:#415766}
+html[data-presto-theme=dark] .prestoAppearanceHint,html[data-presto-theme=dark] .prestoAppearanceFooter>span{color:#aec1cb}
+html[data-presto-theme=dark] .prestoAppearanceFooter{border-color:#3b5060}
+html[data-presto-theme=dark] .prestoAppearanceHeadIcon{background:#293f49}
+
+@media(max-width:720px){
+ .shell .topRight{gap:7px}
+ .prestoAppearanceTrigger{min-height:36px;padding:8px;gap:5px}
+ .prestoAppearanceTrigger span,.prestoAppearanceTrigger svg:last-child{display:none}
+ .prestoAppearancePopover{position:fixed;top:70px;inset-inline-end:12px;inset-inline-start:12px;width:auto;max-height:calc(100dvh - 84px);padding:17px}
+}
+@media(prefers-reduced-motion:reduce){
+ .prestoAppearanceTrigger,.prestoAppearanceSwatch,.prestoAppearanceModes button{transition:none}
+}
