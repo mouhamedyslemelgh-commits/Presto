@@ -44,7 +44,7 @@ export default function ExcelExportDialog({drivers,busy=false,variant='compact',
   catch(e){setError(e instanceof Error?e.message:(ar?'تعذّر إنشاء ملف Excel.':'Impossible de créer le classeur Excel.'))}
  };
  return <>
-  <button type="button" className={'excelExportTrigger '+(variant==='wide'?'excelExportWide':'')} disabled={busy} onClick={()=>{setError('');setOpen(true)}}><Download size={17}/>{busy?(ar?'جارٍ تجهيز Excel...':'Génération Excel...'):(ar?'تنزيل Excel':'Exporter Excel')}</button>
+  <button type="button" className={'excelExportTrigger '+(variant==='wide'?'excelExportWide':'')} disabled={busy} onClick={()=>{setError('');setOpen(true)}}><Download size={17}/>{busy?(ar?'جارٍ تجهيز Excel...':'Génération Excel...'):(ar?'تنزيل حسب الاختيار':'Export personnalisé')}</button>
   {open&&<div className="excelExportOverlay" onMouseDown={e=>{if(e.target===e.currentTarget&&!busy)setOpen(false)}}>
    <section className="excelExportDialog" role="dialog" aria-modal="true" aria-label={ar?'خيارات تنزيل Excel':'Options export Excel'} dir={ar?'rtl':'ltr'}>
     <div className="excelExportHeader">
