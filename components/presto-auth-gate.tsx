@@ -111,10 +111,16 @@ export default function PrestoAuthGate({children}:{children:ReactNode}){
  const signOut=async()=>{
   if(!prestoCloud||pending)return;
   setPending(true);
-  const {error}=await prestoCloud.auth.signOut();
-  setPending(false);
-  if(error){setNotice(error.message);return;}
-  setStage('guest');setMode('login');setPassword('');setNotice('');setChangingPassword(false);setEditingProfile(false);
+  try{
+   const {error}=await prestoCloud.auth.signOut();
+   if(error)throw error;
+   setStage('guest');setMode('login');setPassword('');setNotice('');
+   setChangingPassword(false);setEditingProfile(false);setAccountMenuOpen(false);
+  }catch(error){
+   setNotice(error instanceof Error?error.message:(ar?'تعذر تسجيل الخروج. حاول مجددًا.':'Impossible de se déconnecter. Réessayez.'));
+  }finally{
+   setPending(false);
+  }
  };
 
  if(stage==='ready'&&!recovering)return <>
