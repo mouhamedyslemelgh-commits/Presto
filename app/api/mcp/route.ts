@@ -56,7 +56,7 @@ export async function POST(request: Request) {
   if (rpc.method === 'tools/list') return ok({tools});
   if (rpc.method === 'tools/call') {
     const name = rpc.params?.name;
-    const args = rpc.params?.arguments;
+    const args = rpc.params?.arguments ?? {};
     if (!args || typeof args !== 'object' || Array.isArray(args)) return fail(-32602, 'Invalid arguments');
     try {
       let data: unknown;
@@ -64,7 +64,7 @@ export async function POST(request: Request) {
       else if (name === 'presto_find_drivers') {
         const item = args as Record<string,unknown>;
         if (typeof item.query !== 'string' || !item.query.trim() || item.query.length > 80 ||
-          (item.limit !== undefined && (!Number.isInteger(item.limit) || Number(item.limit) < 1 || Number(item.limit) > 10))) {
+          (item.limit !== undefined && (typeof item.limit !== 'number' || !Number.isInteger(item.limit) || item.limit < 1 || item.limit > 10))) {
           return fail(-32602, 'Invalid search arguments');
         }
         data = await findPrestoDrivers(auth.client, item.query, item.limit === undefined ? 10 : Number(item.limit));
