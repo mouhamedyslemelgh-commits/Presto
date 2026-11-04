@@ -13,6 +13,6 @@ export async function GET() {
     resource: site.replace(/\/$/, '') + '/api/mcp',
     authorization_servers: [issuer],
     scopes_supported: ['openid', 'email'],
-    resource_documentation: site.replace(/\/$/, '') + '/PRESTO_AI_SETUP_AR.md'
+    resource_documentation: 'https://github.com/mouhamedyslemelgh-commits/Presto/blob/feat/secure-chatgpt-integration/PRESTO_AI_SETUP_AR.md'
   }, {headers: {'Cache-Control': 'no-store'}});
 }
