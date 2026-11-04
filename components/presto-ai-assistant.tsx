@@ -1,6 +1,6 @@
 'use client';
 
-import {useState, type FormEvent} from 'react';
+import {useEffect, useState, type FormEvent} from 'react';
 import {Bot, Send, X, LoaderCircle, ShieldCheck} from 'lucide-react';
 import {prestoCloud} from '../lib/presto-cloud';
 import {useLanguage} from './presto-language';
@@ -12,6 +12,24 @@ export default function PrestoAiAssistant() {
   const {language} = useLanguage();
   const ar = language === 'ar';
   const [open, setOpen] = useState(false);
+  const [allowed, setAllowed] = useState(false);
+  useEffect(() => {
+    if (!prestoCloud) return;
+    let active = true;
+    const check = async () => {
+      const {data: identity, error: authError} = await prestoCloud.auth.getUser();
+      if (authError || !identity.user || identity.user.is_anonymous) {
+        if (active) setAllowed(false);
+        return;
+      }
+      const {data, error} = await prestoCloud.from('presto_admins')
+        .select('user_id').eq('user_id', identity.user.id).maybeSingle();
+      if (active) setAllowed(Boolean(data) && !error);
+    };
+    void check();
+    const {data: listener} = prestoCloud.auth.onAuthStateChange(() => {void check();});
+    return () => {active = false; listener.subscription.unsubscribe();};
+  }, []);
   const [question, setQuestion] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
   const [busy, setBusy] = useState(false);
@@ -43,6 +61,8 @@ export default function PrestoAiAssistant() {
       }]);
     } finally { setBusy(false); }
   };
+
+  if (!allowed) return null;
 
   return <div className="presto-ai" dir={ar ? 'rtl' : 'ltr'}>
     {!open && <button type="button" className="presto-ai-launch" onClick={() => setOpen(true)}
