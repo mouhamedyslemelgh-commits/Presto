@@ -1,6 +1,7 @@
 'use client';
 import {prestoCloud} from '../lib/presto-cloud';
 import SharedDashboard from './shared-dashboard';
+import PrestoAiAssistant from '../components/presto-ai-assistant';
 import PrestoAuthGate from '../components/presto-auth-gate';
 import {useEffect,useMemo,useRef,useState} from 'react';
 import ExcelImporter from '../components/excel-importer';
@@ -167,4 +168,4 @@ return <div className="shell" dir={language==='ar'?'rtl':'ltr'}><div className={
  paymentNumbers:{bankily:editing.paymentNumbers?.bankily||'',masrvi:editing.paymentNumbers?.masrvi||'',sedad:editing.paymentNumbers?.sedad||'',click:editing.paymentNumbers?.click||''}
 }} onChange={next=>setEditing({...editing,...next})} onClose={()=>setDialog(false)} onSave={save}/>}</div>;
 }
-export default function Home(){return <PrestoAuthGate>{prestoCloud?<SharedDashboard/>:<LocalHome/>}</PrestoAuthGate>;}
+export default function Home(){return <PrestoAuthGate>{prestoCloud?<><SharedDashboard/><PrestoAiAssistant/></>:<LocalHome/>}</PrestoAuthGate>;}
