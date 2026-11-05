@@ -1,0 +1,156 @@
+/*
+ * PRESTO mobile layout patch — isolated to small screens.
+ * Keep all desktop/tablet styles untouched.
+ * Tables of drivers become readable stacked cards on phones.
+ */
+@media screen and (max-width:700px){
+  html,body{width:100%;max-width:100%;overflow-x:clip}
+  .shell,.shell .workspace,.shell .workspace main{width:100%;max-width:100%;min-width:0}
+  .shell{overflow-x:clip}
+  .shell .workspace main{padding:14px 12px calc(32px + env(safe-area-inset-bottom,0px))}
+  .shell main :is(.pageHead,.dashboardWelcome,.panel,.opsPanel,.settingsCard){max-width:100%;min-width:0}
+  .shell main :is(h1,h2,h3,p,strong,small,span){overflow-wrap:break-word}
+
+  /* Compact fixed-height navigation with enough room for Arabic and French */
+  .shell .topbar{height:60px;min-height:60px;padding-inline:11px;gap:7px;justify-content:flex-start}
+  .shell .topbar>div:first-of-type{display:none!important}
+  .shell .menuButton{width:42px;height:42px;min-width:42px;display:flex;align-items:center;justify-content:center;border-radius:12px}
+  .shell .mobileBrandLogo{display:block;width:64px;max-width:64px;height:40px;object-fit:contain;margin-inline-end:auto}
+  .shell .topRight{margin-inline-start:auto;gap:5px;min-width:0;flex-shrink:0}
+  .shell .prestoLanguagePicker{padding:2px;max-width:100%;gap:2px}
+  .shell .prestoLanguagePicker button{min-width:32px;min-height:34px;padding:5px 7px;font-size:11px}
+  .shell .prestoAppearanceTrigger{width:40px;min-width:40px;height:40px;min-height:40px;padding:0;display:flex;align-items:center;justify-content:center;gap:0}
+  .shell .prestoAppearanceTrigger>span,.shell .prestoAppearanceTrigger>svg:last-child:not(:first-child){display:none}
+  .shell .prestoAppearancePopover{position:fixed;top:64px;left:12px;right:12px;width:auto;max-width:none;max-height:calc(100dvh - 78px);overflow-y:auto;overscroll-behavior:contain}
+  .shell .sidebar{width:min(300px,87vw);padding-bottom:calc(34px + env(safe-area-inset-bottom,0px));overscroll-behavior:contain}
+  .shell .sidebar nav button{min-height:48px}
+
+  /* Intro, dashboard actions, counters and navigation cards */
+  .shell .pageHead{padding:17px 14px;margin-bottom:13px;border-radius:15px;gap:13px}
+  .shell .pageHead>div:first-child{min-width:0}
+  .shell .pageHead h1{font-size:clamp(21px,6vw,26px);line-height:1.35;margin:0}
+  .shell .pageHead p{font-size:12px;line-height:1.65;margin-top:7px}
+  .shell .headActions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;width:100%;justify-content:stretch}
+  .shell .headActions>*{width:100%;max-width:100%;min-width:0}
+  .shell .headActions :is(button,.primary,.secondary,.excelExportTrigger,.excelImportButton,.excelQuickDownload){width:100%;min-width:0;min-height:46px;max-width:100%;padding:10px 7px;font-size:11px;line-height:1.3;white-space:normal;overflow-wrap:anywhere;gap:5px;justify-content:center;text-align:center}
+  .shell .headActions button svg{flex-shrink:0;width:16px;height:16px}
+  .shell .headActions>.primary:only-child{grid-column:1/-1}
+  .shell .dashboardWelcome{padding:19px 15px;gap:17px}
+  .shell .dashboardWelcome h2{font-size:clamp(20px,5.8vw,25px);line-height:1.45}
+  .shell .dashboardWelcome p{font-size:12px;line-height:1.8}
+  .shell .dashboardWelcomeActions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;width:100%}
+  .shell .dashboardWelcomeActions button{width:100%;min-width:0;min-height:49px;padding:10px 7px;font-size:11px;white-space:normal;line-height:1.5}
+  .shell .statGrid,.shell .paymentGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+  .shell .stat{min-width:0;min-height:138px;padding:15px 12px;overflow:hidden}
+  .shell .stat strong{font-size:clamp(25px,8vw,33px)}
+  .shell .stat small,.shell .stat p{font-size:11px;line-height:1.6}
+  .shell .payment{min-width:0;min-height:132px;padding:12px}
+  .shell .paymentHeader{display:flex;flex-wrap:wrap;gap:7px}
+  .shell .paymentHeader strong{font-size:clamp(22px,7vw,28px)}
+  .shell .dashboardQuickLinks{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .shell .dashboardQuickLinks button{min-width:0;min-height:65px;padding:10px;gap:7px;overflow-wrap:anywhere}
+  .shell .bottomGrid{grid-template-columns:minmax(0,1fr)}
+  .shell .panel,.shell .opsPanel{padding:15px 12px;border-radius:15px}
+  .shell .panelTitle,.shell .opsPanelHeader,.shell .driverRegisterPanelTitle{flex-wrap:wrap;align-items:flex-start;gap:12px}
+  .shell .panelTitle>div,.shell .driverRegisterPanelTitle>div,.shell .opsPanelHeaderIntro{min-width:0;max-width:100%}
+  .shell .driverRegisterRecordCount,.shell .opsTotal{margin-inline-start:0}
+  .shell .driverRegisterPanelTitle h2,.shell .opsPanelHeader h2{font-size:19px;line-height:1.45}
+  .shell .driverRegisterPanelTitle p,.shell .opsPanelHeader p{font-size:11px;line-height:1.7}
+  .shell .controls,.shell .driverRegisterSearch{display:flex;flex-direction:column;align-items:stretch;gap:8px;width:100%;max-width:100%}
+  .shell .controls label,.shell .driverRegisterSearch label{min-width:0;width:100%;max-width:100%;min-height:45px}
+  .shell .controls :is(input,select),.shell .driverRegisterSearch input{width:100%;max-width:100%;min-width:0;font-size:16px}
+
+  /* Driver and vehicle ledgers become stacked cards: no 1000px sideways scrolling */
+  .shell .driverRegisterPanel .driverRegisterWrap{width:100%;min-width:0;max-width:100%;height:auto;max-height:none;overflow:visible;border:0;box-shadow:none;background:transparent;border-radius:0}
+  .shell .driverRegisterPanel .driverRegisterTable,
+  .shell .driverRegisterPanel .driverVehicleRegisterTable{display:block;width:100%;min-width:0!important;max-width:100%;border:0;table-layout:auto}
+  .shell .driverRegisterTable thead{display:none}
+  .shell .driverRegisterTable tbody{display:grid;grid-template-columns:minmax(0,1fr);gap:12px;width:100%}
+  .shell .driverRegisterTable tr.driverRegisterRow{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:start;gap:10px;width:100%;min-width:0;padding:13px;border:1px solid #e1e9f0;border-radius:16px;background:#fff;box-shadow:0 5px 18px #15324a0a;overflow:hidden}
+  .shell .driverRegisterTable tr.driverRegisterRow>td{display:flex;flex-direction:column;justify-content:flex-start;gap:5px;min-width:0;width:100%;max-width:100%;padding:0!important;border:0!important;white-space:normal;vertical-align:top;font-size:12px;line-height:1.5;background:transparent!important;overflow-wrap:anywhere}
+  .shell .driverRegisterTable tr.driverRegisterRow>td[data-label]::before{content:attr(data-label);display:block;color:#738699;font-size:10px;font-weight:800;line-height:1.5;letter-spacing:0}
+  .shell .driverRegisterTable tr.driverRegisterRow>td:first-child{grid-column:1/-1;display:flex;flex-direction:row;align-items:center;gap:9px;padding-bottom:8px!important;border-bottom:1px solid #edf1f5!important}
+  .shell .driverRegisterTable tr.driverRegisterRow>td:first-child::before{margin-inline-end:auto}
+  .shell .driverRegisterTable tr.driverRegisterRow>td.driverRegisterIdentityCell{grid-column:1/-1;padding-bottom:10px!important;border-bottom:1px solid #edf1f5!important;gap:8px}
+  .shell .driverRegisterTable tr.driverRegisterRow>td.driverRegisterIdentityCell::before{display:none}
+  .shell .driverRegisterTable .driverRegisterIdentity{display:flex;gap:10px;align-items:center;width:100%;min-width:0;text-align:start}
+  .shell .driverRegisterTable .driverRegisterNameStack{min-width:0;flex:1}
+  .shell .driverRegisterTable .driverRegisterNameStack strong{font-size:15px;line-height:1.5;white-space:normal;overflow-wrap:anywhere}
+  .shell .driverRegisterTable .driverRegisterNameStack small{font-size:11px;white-space:normal}
+  .shell .driverRegisterTable .driverRegisterAvatar{width:44px;height:44px;flex:0 0 44px}
+  .shell .driverRegisterTable .equipmentCardLink{align-self:flex-start;margin:0;min-height:36px;display:inline-flex;align-items:center;padding:7px 11px;font-size:11px}
+  .shell .driverRegisterTable .driverRegisterPhone,.shell .driverRegisterTable .driverVehicleAppCode{max-width:100%;white-space:normal;overflow-wrap:anywhere}
+  .shell .driverRegisterTable .driverRegisterStatus,.shell .driverRegisterTable .driverRegisterPayment{align-self:flex-start;max-width:100%;white-space:normal;font-size:11px}
+  .shell .driverRegisterTable .driverRegisterNotes{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;max-width:100%;font-size:11px}
+  .shell .driverRegisterTable .driverVehicleListPhoto{width:75px;max-width:100%;height:58px;object-fit:cover}
+  .shell .driverRegisterTable .driverRegisterEquipment{display:flex;flex-wrap:wrap;gap:5px}
+  .shell .driverRegisterTable tr.driverRegisterRow>td:last-child:has(.driverRegisterActions){grid-column:1/-1;border-top:1px solid #edf1f5!important;padding-top:10px!important}
+  .shell .driverRegisterTable .driverRegisterActions{width:100%;display:flex;gap:8px}
+  .shell .driverRegisterTable .driverRegisterActions button{min-height:44px;min-width:44px;display:flex;align-items:center;justify-content:center;flex:1;border-radius:10px}
+  .shell .driverRegisterTable tr.driverRegisterEmptyRow{display:block;padding:18px 10px;width:100%;background:#fff;border-radius:14px;border:1px solid #e2e9ef}
+  .shell .driverRegisterTable tr.driverRegisterEmptyRow td{display:flex;flex-direction:column;align-items:center;text-align:center;width:100%;min-width:0;padding:18px 10px;border:0}
+  /* Other legacy tabular exports remain horizontally scrollable instead of crushing columns */
+  .shell .tableOverflow{max-width:100%;min-width:0;overflow-x:auto;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch}
+  .shell .tableOverflow table{min-width:680px}
+
+  /* Equipment, payment accounts and reports */
+  .shell .opsMetrics{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+  .shell .opsMetric{min-height:115px;padding:12px;min-width:0}
+  .shell .opsMetric strong{font-size:22px;white-space:normal}
+  .shell .opsSearchToolbar{display:flex;flex-direction:column;align-items:stretch;gap:10px}
+  .shell .opsSearch{width:100%;max-width:100%;min-width:0}
+  .shell .opsFilterChips{display:flex;flex-wrap:wrap;gap:6px}
+  .shell .opsFilterChips button{min-height:40px}
+  .shell .opsDriverCards{grid-template-columns:minmax(0,1fr);gap:10px}
+  .shell .opsDriverCard{min-width:0;padding:13px}
+  .shell .opsPaymentSummary{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .shell .opsProviderSummary{min-width:0;padding:10px;flex-wrap:wrap}
+  .shell .opsProviderSummary strong{font-size:20px}
+  .shell .opsReportMetrics,.shell .opsBreakdownGrid{grid-template-columns:minmax(0,1fr)}
+  .shell .opsSettingsPage,.shell .settingsGrid{grid-template-columns:minmax(0,1fr)}
+  .shell .opsSettingsIntro,.shell .settingsCard,.shell .opsSettingsPage .settingsCard{padding:15px 13px}
+  .shell .opsSettingsPage .prestoSheetsActions{display:grid;grid-template-columns:1fr;gap:8px}
+  .shell .opsSettingsPage .prestoSheetsActions>*{width:100%;max-width:100%;min-height:44px;justify-content:center;white-space:normal;overflow-wrap:anywhere}
+  .shell .settingsField :is(input,select){min-width:0;max-width:100%}
+
+  /* Mobile dialogs: fitting inside the viewport with keyboard-safe scrolling */
+  .modalWrap,.driverProfileOverlay,.excelExportOverlay,.excelModalWrap{padding:7px;align-items:center}
+  .driverEditorDialog,.driverProfileDialog,.excelExportDialog,.excelModal{width:100%;max-width:100%;max-height:calc(100dvh - 14px);border-radius:16px;overscroll-behavior:contain}
+  .driverEditorHead,.excelExportHeader{padding:15px 13px;gap:9px}
+  .driverEditorBody,.excelExportBody{padding:13px}
+  .driverEditorSection{padding:12px;border-radius:13px}
+  .driverEditorFieldGrid,.driverEditorPayments{grid-template-columns:minmax(0,1fr)}
+  .driverEditorField{min-width:0;max-width:100%}
+  .driverEditorInputWrap{min-width:0;max-width:100%}
+  .driverEditorInputWrap :is(input,select,textarea){width:100%;min-width:0;max-width:100%;font-size:16px}
+  .driverEditorActions,.excelExportFooter{padding:11px 12px calc(11px + env(safe-area-inset-bottom,0px));gap:8px}
+  .driverEditorFooterButtons,.excelExportFooter{width:100%}
+  .driverEditorFooterButtons button,.excelExportFooter button{min-height:44px;min-width:0;flex:1}
+  .driverVehiclePhotos,.driverProfileVehiclePhotos{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+  .driverVehiclePhotoPicker{min-width:0;padding:8px}
+  .driverVehiclePhotoPlaceholder,.driverVehiclePhotoPreview{height:98px}
+  .driverProfileDialog .driverProfileHeroMain{flex-wrap:wrap}
+  .driverProfileDialog .driverProfileHeroText{min-width:0}
+  .excelExportChoices{grid-template-columns:minmax(0,1fr)}
+  .excelExportInputs{max-width:100%}
+  .excelExportInputs :is(input,select){min-width:0;max-width:100%;font-size:16px}
+}
+@media screen and (max-width:380px){
+  .shell .workspace main{padding-inline:9px}
+  .shell .topbar{padding-inline:8px;gap:4px}
+  .shell .mobileBrandLogo{width:56px;max-width:56px}
+  .shell .statGrid,.shell .paymentGrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+  .shell .stat,.shell .payment{padding:12px 9px}
+  .shell .driverRegisterTable tr.driverRegisterRow{padding:11px;gap:8px}
+  .shell .headActions{grid-template-columns:minmax(0,1fr)}
+  .shell .headActions>*{grid-column:1/-1}
+  .shell .opsMetrics{grid-template-columns:minmax(0,1fr)}
+}
+@media screen and (max-width:320px){
+  .shell .statGrid,.shell .paymentGrid,.shell .dashboardQuickLinks,.shell .dashboardWelcomeActions{grid-template-columns:minmax(0,1fr)}
+  .shell .driverRegisterTable tr.driverRegisterRow{grid-template-columns:minmax(0,1fr)}
+  .shell .driverRegisterTable tr.driverRegisterRow>td{grid-column:1/-1}
+}
+@media (prefers-reduced-motion:reduce){
+  .shell .driverRegisterTable tr.driverRegisterRow{transition:none}
+}
