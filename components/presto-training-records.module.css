@@ -116,3 +116,114 @@
  .fields{padding:16px;gap:13px}
 }
 @media(prefers-reduced-motion:reduce){.card,.add{transition:none}}
+
+
+/* Redesigned PRESTO trainee registration: compact, accessible, mobile-first */
+.overlay{
+ z-index:1050;
+ padding:clamp(8px,2vw,24px);
+ background:rgba(13,22,34,.68);
+ backdrop-filter:blur(7px);
+ -webkit-backdrop-filter:blur(7px)
+}
+.dialog{
+ width:min(940px,100%);
+ max-height:calc(100dvh - 28px);
+ overflow:hidden;
+ display:flex;
+ flex-direction:column;
+ border:1px solid #ffd9c7;
+ border-radius:23px;
+ background:#fff;
+ box-shadow:0 32px 90px #07141f55
+}
+.dialogHeader{
+ flex:none;min-height:99px;display:flex;justify-content:space-between;
+ align-items:center;gap:18px;padding:18px 25px;
+ color:#fff;border:0;
+ background:linear-gradient(115deg,#f15b2c 0%,#df331c 47%,#a50e19 100%);
+ position:relative;overflow:hidden
+}
+.dialogHeader::after{content:"";position:absolute;pointer-events:none;left:-60px;bottom:-100px;width:320px;height:170px;border:26px solid #ffbd6250;border-radius:50%;transform:rotate(-24deg)}
+.headingContent{display:flex;align-items:center;gap:15px;position:relative;z-index:1;min-width:0}
+.headingIcon{width:54px;height:54px;border:1px solid #ffffff40;flex-shrink:0;border-radius:17px;display:grid;place-items:center;background:#ffffff20;color:#fff}
+.headerEyebrow{display:block;color:#ffe7d7;font-weight:800;font-size:11px;letter-spacing:1.1px;line-height:1.4;margin-bottom:4px}
+.dialogHeader h2{font-size:clamp(20px,2.6vw,26px);font-weight:900;line-height:1.3;margin:0}
+.dialogHeader p{margin:5px 0 0;color:#ffe6dc;line-height:1.55;font-size:12px}
+.dialogHeader button{width:40px;height:40px;background:#ffffff26;color:#fff;border:1px solid #ffffff37;z-index:1;flex-shrink:0}
+.dialogHeader button:hover{background:#ffffff45}
+.registerForm{display:flex;flex-direction:column;min-height:0;flex:1}
+.dialogBody{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:21px 24px;background:linear-gradient(180deg,#fffaf7,#fff 40%,#fffdfb)}
+.topCards{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr);gap:13px;margin-bottom:16px;align-items:stretch}
+.photoCard{display:flex;align-items:center;gap:13px;min-width:0;border:1px solid #f5dcd1;border-radius:17px;padding:14px;background:linear-gradient(115deg,#fff4ed,#fff);cursor:pointer;transition:border-color .15s,box-shadow .15s}
+.photoCard:hover,.photoCard:focus-within{border-color:#ee784f;box-shadow:0 0 0 3px #ed6a3422}
+.photoCard .photoPreview{width:94px;height:104px;min-height:104px;flex-shrink:0;background:#fff0e9;border-radius:14px;border:1px solid #f5cab8;overflow:hidden;display:block}
+.photoCard .photoPreview img{width:100%;height:100%;object-fit:cover;object-position:center 12%}
+.photoInfo{display:flex;flex-direction:column;gap:7px;min-width:0;flex:1}
+.photoInfo strong{display:flex;align-items:center;gap:6px;color:#572a24;font-weight:850;font-size:13px}
+.photoInfo>span:nth-child(2){font-size:11px;font-weight:500;line-height:1.7;color:#8b6f64;overflow-wrap:anywhere}
+.photoButton{width:fit-content;display:inline-flex;align-items:center;gap:7px;padding:7px 10px;border-radius:9px;background:#fff;color:#da572e;font-size:11px;font-weight:800;border:1px solid #eed4c6}
+.photoInput{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+.formIntro{display:flex;align-items:center;gap:14px;padding:16px;border:1px solid #f6ddce;background:linear-gradient(115deg,#fff7ed,#fffafa);border-radius:17px}
+.formIntroIcon{width:50px;height:50px;flex-shrink:0;display:grid;place-items:center;border-radius:15px;background:#ffe5d7;color:#d4512f}
+.formIntro strong{display:block;color:#793424;font-weight:900;font-size:15px;margin-bottom:4px}
+.formIntro p{margin:0;color:#7e615a;font-size:11px;line-height:1.8}
+.formIntro span:not(.formIntroIcon){display:inline-flex;align-items:center;gap:6px;color:#26805b;font-size:11px;font-weight:800;margin-top:8px}
+.driverLink{display:block;grid-column:auto;background:linear-gradient(120deg,#fff5ed,#fffaf6);border:1px solid #f2d9ca;border-radius:17px;padding:17px 18px;margin-bottom:17px}
+.sectionTitle{display:flex;align-items:center;gap:12px;min-width:0;margin-bottom:13px}
+.sectionIcon{width:41px;height:41px;display:grid;place-items:center;flex-shrink:0;background:#ffeadf;color:#d9532e;border-radius:13px}
+.sectionTitle h3{font-size:16px;line-height:1.4;color:#622e25;font-weight:900;margin:0}
+.sectionTitle p{font-size:11px;line-height:1.6;color:#8d7770;font-weight:500;margin:4px 0 0}
+.linkInputs{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:12px}
+.linkSearch{display:flex;align-items:center;gap:9px;background:#fff;border:1px solid #e9d6ce;border-radius:11px;padding:0 12px;color:#a17864;min-width:0;min-height:44px}
+.linkSearch input{width:100%;height:42px;outline:0;border:0;background:transparent;font-size:13px;min-width:0;color:#3a3440}
+.linkSearch:focus-within,.linkSelect:focus-within{box-shadow:0 0 0 3px #fbe0d6;border-color:#ed8a61}
+.linkSelect{display:block;min-width:0}
+.linkSelect select{width:100%;min-width:0;background:#fff;color:#3d3540;border:1px solid #e9d6ce;min-height:44px;padding:9px 12px;border-radius:11px;font-size:13px;outline:none}
+.linkHint{display:flex;align-items:flex-start;gap:7px;color:#8b6b5c;font-size:11px;line-height:1.6;margin:10px 0 0}
+.linkHint svg{color:#df6a39;flex-shrink:0}
+.formSection{border:1px solid #f3e4db;background:#fff;border-radius:18px;padding:17px 18px 19px;box-shadow:0 5px 25px #903b260b}
+.formSection .sectionTitle{margin-bottom:14px}
+.formSection .sectionIcon{background:#fff1e8}
+.fields{padding:0;gap:14px 17px;background:transparent}
+.fields>label{display:flex;flex-direction:column;gap:8px;font-weight:700;font-size:12px;color:#39475a}
+.fieldTitle{display:flex;align-items:center;gap:7px;font-size:12px;color:#424658;font-weight:800}
+.fieldTitle svg{color:#dc6740;flex-shrink:0}
+.fieldTitle em{font-style:normal;color:#d83426;margin-inline-start:0}
+.fields input:not([type=file]),.fields select,.fields textarea{width:100%;min-height:45px;background:#fdfdfd;border:1px solid #dcdfe5;border-radius:11px;padding:11px 12px;font-size:13px;line-height:1.4;transition:box-shadow .15s,border-color .15s}
+.fields input::placeholder,.fields textarea::placeholder{color:#abb0b8}
+.fields input:focus,.fields textarea:focus,.fields select:focus{border-color:#ea7449;box-shadow:0 0 0 3px #ffdfce;outline:0}
+.fields textarea{min-height:78px;resize:vertical}
+.formActions{display:flex;align-items:center;justify-content:flex-end;gap:11px;margin:0;padding:14px 24px;border-top:1px solid #f1e2d7;background:#fff;flex-shrink:0;box-shadow:0 -5px 18px #c37a4c0a}
+.formActions .add{min-width:185px;min-height:45px;box-shadow:0 8px 18px #dd50282b}
+.formActions .outline{border:1px solid #eed5c6;color:#8f4936;background:#fff7f3;min-height:45px}
+.footerHint{display:flex;align-items:center;gap:7px;color:#65816f;font-size:11px;font-weight:750;margin-inline-end:auto}
+.dialog .error{margin:8px 24px 0}
+.srOnly{position:absolute;clip:rect(0,0,0,0);clip-path:inset(50%);width:1px;height:1px;overflow:hidden;white-space:nowrap}
+@media(max-width:760px){
+ .dialog{max-height:calc(100dvh - 12px);border-radius:17px}
+ .dialogHeader{padding:16px}
+ .dialogBody{padding:14px}
+ .topCards{grid-template-columns:1fr}
+ .photoCard .photoPreview{width:84px;height:90px;min-height:90px}
+ .formIntro{padding:14px}
+ .driverLink,.formSection{padding:14px}
+ .linkInputs{grid-template-columns:1fr}
+ .formActions{padding:12px 14px;gap:8px}
+ .footerHint{display:none}
+}
+@media(max-width:520px){
+ .overlay{padding:0}
+ .dialog{width:100%;height:100dvh;max-height:100dvh;border-radius:0;border:0}
+ .dialogHeader{min-height:76px;padding:12px 15px}
+ .headingIcon{width:44px;height:44px;border-radius:12px}
+ .dialogHeader h2{font-size:19px}
+ .dialogHeader p{font-size:10px}
+ .dialogBody{padding:12px}
+ .fields{grid-template-columns:1fr}
+ .formActions .outline,.formActions .add{flex:1;min-width:0;white-space:normal;padding:10px 9px}
+ .topCards{gap:10px}
+ .formIntro strong{font-size:13px}
+ .sectionTitle h3{font-size:14px}
+}
+@media(prefers-reduced-motion:reduce){.photoCard,.fields input:not([type=file]),.fields select,.fields textarea{transition:none}}
