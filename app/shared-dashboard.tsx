@@ -436,7 +436,8 @@ export default function SharedDashboard(){
  onOpenTraining={()=>setShowManualTraining(x=>!x)}
  onUpdate={async(id,patch)=>{
   if(!prestoCloud||!admin)throw Error(language==='ar'?'تسجيل الدخول مطلوب لتعديل السجل.':'Connexion requise.');
-  const {error}=await prestoCloud.from('presto_drivers').update(patch).eq('id',id);
+  const nextPatch=patch.delivery_date?{...patch,pdf_source_date:patch.delivery_date}:patch;
+  const {error}=await prestoCloud.from('presto_drivers').update(nextPatch).eq('id',id);
   if(error)throw Error(error.message);
   await load();
   void mirrorExcel();
