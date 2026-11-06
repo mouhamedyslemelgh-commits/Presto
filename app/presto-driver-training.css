@@ -186,3 +186,12 @@
 .trainingVideoFallback{background:#fff3e9;color:#a84c2c;border:1px solid #f7cbb6;border-radius:11px;padding:14px 18px;font-weight:700;font-size:12px;line-height:1.8;margin-bottom:12px}
 @media(max-width:720px){.prestoTrainingBanner{gap:13px;padding:19px;border-radius:15px}.prestoTrainingBannerSymbol{flex-basis:48px;height:48px;border-radius:12px}.prestoTrainingBannerCopy h2{font-size:17px}.prestoTrainingBannerActions{width:100%;flex-direction:row}.prestoTrainingBannerButton,.prestoTrainingBannerPublic{flex:1;min-width:0;padding:11px 9px;font-size:11px}}
 @media(max-width:400px){.prestoTrainingBannerActions{flex-direction:column}}
+
+
+/* Integrated trainee register, reached from the PDF roster */
+.prestoTrainingSectionHead{display:flex;align-items:center;justify-content:space-between;gap:15px;flex-wrap:wrap;margin-bottom:16px;padding:21px 24px;border-radius:19px;border:1px solid #f1ded2;background:linear-gradient(110deg,#fff7f1,#fff)}
+.prestoTrainingSectionHead span{font-size:10px;font-weight:900;letter-spacing:1px;color:#d45a31}
+.prestoTrainingSectionHead h2{font-size:clamp(20px,2.5vw,27px);margin:5px 0 6px;color:#243547}
+.prestoTrainingSectionHead p{font-size:12px;color:#76818e;line-height:1.7;margin:0}
+.prestoTrainingSectionHead button{border:1px solid #f1dfd3;min-height:43px;border-radius:11px;background:#fff6ed;color:#b2512e;font-weight:800}
+@media(max-width:650px){.prestoTrainingSectionHead{padding:16px;align-items:stretch}.prestoTrainingSectionHead button{width:100%;justify-content:center}}
