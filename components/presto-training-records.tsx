@@ -31,6 +31,15 @@ export default function PrestoTrainingRecords({language,editable=true,drivers=[]
  const [search,setSearch]=useState('');
  const [filter,setFilter]=useState<'all'|Status>('all');
  const [open,setOpen]=useState(false);
+ // Keep the underlying dashboard fixed while the registration form is open.
+ useEffect(()=>{
+  if(!open)return;
+  const previous=document.body.style.overflow;
+  document.body.style.overflow='hidden';
+  const onEscape=(event:KeyboardEvent)=>{if(event.key==='Escape'&&!saving)setOpen(false)};
+  document.addEventListener('keydown',onEscape);
+  return ()=>{document.body.style.overflow=previous;document.removeEventListener('keydown',onEscape)};
+ },[open,saving]);
  const [selectedId,setSelectedId]=useState<number|null>(null);
  const [draft,setDraft]=useState<Draft>(blank);
  const [file,setFile]=useState<File|null>(null);
@@ -165,12 +174,12 @@ export default function PrestoTrainingRecords({language,editable=true,drivers=[]
     {editable&&<div className={styles.cardActions}><button onClick={()=>edit(row)}><Edit3 size={15}/>{L('تعديل','Modifier')}</button><button className={styles.danger} onClick={()=>void remove(row)}><Trash2 size={15}/>{L('حذف','Supprimer')}</button></div>}
    </article>)}</div>}
   {open&&<div className={styles.overlay} onMouseDown={e=>{if(e.target===e.currentTarget&&!saving)setOpen(false)}}>
-   <div className={styles.dialog} role="dialog" aria-modal="true" aria-label={L('بيانات المتدرب','Fiche du participant')}>
+   <div className={styles.dialog} role="dialog" aria-modal="true" aria-labelledby="presto-training-dialog-title" aria-describedby="presto-training-dialog-description">
     <div className={styles.dialogHeader}>
      <div className={styles.headingContent}>
       <span className={styles.headingIcon}><GraduationCap size={25}/></span>
-      <div><span className={styles.headerEyebrow}>PRESTO · FORMATION</span><h2>{selectedId!==null?L('تعديل بيانات المتدرب','Modifier le participant'):L('تسجيل متدرب جديد','Nouveau participant')}</h2>
-       <p>{L('سجّل التدريب واربطه بملف السائق عند الحاجة','Enregistrer et associer la formation à un livreur')}</p></div>
+      <div><span className={styles.headerEyebrow}>PRESTO · FORMATION</span><h2 id="presto-training-dialog-title">{selectedId!==null?L('تعديل بيانات المتدرب','Modifier le participant'):L('تسجيل متدرب جديد','Nouveau participant')}</h2>
+       <p id="presto-training-dialog-description">{L('سجّل التدريب واربطه بملف السائق عند الحاجة','Enregistrer et associer la formation à un livreur')}</p></div>
      </div>
      <button type="button" aria-label={L('إغلاق','Fermer')} onClick={()=>setOpen(false)} disabled={saving}><X size={22}/></button>
     </div>
@@ -178,7 +187,7 @@ export default function PrestoTrainingRecords({language,editable=true,drivers=[]
      <div className={styles.dialogBody}>
       <div className={styles.topCards}>
        <label className={styles.photoCard}>
-        <span className={styles.photoPreview}><img src={preview||'/images/presto-uniform-rider.webp'} alt={L('صورة PRESTO الافتراضية','Portrait PRESTO par défaut')}/></span>
+        <span className={styles.photoPreview}><img src={preview||photos[draft.photo_path]||'/images/presto-uniform-rider.webp'} alt={L('صورة PRESTO الافتراضية','Portrait PRESTO par défaut')}/></span>
         <span className={styles.photoInfo}><strong><Camera size={17}/>{L('صورة المتدرب','Photo du participant')}</strong>
          <span>{file?.name||L('الصورة اختيارية، وستظهر صورة PRESTO الافتراضية عند عدم رفع صورة.','Facultatif : le portrait PRESTO sera affiché par défaut.')}</span>
          <span className={styles.photoButton}><Camera size={15}/>{L('اختيار صورة','Choisir une photo')}</span>
