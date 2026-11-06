@@ -11,6 +11,7 @@ import PrestoSpotlightCard from '../components/ui/presto-spotlight-card';
 import DriverRegistrationDialog from '../components/driver-registration-dialog';
 import DriverRegisterTable from '../components/driver-register-table';
 import PrestoTrainingRecords from '../components/presto-training-records';
+import PrestoPdfRoster from '../components/presto-pdf-roster';
 import {EquipmentPanel,MobileMoneyPanel,OperationsReports} from '../components/presto-operations-panels';
 import {useLanguage,LanguageSwitcher} from '../components/presto-language';
 import {PrestoAppearanceControl,PrestoAppearanceSettings} from '../components/presto-appearance';
@@ -22,7 +23,7 @@ import {downloadPrestoXlsx} from '../lib/presto-excel-export';
 import {normalizeHeader,type ImportedDriver,type ImportMode} from '../lib/presto-excel';
 import {LayoutDashboard,Users,Package,Wallet,ChartNoAxesColumn,Settings,Bike,GraduationCap,ArrowUpRight,Download,Plus,Search,Edit3,Trash2,Menu,X,Check,ShieldAlert,LogIn,LogOut,RefreshCw} from 'lucide-react';
 type Pay='bankily'|'masrvi'|'sedad'|'click';
-type Row={id:number;name:string;phone:string;bag:boolean;shirt:boolean;verified:boolean;bankily:boolean;masrvi:boolean;sedad:boolean;click:boolean;bankily_account:string;masrvi_account:string;sedad_account:string;click_account:string;delivery_date:string;observations:string;city:string;vehicle_type:string;app_code:string;driver_photo_path:string;vehicle_photo_path:string};
+type Row={id:number;name:string;phone:string;bag:boolean;shirt:boolean;verified:boolean;bankily:boolean;masrvi:boolean;sedad:boolean;click:boolean;bankily_account:string;masrvi_account:string;sedad_account:string;click_account:string;delivery_date:string;observations:string;city:string;vehicle_type:string;app_code:string;driver_photo_path:string;vehicle_photo_path:string;license_plate?:string;presto_reference?:string;pdf_position?:number|null;training_completed?:boolean|null;pdf_source_phone?:string;pdf_source_date?:string|null};
 const profileData=(d:Row)=>({id:d.id,name:d.name,phone:d.phone,bag:d.bag,shirt:d.shirt,verified:d.verified,payments:{bankily:d.bankily,masrvi:d.masrvi,sedad:d.sedad,click:d.click},paymentNumbers:{bankily:d.bankily_account,masrvi:d.masrvi_account,sedad:d.sedad_account,click:d.click_account},deliveryDate:d.delivery_date,observations:d.observations,city:d.city,vehicleType:d.vehicle_type,appCode:d.app_code,driverPhotoPath:d.driver_photo_path,vehiclePhotoPath:d.vehicle_photo_path});
 type View='dashboard'|'drivers'|'registration'|'training'|'equipment'|'mobile'|'reports'|'settings';
 const pays:[Pay,string,string,string][]=[['bankily','Bankily','BPM','#228e99'],['masrvi','Masrvi','BMCI','#6949a7'],['sedad','Sedad','BMI','#22966a'],['click','CLICK','BNM','#2480a9']];
@@ -55,6 +56,7 @@ export default function SharedDashboard(){
  const [email,setEmail]=useState(''),[password,setPassword]=useState(''),[company,setCompany]=useState('PRESTO'),[city,setCity]=useState('Nouakchott · MR');
  const [claimCode,setClaimCode]=useState(''),[claiming,setClaiming]=useState(false);
  const [legacyCount,setLegacyCount]=useState(0),[legacyUploading,setLegacyUploading]=useState(false);
+ const [showManualTraining,setShowManualTraining]=useState(false);
  useEffect(()=>{
   const onKeyDown=(event:KeyboardEvent)=>{if(event.key==='Escape')setOpenMenu(false)};
   window.addEventListener('keydown',onKeyDown);
@@ -68,7 +70,7 @@ export default function SharedDashboard(){
    const all:Row[]=[];
    for(let i=0;i<10000;i+=1000){
     const {data,error}=await prestoCloud.from('presto_drivers')
-     .select('id,name,phone,bag,shirt,verified,bankily,masrvi,sedad,click,bankily_account,masrvi_account,sedad_account,click_account,delivery_date,observations,city,vehicle_type,app_code,driver_photo_path,vehicle_photo_path')
+     .select('id,name,phone,bag,shirt,verified,bankily,masrvi,sedad,click,bankily_account,masrvi_account,sedad_account,click_account,delivery_date,observations,city,vehicle_type,app_code,driver_photo_path,vehicle_photo_path,license_plate,presto_reference,pdf_position,training_completed,pdf_source_phone,pdf_source_date')
      .order('id',{ascending:true}).range(i,i+999);
     if(error)throw Error(error.message);
     const chunk=(data??[]) as Row[];
@@ -430,7 +432,16 @@ export default function SharedDashboard(){
   </div><div className="sectionHeading"><h2>{t("MOYENS DE PAIEMENT")}</h2><small>{t("Comptes enregistrés")}</small></div><div className="paymentGrid">{pays.map(([k,name,bank,color])=><button className="payment" key={k} onClick={()=>go('mobile')} style={{'--c':color} as React.CSSProperties}><div className="paymentHeader"><span className="paymentLogo"><img src={'/logos/'+k+'.webp'} alt={name} width={54} height={54}/></span><div><b>{name}</b><small>{bank}</small></div><strong>{count(k)}</strong></div><div className="track"><div style={{width:pct(count(k))+'%'}}/></div></button>)}</div><div className="bottomGrid"><section className="panel register"><div className="panelTitle"><div><h2>{t("Registre des remises")}</h2><p>{t("Les cinq derniers livreurs")}</p></div><button className="secondary" onClick={()=>go('drivers')}>{t("Voir le registre")}</button></div>{table(orderedRows.slice(-5).reverse(),true)}</section><aside className="attention"><small>{t("POINT D’ATTENTION")}</small><strong>{totals.missing}</strong><span>{t("sans mobile money")}</span><hr/><h3>{t("Priorité opérationnelle")}</h3><p>{t("Relancer les livreurs sans compte actif.")}</p><button onClick={()=>go('drivers')}>{t("Voir les dossiers à relancer")}<ArrowUpRight size={15}/></button></aside></div></>}
   {view==='drivers'&&<section className="panel fullTable driverRegisterPanel"><div className="panelTitle driverRegisterPanelTitle"><div><span className="driverRegisterOverline">PRESTO · {language==='ar'?'سجل تسليم المعدات':'REGISTRE DES REMISES'}</span><h2>{t("Registre des remises")}</h2><p>{language==='ar'?'ترقيم متسلسل من أول سائق إلى آخر سائق مسجل':'Numérotation continue du premier au dernier livreur'}</p></div><div className="driverRegisterRecordCount"><strong>{totals.all}</strong><small>{language==='ar'?'إجمالي السائقين':'Livreurs au total'}</small></div></div><div className="controls driverRegisterSearch"><label><Search size={18}/><input value={search} onChange={e=>setSearch(e.target.value)} placeholder={language==='ar'?'ابحث بالاسم أو رقم الهاتف أو الترتيب':'Rechercher par nom, téléphone ou numéro'}/></label><span>{language==='ar'?('عرض '+filtered.length+' من '+totals.all):('Affichage de '+filtered.length+' sur '+totals.all)}</span></div>{table(filtered)}</section>}
   {view==='registration'&&<section className="panel fullTable driverRegisterPanel driverVehicleRegisterPanel"><div className="panelTitle driverRegisterPanelTitle"><div><span className="driverRegisterOverline">PRESTO · {language==='ar'?'تسجيل السائقين والمركبات':'LIVREURS ET VÉHICULES'}</span><h2>{language==='ar'?'سجل السائقين والمركبات':'Registre des livreurs et véhicules'}</h2><p>{language==='ar'?'الاسم، المدينة، نوع المركبة، الصور، الهاتف وكود التطبيق — دون القميص والحقيبة':'Nom, ville, véhicule, photos, téléphone et code application — sans les équipements'}</p></div><div className="driverRegisterRecordCount"><strong>{registrationRows.length}</strong><small>{language==='ar'?'سائقون ومركبات':'Livreurs enregistrés'}</small></div></div><div className="controls driverRegisterSearch"><label><Search size={18}/><input value={search} onChange={e=>setSearch(e.target.value)} placeholder={language==='ar'?'ابحث بالاسم أو الهاتف أو المدينة أو المركبة':'Rechercher nom, téléphone, ville ou véhicule'}/></label><span>{language==='ar'?'عرض '+registeredFiltered.length+' من '+registrationRows.length:'Affichage de '+registeredFiltered.length+' sur '+registrationRows.length}</span></div>{table(registeredFiltered,false,'registration')}</section>}
-  {view==='training'&&<PrestoTrainingRecords language={language} editable={admin}/>}
+  {view==='training'&&<><PrestoPdfRoster rows={rows} photos={photoUrls} language={language} editable={admin}
+ onOpenTraining={()=>setShowManualTraining(x=>!x)}
+ onUpdate={async(id,patch)=>{
+  if(!prestoCloud||!admin)throw Error(language==='ar'?'تسجيل الدخول مطلوب لتعديل السجل.':'Connexion requise.');
+  const {error}=await prestoCloud.from('presto_drivers').update(patch).eq('id',id);
+  if(error)throw Error(error.message);
+  await load();
+  void mirrorExcel();
+ }}/>
+ {showManualTraining&&<div style={{marginTop:24}}><PrestoTrainingRecords language={language} editable={admin}/></div>}</>}
   {view==='equipment'&&<EquipmentPanel drivers={orderedRows} language={language} onOpen={setSelectedId} onCard={setCardId} readonly={!admin} onToggle={(id,key,val)=>{void setFlag(id,key,val)}}/>}
   {view==='mobile'&&<MobileMoneyPanel drivers={orderedRows} language={language} onOpen={setSelectedId} onCard={setCardId} readonly={!admin} onToggle={(id,key,val)=>{void setFlag(id,key,val)}}/>}
   {view==='reports'&&<OperationsReports drivers={orderedRows} language={language} exportAction={<ExcelExportDialog drivers={rows} busy={exporting} variant="wide" onExport={exportXlsx}/>}/>}
