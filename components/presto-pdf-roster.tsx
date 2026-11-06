@@ -36,7 +36,7 @@ export default function PrestoPdfRoster({rows,photos,language,editable,onUpdate,
  const ar=language==='ar';
  const L=(a:string,b:string)=>ar?a:b;
  const [query,setQuery]=useState('');
- const [showOther,setShowOther]=useState(false);
+ const [showOther,setShowOther]=useState(true);
  const [selected,setSelected]=useState<number|null>(null);
  const [tab,setTab]=useState<'profile'|'card'>('profile');
  const [edit,setEdit]=useState(false);
