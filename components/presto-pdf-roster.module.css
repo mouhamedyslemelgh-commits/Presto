@@ -224,3 +224,8 @@
  .printCard{width:95mm!important;box-shadow:none!important}
  .printCard:before{print-color-adjust:exact!important;-webkit-print-color-adjust:exact!important}
 }
+
+/* Linked training and durable numbering feedback */
+.numberNotice{margin:7px 0 13px;padding:13px 15px;border-radius:12px;border:1px solid #cbe3d3;background:#f1faf3;color:#256c4b;font-weight:750;font-size:12px;line-height:1.6}
+.trainingEditTip{display:flex;align-items:center;gap:8px;grid-column:1/-1;border:1px solid #f1dccf;background:#fff3e9;border-radius:12px;padding:12px;color:#90543d;font-size:12px;line-height:1.65;font-weight:700}
+.trainingEditTip svg{flex-shrink:0;color:#e75f33}
