@@ -738,3 +738,262 @@
 @media(prefers-reduced-motion:reduce){
  .statTrack span,.chip,.primary,.secondary{transition:none!important}
 }
+
+
+/* PRESTO · 06 Nov · direct polish of the equipment-roster profile shown on screen.
+   Screen-only so the existing A4 PDF card print layout remains unchanged. */
+@media screen {
+ .overlay{
+  background:rgba(9,22,36,.69);
+  -webkit-backdrop-filter:blur(11px) saturate(.88);
+  backdrop-filter:blur(11px) saturate(.88);
+ }
+ .modal{
+  width:min(890px,100%);
+  max-height:min(95dvh,1040px);
+  background:#f8fafc;
+  border:1px solid rgba(255,255,255,.94);
+  border-radius:27px;
+  box-shadow:0 35px 105px rgba(6,19,37,.37);
+  scrollbar-color:#cfdbe5 transparent;
+  scrollbar-width:thin;
+  overscroll-behavior:contain;
+ }
+ .modalHead{
+  position:relative;
+  padding:23px clamp(18px,3vw,32px) 21px;
+  background:#fff;
+  border-bottom:1px solid #f0e5df;
+ }
+ .modalHead:before{
+  content:"";
+  position:absolute;
+  inset:0 0 auto;
+  height:4px;
+  background:linear-gradient(90deg,#ea502c 0%,#ff9a57 56%,#e74725 100%);
+ }
+ .modalHeadline .overline{
+  font-size:11px;
+  border:1px solid #f7d9c9;
+  background:#fff1e9;
+  border-radius:100px;
+  padding:6px 11px;
+ }
+ .modalHeadline h2{
+  font-size:clamp(21px,2.8vw,27px);
+  font-weight:900;
+  letter-spacing:-.02em;
+ }
+ .iconButton{
+  background:#f8fafc;
+  border:1px solid #e6eaf0;
+  color:#526376;
+  border-radius:13px;
+  width:42px;
+  height:42px;
+ }
+ .iconButton:hover{background:#fff1e9;color:#d95b38}
+ .hero{
+  display:grid;
+  grid-template-columns:100px minmax(0,1fr) auto;
+  gap:21px;
+  min-height:152px;
+  padding:23px clamp(18px,3vw,32px);
+  background:radial-gradient(ellipse at 85% 0%,#ffe5d6 0%,transparent 51%),
+             linear-gradient(110deg,#fff,#fff7f1);
+  border-bottom:1px solid #f0e5de;
+ }
+ .avatar{
+  width:100px;
+  height:100px;
+  border-radius:22px;
+  background:#fff;
+  border:3px solid #fff;
+  box-shadow:0 9px 25px rgba(145,75,40,.13);
+ }
+ .hero h3{
+  color:#1d3042;
+  font-size:clamp(21px,2.7vw,28px);
+  font-weight:900;
+  line-height:1.4;
+ }
+ .hero small{color:#d85f3c;font-size:12px}
+ .hero span{color:#647587;font-size:12px;line-height:1.7}
+ .heroLogo{
+  padding:10px 12px;
+  border-radius:16px;
+  background:#fff;
+  border:1px solid #f1e0d4;
+ }
+ .heroLogo img{width:76px;height:47px}
+ .tabs{
+  padding:12px clamp(18px,3vw,32px) 10px;
+  gap:8px;
+  background:#fff;
+  border-bottom:1px solid #e7edf1;
+ }
+ .tabs button{
+  border:1px solid transparent;
+  border-radius:12px;
+  padding:12px 20px;
+  min-height:47px;
+  font-size:13px;
+  color:#647487;
+  font-weight:850;
+  background:#f6f8fa;
+ }
+ .tabs button:hover{background:#fff0e7;color:#ba4d2a}
+ .tabs .active,.tabs button[aria-selected="true"]{
+  color:#d3512a;
+  background:#fff0e7;
+  border:1px solid #f3d6c5;
+  box-shadow:inset 0 0 0 1px #f7e0d2;
+ }
+ .modalContent{
+  padding:clamp(19px,3vw,31px);
+  background:linear-gradient(180deg,#f9fbfd 0%,#fff 100%);
+ }
+ .detailGrid{gap:13px;grid-template-columns:repeat(2,minmax(0,1fr))}
+ .detailGrid>div{
+  min-width:0;
+  min-height:92px;
+  grid-template-columns:36px minmax(0,1fr);
+  column-gap:12px;
+  row-gap:6px;
+  padding:17px;
+  border-radius:17px;
+  border:1px solid #e1e8ee;
+  background:#fff;
+  box-shadow:0 5px 18px rgba(30,52,78,.045);
+ }
+ .detailGrid>div svg{
+  box-sizing:content-box;
+  width:19px;
+  height:19px;
+  border-radius:11px;
+  padding:9px;
+  grid-row:span 2;
+  align-self:center;
+  color:#e5633b;
+  background:#fff1e8;
+ }
+ .detailGrid small{
+  color:#8291a0;
+  font-size:11px;
+  font-weight:750;
+  line-height:1.5;
+ }
+ .detailGrid strong{
+  color:#263b4d;
+  font-size:15px;
+  font-weight:850;
+  line-height:1.5;
+ }
+ .statusLine{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:17px}
+ .statusLine>div{
+  min-width:0;
+  min-height:64px;
+  gap:7px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:12px 13px;
+  border-radius:15px;
+  border:1px solid #e2eaf0;
+  background:#fff;
+  color:#43576a;
+  font-size:12px;
+  box-shadow:0 2px 10px rgba(21,43,69,.035);
+ }
+ .statusLine>div:has(.check){
+  border-color:#d3e9dc;
+  background:linear-gradient(110deg,#fff,#f5fcf8);
+ }
+ .statusLine>div svg{flex:0 0 auto}
+ .statusLine>div svg.check{color:#1a9963}
+ .statusLine b{font-size:12px;font-weight:850}
+ .notes{
+  background:#fff;
+  color:#5b6f80;
+  padding:15px 17px;
+  border:1px solid #e2eaf0;
+  border-radius:14px;
+  font-size:13px;
+ }
+ .editor{border-radius:17px;padding:18px;background:#fff;border-color:#e5eaf0}
+ .editor label{font-size:12px;color:#435c70}
+ .editor input:not([type=checkbox]),.editor select{
+  min-height:45px;
+  font-size:14px;
+  border-radius:11px;
+ }
+ .profileButtons{gap:10px;margin-top:23px}
+ .profileButtons button{
+  min-height:45px;
+  border-radius:12px;
+  padding:11px 17px;
+  font-size:12px;
+  font-weight:850;
+  white-space:normal;
+  line-height:1.4;
+ }
+ .primary{
+  color:#fff;
+  background:linear-gradient(105deg,var(--presto-accent,#f05b30),#e44722);
+  box-shadow:0 7px 17px rgba(226,91,43,.2);
+ }
+ .primary:hover{filter:brightness(.96)}
+ .secondary{
+  border:1px solid #e9d5c9;
+  background:#fff5ee;
+  color:#a95535;
+ }
+ .secondary:hover{background:#ffe9db}
+ .profileButtons button:focus-visible,.tabs button:focus-visible,.iconButton:focus-visible{
+  outline:3px solid color-mix(in srgb,var(--presto-accent,#ed623b) 47%,transparent);
+  outline-offset:3px;
+ }
+ .cardView{background:#f9fbfd}
+ .printCard{
+  border:1px solid #edcbb9;
+  box-shadow:0 18px 55px rgba(113,59,34,.13);
+ }
+ .cardTop{background:linear-gradient(110deg,#ca361f,#ed5830 58%,#fc9544)}
+ .cardBottom span[data-state="yes"]{color:#147b4b}
+ .cardBottom span[data-state="no"]{color:#9d7163}
+}
+@media screen and (max-width:700px){
+ .overlay{padding:7px}
+ .modal{width:100%;max-height:calc(100dvh - 14px);border-radius:19px}
+ .modalHead{padding:17px 16px 15px}
+ .modalHeadline h2{font-size:19px}
+ .hero{grid-template-columns:74px minmax(0,1fr);gap:13px;padding:18px 16px;min-height:118px}
+ .avatar{height:74px;width:74px;border-radius:18px}
+ .hero h3{font-size:19px}
+ .heroLogo{display:none}
+ .tabs{padding:9px 12px;gap:6px}
+ .tabs button{flex:1;justify-content:center;padding:10px 8px;min-height:43px;font-size:12px}
+ .modalContent{padding:15px}
+ .detailGrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+ .detailGrid>div{padding:12px 11px;min-height:85px;grid-template-columns:27px minmax(0,1fr);column-gap:8px}
+ .detailGrid>div svg{padding:6px;width:16px;height:16px;border-radius:9px}
+ .detailGrid strong{font-size:13px}
+ .detailGrid small{font-size:10px}
+ .statusLine{grid-template-columns:1fr;gap:8px}
+ .statusLine>div{min-height:49px}
+ .profileButtons{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+ .profileButtons button{width:100%;min-width:0;padding:10px 9px;font-size:11px}
+ .cardView .profileButtons{grid-template-columns:1fr}
+}
+@media screen and (max-width:390px){
+ .detailGrid{grid-template-columns:minmax(0,1fr)}
+ .detailGrid>div{min-height:72px}
+ .hero{grid-template-columns:65px minmax(0,1fr);gap:10px}
+ .avatar{width:65px;height:65px}
+ .hero h3{font-size:17px}
+ .tabs button{font-size:11px}
+ .profileButtons{grid-template-columns:1fr}
+}
+@media screen and (prefers-reduced-motion:reduce){
+ .modal *{transition:none!important}
+}
