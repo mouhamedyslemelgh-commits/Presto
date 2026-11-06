@@ -227,3 +227,258 @@
  .sectionTitle h3{font-size:14px}
 }
 @media(prefers-reduced-motion:reduce){.photoCard,.fields input:not([type=file]),.fields select,.fields textarea{transition:none}}
+
+
+/* PRESTO registration UI refresh — 2026-11-06 */
+.overlay{
+  background:rgba(13,24,41,.64);
+  backdrop-filter:blur(9px);
+  -webkit-backdrop-filter:blur(9px);
+  padding:clamp(10px,2vw,24px);
+}
+.dialog{
+  width:min(948px,100%);
+  max-height:min(900px,calc(100dvh - 32px));
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+  border:1px solid #ead6ce;
+  border-radius:24px;
+  background:#fff;
+  box-shadow:0 34px 100px rgba(9,22,36,.28),0 2px 10px rgba(9,22,36,.07);
+}
+.dialogHeader{
+  padding:19px 27px;
+  min-height:106px;
+  background:linear-gradient(112deg,#f46b3b 0%,#e7442b 51%,#bf2030 100%);
+  isolation:isolate;
+}
+.dialogHeader::after{
+  content:"";
+  width:305px;
+  height:305px;
+  left:-82px;
+  bottom:-210px;
+  border:29px solid rgba(255,219,179,.25);
+  transform:rotate(-28deg);
+  pointer-events:none;
+}
+.headingContent{gap:14px}
+.headingIcon{
+  width:52px;height:52px;
+  border-radius:15px;
+  background:rgba(255,255,255,.15);
+  border:1px solid rgba(255,255,255,.32);
+}
+.headerEyebrow{
+  font-size:10px;
+  letter-spacing:1.6px;
+  color:#ffede7;
+}
+.dialogHeader h2{
+  font-size:clamp(21px,2.3vw,25px);
+  letter-spacing:-.25px;
+}
+.dialogHeader p{font-size:12px;color:#ffede8}
+.dialogHeader button{
+  width:42px;
+  height:42px;
+  border-radius:12px;
+  background:rgba(255,255,255,.15);
+}
+.dialogHeader button:hover{background:rgba(255,255,255,.25)}
+.dialogHeader button:focus-visible,
+.formActions button:focus-visible,
+.photoCard:focus-within{
+  outline:3px solid rgba(248,145,96,.6);
+  outline-offset:2px;
+}
+.registerForm{min-height:0;display:flex;flex-direction:column}
+.dialogBody{
+  padding:22px 25px 25px;
+  background:#f8fafc;
+  overflow-y:auto;
+  scrollbar-gutter:stable;
+  scrollbar-width:thin;
+  scrollbar-color:#d3dbe5 transparent;
+}
+.topCards{grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:14px;margin-bottom:17px}
+.photoCard,.formIntro{
+  border:1px solid #e8e9ef;
+  border-radius:17px;
+  background:#fff;
+  box-shadow:0 2px 10px rgba(21,39,59,.025);
+  min-height:122px;
+}
+.photoCard{padding:13px;gap:13px}
+.photoCard:hover,.photoCard:focus-within{
+  border-color:#ee936d;
+  box-shadow:0 0 0 3px rgba(242,101,53,.1);
+}
+.photoCard .photoPreview{
+  width:84px;
+  height:94px;
+  min-height:94px;
+  border-radius:13px;
+  border-color:#f2ded4;
+  background:#fff5ed;
+}
+.photoInfo{gap:7px}
+.photoInfo strong{font-size:13px;color:#343e4d}
+.photoInfo>span:nth-child(2){
+  font-size:11px;
+  color:#758395;
+  line-height:1.6;
+}
+.photoButton{
+  padding:7px 12px;
+  border-radius:9px;
+  background:#fff3ec;
+  border-color:#f1d3c3;
+  color:#bc492e;
+}
+.formIntro{padding:15px;gap:13px}
+.formIntroIcon{
+  width:46px;
+  height:46px;
+  background:#fff0e5;
+  color:#d34e2d;
+  border-radius:13px;
+}
+.formIntro strong{color:#334154;font-size:14px;margin-bottom:3px}
+.formIntro p{color:#758395;line-height:1.65;font-size:11px}
+.formIntro span:not(.formIntroIcon){margin-top:5px;color:#27805c;font-weight:700}
+.driverLink,.formSection{
+  padding:18px 19px;
+  border:1px solid #e5e9ef;
+  border-radius:17px;
+  background:#fff;
+  box-shadow:0 2px 10px rgba(24,46,68,.025);
+}
+.driverLink{margin-bottom:16px}
+.sectionTitle{gap:10px;margin-bottom:14px}
+.sectionTitle h3{color:#2f3d4d;font-size:15px;font-weight:850}
+.sectionTitle p{color:#8090a0;font-size:11px;margin-top:3px}
+.sectionIcon,.formSection .sectionIcon{
+  background:#fff0e7;
+  color:#d55334;
+  border-radius:12px;
+  width:40px;height:40px;
+}
+.linkInputs{grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
+.linkSearch,.linkSelect select{
+  background:#fbfcfe;
+  border:1px solid #dce3ea;
+  min-height:46px;
+  border-radius:11px;
+  color:#34455a;
+}
+.linkSearch{padding:0 13px}
+.linkSearch input{height:44px;font-size:13px}
+.linkSelect select{font-size:13px;padding:10px 12px}
+.linkHint{margin:9px 0 0;color:#727f8d;font-size:11px}
+.linkHint svg{color:#dc6948}
+.fields{gap:15px 18px}
+.fields>label{gap:7px;color:#334155}
+.fieldTitle{
+  font-size:12px;
+  color:#344354;
+  font-weight:800;
+}
+.fieldTitle svg{color:#dc6342}
+.fields input:not([type=file]),.fields select,.fields textarea{
+  min-height:47px;
+  padding:11px 14px;
+  background:#fcfdff;
+  color:#283b4d;
+  border:1px solid #dce3ec;
+  border-radius:11px;
+  font-size:13px;
+  font-weight:500;
+}
+.fields input:not([type=file]):hover,.fields select:hover,.fields textarea:hover{border-color:#c2cdd9}
+.fields input:focus,.fields select:focus,.fields textarea:focus{
+  outline:0;
+  border-color:#df633e;
+  background:#fff;
+  box-shadow:0 0 0 3px rgba(241,103,59,.13);
+}
+.fields input[type=date]{direction:ltr;text-align:start}
+.fields input::placeholder,.fields textarea::placeholder{color:#97a3b1;font-weight:400}
+.fields textarea{min-height:78px;line-height:1.65}
+.formActions{
+  min-height:75px;
+  padding:14px 25px;
+  border-top:1px solid #e8edf2;
+  background:rgba(255,255,255,.98);
+  box-shadow:0 -8px 24px rgba(26,43,67,.04);
+}
+.formActions .add,.formActions .outline{
+  min-height:46px;
+  border-radius:11px;
+  padding:11px 17px;
+  font-size:13px;
+}
+.formActions .add{
+  min-width:196px;
+  background:linear-gradient(106deg,#f26436,#d73e25);
+  box-shadow:0 5px 15px rgba(228,75,35,.2);
+}
+.formActions .add:hover{background:linear-gradient(106deg,#e65930,#c93422)}
+.formActions .outline{
+  color:#556474;
+  border-color:#dce3ea;
+  background:#fff;
+}
+.footerHint{color:#557868;font-size:11px}
+.dialog .error{margin:10px 25px 0;border-radius:10px}
+@media(max-width:760px){
+  .dialog{max-height:calc(100dvh - 14px);border-radius:18px}
+  .dialogHeader{padding:16px 18px;min-height:91px}
+  .dialogBody{padding:16px;scrollbar-gutter:auto}
+  .topCards{grid-template-columns:1fr;gap:10px}
+  .photoCard,.formIntro{min-height:initial}
+  .photoCard .photoPreview{width:75px;height:81px;min-height:81px}
+  .driverLink,.formSection{padding:15px 16px}
+  .formActions{padding:12px 16px;min-height:70px}
+}
+@media(max-width:520px){
+  .overlay{padding:0;backdrop-filter:none}
+  .dialog{
+    width:100%;height:100dvh;max-height:100dvh;
+    border:0;border-radius:0;box-shadow:none;
+  }
+  .dialogHeader{min-height:82px;padding:12px 15px}
+  .headingIcon{width:42px;height:42px;border-radius:12px}
+  .headingContent{gap:11px}
+  .headerEyebrow{font-size:9px;letter-spacing:1px}
+  .dialogHeader h2{font-size:19px}
+  .dialogHeader p{font-size:10px}
+  .dialogHeader button{width:38px;height:38px}
+  .dialogBody{padding:12px 12px 16px}
+  .topCards{margin-bottom:12px}
+  .photoCard{padding:11px;gap:11px}
+  .photoCard .photoPreview{width:69px;height:77px;min-height:77px}
+  .formIntro{padding:12px}
+  .formIntroIcon{width:39px;height:39px;flex-shrink:0}
+  .formIntro strong{font-size:12px}
+  .formIntro p{font-size:10px}
+  .driverLink,.formSection{padding:13px 12px;border-radius:13px}
+  .sectionTitle h3{font-size:14px}
+  .sectionIcon,.formSection .sectionIcon{width:36px;height:36px}
+  .linkInputs,.fields{grid-template-columns:1fr;gap:12px}
+  .fields input:not([type=file]),.fields select,.fields textarea{font-size:16px;min-height:48px}
+  .formActions{
+    padding:10px 12px calc(10px + env(safe-area-inset-bottom));
+    gap:9px;
+    min-height:74px;
+  }
+  .formActions .add,.formActions .outline{
+    min-width:0;flex:1;min-height:46px;
+    font-size:12px;padding:9px 8px;white-space:normal;
+  }
+  .dialog .error{margin:8px 12px 0}
+}
+@media(prefers-reduced-motion:reduce){
+ .photoCard,.fields input,.fields select,.fields textarea{transition:none}
+}
