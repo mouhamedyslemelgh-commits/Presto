@@ -19,7 +19,7 @@
     "jspdf": "4.2.1",
     "gsap": "3.15.0",
     "@gsap/react": "2.1.2",
-    "pdfjs-dist": "6.5.438"
+    "pdfjs-dist": "5.4.394"
   },
   "devDependencies": {
     "@types/node": "22.15.30",
