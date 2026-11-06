@@ -16,7 +16,10 @@ const blank=():Draft=>({
  trainer:'',training_location:'',training_status:'completed',app_type:'driver',notes:''
 });
 const isStatus=(value:string):value is Status=>['completed','in_progress','needs_review'].includes(value);
-export default function PrestoTrainingRecords({language,editable=true}:{language:string;editable?:boolean}){
+type LinkedDriver={id:number;name:string;phone:string;city?:string};
+type Props={language:string;editable?:boolean;drivers?:LinkedDriver[];openRequest?:number;prefillDriver?:LinkedDriver|null;onSaved?:()=>void|Promise<void>};
+const phoneDigits=(value:string)=>String(value||'').replace(/\D/g,'');
+export default function PrestoTrainingRecords({language,editable=true,drivers=[],openRequest=0,prefillDriver=null,onSaved}:Props){
  const ar=language==='ar';
  const L=(a:string,f:string)=>ar?a:f;
  const [items,setItems]=useState<RecordRow[]>([]);
@@ -32,6 +35,11 @@ export default function PrestoTrainingRecords({language,editable=true}:{language
  const [draft,setDraft]=useState<Draft>(blank);
  const [file,setFile]=useState<File|null>(null);
  const [preview,setPreview]=useState<string>('');
+ const [linkedDriverId,setLinkedDriverId]=useState<number|null>(null);
+ const linkedDriver=drivers.find(d=>d.id===linkedDriverId)||null;
+ const autoMatched=drivers.filter(d=>phoneDigits(d.phone).length>=7&&phoneDigits(d.phone)===phoneDigits(draft.phone));
+ const target=linkedDriver||(autoMatched.length===1?autoMatched[0]:null);
+ const labelDriver=(d:LinkedDriver)=>d.name+' · '+d.phone;
  const refresh=useCallback(async()=>{
   if(!prestoCloud){setError('PRESTO Supabase unavailable');setLoading(false);return;}
   const {data,error:loadError}=await prestoCloud.from('presto_training_records')
@@ -69,13 +77,30 @@ export default function PrestoTrainingRecords({language,editable=true}:{language
  const stats={total:items.length,completed:items.filter(x=>x.training_status==='completed').length,in_progress:items.filter(x=>x.training_status==='in_progress').length,needs_review:items.filter(x=>x.training_status==='needs_review').length};
  const metrics:[string,number,typeof Users][]=[[L('إجمالي المسجلين','Inscrits'),stats.total,Users],[L('أكملوا التدريب','Formations terminées'),stats.completed,CheckCircle2],[L('قيد التدريب','En formation'),stats.in_progress,ClipboardList],[L('تحتاج مراجعة','À revoir'),stats.needs_review,Award]];
  const edit=(row?:RecordRow)=>{
-  setSelectedId(row?.id??null);setDraft(row?{name:row.name,phone:row.phone,city:row.city,photo_path:row.photo_path,training_date:row.training_date,trainer:row.trainer,training_location:row.training_location,training_status:row.training_status,app_type:row.app_type,notes:row.notes}:blank());
+  const values=row?{name:row.name,phone:row.phone,city:row.city,photo_path:row.photo_path,training_date:row.training_date,trainer:row.trainer,training_location:row.training_location,training_status:row.training_status,app_type:row.app_type,notes:row.notes}:blank();
+  const matches=drivers.filter(d=>phoneDigits(d.phone).length>=7&&phoneDigits(d.phone)===phoneDigits(values.phone));
+  setLinkedDriverId(matches.length===1?matches[0].id:null);
+  setSelectedId(row?.id??null);setDraft(values);
   setFile(null);setSuccess('');setError('');setOpen(true);
  };
+ useEffect(()=>{
+  if(openRequest<1)return;
+  const source=prefillDriver;
+  setSelectedId(null);
+  setLinkedDriverId(source?.id??null);
+  setDraft({...blank(),name:source?.name||'',phone:source?.phone||'',city:source?.city||''});
+  setFile(null);setSuccess('');setError('');setOpen(true);
+ // openRequest only changes in response to explicit user input.
+ // eslint-disable-next-line react-hooks/exhaustive-deps
+ },[openRequest]);
  const save=async(event:FormEvent<HTMLFormElement>)=>{
   event.preventDefault();
   if(!prestoCloud||!editable||saving)return;
   if(!draft.name.trim()||!draft.phone.trim()||!draft.training_date){setError(L('الاسم والهاتف وتاريخ التدريب مطلوبة.','Nom, téléphone et date sont obligatoires.'));return;}
+  if(linkedDriver&&phoneDigits(linkedDriver.phone)!==phoneDigits(draft.phone)){
+   setError(L('رقم الهاتف يختلف عن السائق المحدد. اختر السائق مرة أخرى أو صحّح الرقم.','Le téléphone est différent de celui du livreur sélectionné. Corrigez-le ou changez de livreur.'));return;
+  }
+  if(!linkedDriver&&autoMatched.length>1){setError(L('يوجد أكثر من سائق بهذا الرقم. اختر السائق من القائمة.','Plusieurs livreurs portent ce numéro. Choisissez le bon profil.'));return;}
   setSaving(true);setError('');setSuccess('');
   try{
    let photoPath=draft.photo_path;
@@ -88,17 +113,27 @@ export default function PrestoTrainingRecords({language,editable=true}:{language
     photoPath=key;
    }
    const payload={...draft,name:draft.name.trim(),phone:draft.phone.trim(),city:draft.city.trim(),trainer:draft.trainer.trim(),training_location:draft.training_location.trim(),notes:draft.notes.trim(),photo_path:photoPath};
+   if(selectedId===null&&items.some(row=>phoneDigits(row.phone)===phoneDigits(payload.phone)&&row.training_date===payload.training_date&&row.app_type===payload.app_type)){
+    throw new Error(L('هذا المتدرب مسجل بالفعل في نفس التاريخ ولنفس التطبيق. افتح سجله وعدّله بدل تكراره.','Ce participant a déjà une fiche pour cette date et cette application. Modifiez-la au lieu de la dupliquer.'));
+   }
    const result=selectedId===null?await prestoCloud.from('presto_training_records').insert(payload):await prestoCloud.from('presto_training_records').update(payload).eq('id',selectedId);
    if(result.error)throw result.error;
-   setOpen(false);setFile(null);setSuccess(L('حُفظ سجل التدريب بنجاح.','Fiche de formation enregistrée.'));
+   let syncNotice='';
+   if(target){
+    const {error:driverError}=await prestoCloud.from('presto_drivers')
+     .update({training_completed:payload.training_status==='completed'}).eq('id',target.id);
+    if(driverError)syncNotice=L('تم حفظ التدريب، لكن تعذر تحديث ملف السائق: ','Formation enregistrée mais mise à jour du dossier impossible : ')+driverError.message;
+   }
+   setOpen(false);setFile(null);setSuccess(syncNotice||L('حُفظ سجل التدريب ورُبط بملف السائق المطابق إن وُجد.','Fiche enregistrée et liée au livreur correspondant, le cas échéant.'));
    await refresh();
+   await onSaved?.();
   }catch(e){setError(e instanceof Error?e.message:L('تعذر الحفظ.','Enregistrement impossible.'));}
   finally{setSaving(false);}
  };
  const remove=async(row:RecordRow)=>{
   if(!prestoCloud||!editable||!confirm(L('حذف سجل تدريب '+row.name+'؟','Supprimer la fiche de '+row.name+' ?')))return;
   const {error:delError}=await prestoCloud.from('presto_training_records').delete().eq('id',row.id);
-  if(delError)setError(delError.message);else{setSuccess(L('تم حذف السجل.','Fiche supprimée.'));await refresh();}
+  if(delError)setError(delError.message);else{setSuccess(L('تم حذف سجل التدريب.','Fiche de formation supprimée.'));await refresh();await onSaved?.();}
  };
  const exportCSV=()=>{
   const headers=['N°','Nom / الاسم','Téléphone / الهاتف','Ville / المدينة','Date / التاريخ','Formateur / المدرب','Lieu / المكان','Application','Statut / الحالة','Notes / ملاحظات'];
@@ -123,10 +158,23 @@ export default function PrestoTrainingRecords({language,editable=true}:{language
   {loading?<p className={styles.empty}>{L('جار تحميل السجلات...','Chargement des fiches...')}</p>:!filtered.length?<div className={styles.empty}><ClipboardList size={35}/><strong>{L('لا توجد سجلات تدريب حتى الآن','Aucune fiche de formation')}</strong><span>{L('أضف أول شخص بعد تدريبه على التطبيق.','Ajoutez une personne après sa formation.')}</span></div>:<div className={styles.cards}>{filtered.map((row,i)=><article className={styles.card} key={row.id}><div className={styles.cardTop}><div className={styles.picture}><img src="/images/presto-uniform-rider.webp" alt={row.name}/></div><div className={styles.person}><small>#{String(filtered.length-i).padStart(3,'0')}</small><h3>{row.name}</h3><a href={'tel:'+row.phone}><Phone size={14}/><bdi>{row.phone}</bdi></a></div><span className={styles.status} data-status={isStatus(row.training_status)?row.training_status:'needs_review'}>{statusLabel(row.training_status)}</span></div>
     <dl className={styles.details}><div><dt><CalendarDays size={15}/>{L('تاريخ التدريب','Date')}</dt><dd>{row.training_date||'—'}</dd></div><div><dt><MapPin size={15}/>{L('المدينة / المكان','Ville / lieu')}</dt><dd>{[row.city,row.training_location].filter(Boolean).join(' · ')||'—'}</dd></div><div><dt><UserRound size={15}/>{L('المدرب','Formateur')}</dt><dd>{row.trainer||'—'}</dd></div><div><dt><ClipboardList size={15}/>{L('التطبيق','Application')}</dt><dd>{row.app_type==='driver'?L('تطبيق السائق','Livreur'):row.app_type==='customer'?L('تطبيق الزبون','Client'):L('التطبيقان','Les deux')}</dd></div></dl>
     {row.notes&&<p className={styles.notes}>{row.notes}</p>}
+     {drivers.some(d=>phoneDigits(d.phone).length>=7&&phoneDigits(d.phone)===phoneDigits(row.phone))&&<span className={styles.linkTag}><CheckCircle2 size={15}/>{L('مرتبط بملف سائق PRESTO','Lié à un livreur PRESTO')}</span>}
     {editable&&<div className={styles.cardActions}><button onClick={()=>edit(row)}><Edit3 size={15}/>{L('تعديل','Modifier')}</button><button className={styles.danger} onClick={()=>void remove(row)}><Trash2 size={15}/>{L('حذف','Supprimer')}</button></div>}
    </article>)}</div>}
   {open&&<div className={styles.overlay} onMouseDown={e=>{if(e.target===e.currentTarget&&!saving)setOpen(false)}}><div className={styles.dialog} role="dialog" aria-modal="true" aria-label={L('بيانات المتدرب','Fiche du participant')}><div className={styles.dialogHeader}><div><span className={styles.eyebrow}>PRESTO · FORMATION</span><h2>{selectedId!==null?L('تعديل بيانات المتدرب','Modifier la fiche'):L('تسجيل متدرب جديد','Nouvelle fiche de formation')}</h2></div><button aria-label={L('إغلاق','Fermer')} onClick={()=>setOpen(false)} disabled={saving}><X size={22}/></button></div><form onSubmit={e=>void save(e)}><div className={styles.fields}>
     <label className={styles.photoPicker}><span>{L('صورة الشخص','Photo du participant')}</span><div className={styles.photoPreview}><img src={preview||'/images/presto-uniform-rider.webp'} alt=""/><Camera size={17}/></div><input type="file" accept="image/png,image/jpeg,image/webp" onChange={e=>setFile(e.target.files?.[0]||null)}/><small>{L('صورة اختيارية، حتى 5 ميغابايت','Photo facultative, 5 Mo max.')}</small></label>
+    <label className={styles.driverLink}>{L('الربط بسائق مسجل','Lier à un livreur enregistré')}
+     <select value={linkedDriverId??''} onChange={e=>{
+       const id=e.target.value?Number(e.target.value):null;
+       const d=drivers.find(item=>item.id===id);
+       setLinkedDriverId(id);
+       if(d)setDraft(old=>({...old,name:d.name,phone:d.phone,city:d.city||old.city}));
+     }}>
+      <option value="">{L('متدرب مستقل / مطابقة برقم الهاتف','Participant indépendant / correspondance téléphone')}</option>
+      {drivers.filter(d=>d.name.trim()&&phoneDigits(d.phone).length>=7).map(d=><option value={d.id} key={d.id}>{labelDriver(d)}</option>)}
+     </select>
+     <small>{target?L('سيتم ربط التدريب بهذا السائق وتحديث حالته.','La formation sera liée à ce livreur et son statut mis à jour.'):L('يمكن إضافة متدرب حتى إن لم يكن سائقًا مسجلًا.','Vous pouvez ajouter un participant non inscrit comme livreur.')}</small>
+    </label>
     <label>{L('الاسم الكامل *','Nom complet *')}<input required maxLength={100} value={draft.name} onChange={e=>setDraft({...draft,name:e.target.value})}/></label>
     <label>{L('رقم الهاتف *','Téléphone *')}<input required type="tel" maxLength={30} dir="ltr" value={draft.phone} onChange={e=>setDraft({...draft,phone:e.target.value})}/></label>
     <label>{L('المدينة','Ville')}<input maxLength={100} value={draft.city} onChange={e=>setDraft({...draft,city:e.target.value})}/></label>
