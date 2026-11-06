@@ -430,7 +430,14 @@ export default function SharedDashboard(){
  const totals={all:rows.length,bags:rows.filter(x=>x.bag).length,shirts:rows.filter(x=>x.shirt).length,complete:rows.filter(complete).length,missing:rows.filter(x=>!hasPay(x)).length};
  const count=(key:Pay)=>rows.filter(x=>x[key]).length;
  const pct=(v:number)=>totals.all?Math.round(v/totals.all*1000)/10:0;
- const orderedRows=[...rows].sort((a,b)=>a.id-b.id);
+ // Shared positions follow the original PDF order, then new registrations.
+ // Never expose sparse Supabase identity IDs as user-facing row numbers.
+ const orderedRows=[...rows].sort((a,b)=>{
+  if(a.pdf_position!=null&&b.pdf_position!=null)return a.pdf_position-b.pdf_position;
+  if(a.pdf_position!=null)return -1;
+  if(b.pdf_position!=null)return 1;
+  return a.id-b.id;
+ });
  const positions=new Map<number,number>(orderedRows.map((d,i)=>[d.id,i+1]));
  const filtered=orderedRows.filter(d=>[d.name,d.phone,d.city,d.vehicle_type,d.app_code,positions.get(d.id)].join(' ').toLowerCase().includes(search.trim().toLowerCase()));
  const registrationRows=orderedRows.filter(d=>Boolean(d.city?.trim()||d.vehicle_type?.trim()||d.app_code?.trim()||d.driver_photo_path||d.vehicle_photo_path));
@@ -525,7 +532,7 @@ export default function SharedDashboard(){
 
   <section className="settingsCard opsDangerCard"><div className="settingsCardHead"><span className="settingsIcon"><RefreshCw size={20}/></span><div><h3>{t("Effacer le registre partagé")}</h3><p>{t("Cette action supprime les fiches pour tous les visiteurs.")}</p></div></div><button className="settingsDangerButton" disabled={!admin} onClick={()=>{if(!prestoCloud||!window.confirm(t('Effacer TOUS les livreurs pour TOUS les visiteurs ?')))return;void mutate(()=>prestoCloud.from('presto_drivers').delete().gte('id',1))}}><Trash2 size={16}/>{t("Supprimer tous les livreurs")}</button></section></div>}
   </main></div>
-  {cardRow&&<EquipmentCardDialog driver={profileData(cardRow)} photo="/images/presto-uniform-rider.webp" ar={language==='ar'} maskPhone={false} onClose={()=>setCardId(null)}/>}
+  {cardRow&&<EquipmentCardDialog driver={profileData(cardRow)} displayNumber={positions.get(cardRow.id)||cardRow.id} photo="/images/presto-uniform-rider.webp" ar={language==='ar'} maskPhone={false} onClose={()=>setCardId(null)}/>}
   {selectedId!==null&&rows.some(d=>d.id===selectedId)&&(()=>{const d=rows.find(x=>x.id===selectedId)!;return <DriverProfile key={d.id} displayNumber={positions.get(d.id)||d.id} driver={profileData(d)} photoUrls={photoUrls} onClose={()=>setSelectedId(null)} readOnly={!admin} onSave={async next=>{if(!prestoCloud||!admin)throw Error("Accès administrateur requis.");const {error}=await prestoCloud.from("presto_drivers").update({name:next.name,phone:next.phone,bag:next.bag,shirt:next.shirt,verified:next.verified,bankily:next.payments.bankily,masrvi:next.payments.masrvi,sedad:next.payments.sedad,click:next.payments.click,bankily_account:next.paymentNumbers?.bankily||"",masrvi_account:next.paymentNumbers?.masrvi||"",sedad_account:next.paymentNumbers?.sedad||"",click_account:next.paymentNumbers?.click||"",delivery_date:next.deliveryDate||"",observations:next.observations||"",city:next.city||"",vehicle_type:next.vehicleType||"",app_code:next.appCode||""}).eq("id",next.id);if(error)throw Error(error.message);await load();await mirrorExcel();}}/>})()}
  {editing&&admin&&<DriverRegistrationDialog mode={dialogMode} language={language} isEdit={editing.id>0} values={{
   name:editing.name,phone:editing.phone,city:editing.city,vehicleType:editing.vehicle_type,appCode:editing.app_code,driverPhotoPath:editing.driver_photo_path,vehiclePhotoPath:editing.vehicle_photo_path,deliveryDate:editing.delivery_date||'',observations:editing.observations||'',
