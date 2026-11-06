@@ -1,0 +1,414 @@
+/* PRESTO · Driver profile visual refresh
+   Scoped to the existing dialog: no changes to records, forms, or data flow. */
+.driverProfileOverlay {
+  z-index: 225;
+  padding: clamp(10px, 3vw, 30px);
+  background: rgba(11, 23, 36, .68);
+  backdrop-filter: blur(10px) saturate(.85);
+  -webkit-backdrop-filter: blur(10px) saturate(.85);
+  overscroll-behavior: contain;
+}
+.driverProfileDialog {
+  width: min(100%, 900px);
+  max-height: min(94dvh, 1060px);
+  border: 1px solid rgba(255,255,255,.8);
+  border-radius: 26px;
+  overflow: auto;
+  overscroll-behavior: contain;
+  background: #f7f9fc;
+  color: #263647;
+  box-shadow: 0 38px 95px rgba(7,18,34,.32), 0 4px 16px rgba(7,18,34,.12);
+  scrollbar-color: #d5dde5 transparent;
+  scrollbar-width: thin;
+  isolation: isolate;
+}
+.driverProfileHero {
+  color: #172b3f;
+  background: radial-gradient(ellipse at 87% 0%, rgba(251,153,111,.19), transparent 43%),
+              linear-gradient(115deg, #fffdfb 0%, #fff5ee 52%, #ffffff 100%);
+  padding: clamp(22px,3vw,32px) clamp(20px,3.4vw,37px) 27px;
+  border-bottom: 1px solid #f0e8e2;
+}
+.driverProfileHero::before {
+  height: 4px;
+  background: linear-gradient(90deg, #e55d39, #f39256 45%, #e6543c);
+}
+.driverProfileHeroGlow {opacity:.22;pointer-events:none}
+.driverProfileHeroTop {gap:16px;flex-wrap:wrap}
+.driverProfileEyebrow {
+  color: #d45e40;
+  background: rgba(255,255,255,.85);
+  border: 1px solid #f4e1d6;
+  padding: 9px 13px;
+  border-radius: 12px;
+  letter-spacing: .02em;
+  font-size: 11px;
+  line-height: 1.5;
+}
+.driverProfileClose {
+  color: #5b6572;
+  background: #fff;
+  border: 1px solid #eaded6;
+  border-radius: 13px;
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(26,32,39,.05);
+}
+.driverProfileClose:hover {background:#fff0e8;color:#ce542f}
+.driverProfileHeroMain {gap:21px;margin-top:21px;align-items:center}
+.driverProfileAvatar {
+  width: 98px;
+  height: 98px;
+  flex-basis: 98px;
+  border-radius: 24px;
+  border: 3px solid #fff;
+  background:#fff;
+  box-shadow:0 8px 23px rgba(96,48,27,.16);
+  overflow: hidden;
+}
+.driverProfileHeroText {min-width:0;flex:1}
+.driverProfileCode {
+  color:#c36143;
+  letter-spacing:.035em;
+  font-weight:800;
+  font-size:11px;
+}
+.driverProfileHeroText h2 {
+  color:#1b2e40;
+  font-size:clamp(23px,3.4vw,33px);
+  font-weight:850;
+  margin:6px 0 11px;
+  line-height:1.35;
+}
+.driverProfileState {
+  font-size:11px;
+  border:1px solid transparent;
+  padding:7px 12px;
+}
+.driverProfileState.complete {
+  color:#177a51;
+  border-color:#bce6d0;
+  background:#e8f8ee;
+}
+.driverProfileState.pending {
+  color:#a85a2b;
+  border-color:#f3d8bd;
+  background:#fff1e0;
+}
+.driverProfileHeroStats {
+  margin-top:23px;
+  padding-top:17px;
+  border-color:#eddfd5;
+  gap:10px;
+}
+.driverProfileHeroStats>span {
+  gap:8px;
+  color:#617183;
+  font-size:12px;
+  font-weight:700;
+  padding:10px 13px;
+  border:1px solid #efe5df;
+  border-radius:12px;
+  background:#fff;
+  box-shadow: 0 3px 9px rgba(73,47,34,.035);
+}
+.driverProfileHeroStats svg {color:#df6b43}
+.driverProfileHeroStats strong {color:#24394b;font-size:13px;white-space:nowrap}
+.driverProfileBody {padding:27px clamp(18px,3.3vw,36px) 35px}
+.driverProfileToolbar {
+  padding-bottom:19px;
+  border-bottom:1px solid #e7edf1;
+  margin-bottom:20px;
+  gap:12px;
+}
+.driverProfileToolbar h3 {font-size:19px;font-weight:850;color:#1c3042}
+.driverProfileSectionOverline {
+  color:#dc6844;
+  font-size:10px;
+  letter-spacing:.04em;
+}
+.driverProfileEdit,.driverProfileCancel {
+  border-radius:12px;
+  min-height:41px;
+  padding:10px 15px;
+  font-size:12px;
+  white-space:normal;
+  transition:background .17s,border-color .17s,transform .17s;
+}
+.driverProfileEdit {
+  color:#b95739;
+  background:#fff8f4;
+  border-color:#efd3c5;
+}
+.driverProfileEdit:hover {background:#ffede3;border-color:#e9b7a1;transform:translateY(-1px)}
+.driverProfileCancel:hover {background:#f6f9fc}
+.driverProfileInfoGrid,.driverProfileFields {
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:13px;
+}
+.driverProfileInfo {
+  padding:17px 19px;
+  border:1px solid #e2e9ee;
+  background:#fff;
+  border-radius:17px;
+  min-height:87px;
+  box-shadow:0 3px 11px rgba(19,49,76,.03);
+  gap:9px;
+}
+.driverProfileInfo>span {
+  color:#77889a;
+  font-weight:750;
+  font-size:11px;
+  line-height:1.5;
+}
+.driverProfileInfo>strong {
+  color:#22394c;
+  font-weight:800;
+  font-size:15px;
+  line-height:1.5;
+}
+.driverProfileFields label {
+  gap:9px;
+  font-size:12px;
+  font-weight:750;
+  color:#53697d;
+}
+.driverProfileFields :is(input,select),
+.driverProfilePayEdit input,.driverProfileNotesInput {
+  min-height:46px;
+  padding:12px 14px;
+  border:1px solid #dce5ec;
+  border-radius:12px;
+  background:#fff;
+  color:#233a50;
+  font-size:14px;
+  max-width:100%;
+}
+.driverProfileSectionTitle {
+  margin:29px 0 15px;
+  gap:12px;
+  padding-bottom:12px;
+  border-bottom:1px solid #e7edf1;
+  flex-wrap:wrap;
+}
+.driverProfileSectionTitle>div:nth-child(2) {min-width:0;flex:1}
+.driverProfileSectionTitle h3 {font-size:16px;font-weight:850;color:#21374a;margin:0 0 5px}
+.driverProfileSectionTitle p {font-size:11px;line-height:1.7;color:#8293a2}
+.driverProfileMiniIcon {
+  width:43px;
+  height:43px;
+  flex:0 0 43px;
+  border-radius:14px;
+  color:#e76641;
+  background:#ffede4;
+  border:1px solid #ffddcf;
+}
+.driverProfileCount {
+  border:1px solid #c6e8d5;
+  background:#eaf8f0;
+}
+.driverProfileEquipment {gap:12px}
+.driverProfileEquipmentCard {
+  min-height:75px;
+  padding:14px;
+  border-radius:16px;
+  border-color:#e1e9ef;
+  background:#fff;
+  gap:9px;
+  box-shadow:0 3px 11px rgba(19,49,76,.025);
+}
+.driverProfileEquipmentCard.isYes {
+  border-color:#cae8d7;
+  background:linear-gradient(120deg,#fff,#f5fdf8);
+}
+.driverProfileEquipmentCard.isNo {background:#fff}
+.driverProfileEquipmentCard>span {color:#42596d;line-height:1.45}
+.driverProfileEquipmentCard strong {font-size:11px}
+.driverProfileEquipmentCard input {width:20px;height:20px}
+.driverProfileVehiclePhotos {gap:14px}
+.driverProfileVehiclePhotos>div {
+  border:1px solid #e1e9ef;
+  border-radius:17px;
+  overflow:hidden;
+  background:#fff;
+}
+.driverProfilePayments {gap:13px}
+.driverProfilePaymentCard {
+  border:1px solid #e1e7ed;
+  border-top:3px solid var(--pay-color);
+  border-radius:18px;
+  padding:18px;
+  background:#fff;
+  box-shadow:0 5px 17px rgba(17,42,63,.045);
+  transition:box-shadow .2s,transform .2s,border-color .2s;
+}
+.driverProfilePaymentCard.enabled:hover {
+  box-shadow:0 10px 25px rgba(17,42,63,.095);
+  transform:translateY(-2px);
+}
+.driverProfilePaymentCard.disabled {
+  border-top-color:#d1dce4;
+  opacity:.8;
+}
+.driverProfilePayLogo {border-radius:13px}
+.driverProfilePayHead strong {font-weight:850}
+.driverProfilePayTag {font-size:11px}
+.driverProfilePayValue {
+  background:#f5f8fa;
+  border:1px solid #eff2f4;
+  border-radius:12px;
+  padding:13px 14px;
+}
+.driverProfilePayValue strong {font-size:15px}
+.driverProfileNotes {
+  background:#fff;
+  border-radius:15px;
+  border-color:#e1e8ee;
+  padding:17px 19px;
+  font-size:13px;
+  color:#53677b;
+}
+.driverProfileFooter {
+  position:sticky;
+  bottom:0;
+  z-index:5;
+  gap:12px;
+  padding:14px clamp(18px,3.3vw,36px);
+  background:rgba(255,255,255,.97);
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+  border-top:1px solid #e3e9ed;
+  box-shadow:0 -9px 25px rgba(28,43,60,.045);
+}
+.driverProfileFooter>span {color:#8b9aa6}
+.driverProfileDone,.driverProfileSave {
+  min-height:43px;
+  border-radius:12px;
+  padding:12px 20px;
+  font-weight:800;
+  font-size:12px;
+}
+.driverProfileDone {color:#4e6376;background:#f3f6f8;border-color:#dce5ec}
+.driverProfileDone:hover {background:#e9eef2}
+.driverProfileSave {
+  background:var(--presto-accent,#ec633a);
+  color:#fff;
+  box-shadow:0 6px 16px rgba(239,98,54,.2);
+}
+.driverProfileSave:disabled {opacity:.6;cursor:wait}
+.driverProfileDialog button:focus-visible,
+.driverProfileDialog :is(input,select,textarea):focus-visible {
+  outline:3px solid color-mix(in srgb,var(--presto-accent,#eb683c) 42%,transparent);
+  outline-offset:3px;
+}
+.driverProfileDialog :is(button,input,select,textarea) {font-family:inherit}
+.driverProfileDialog :is(button,input,select,textarea):disabled {cursor:not-allowed}
+
+/* Respect the built-in PRESTO night appearance. */
+:root[data-presto-theme="dark"] .driverProfileDialog {
+  background:#111c29;
+  border-color:#334458;
+  color:#e9f0f6;
+}
+:root[data-presto-theme="dark"] .driverProfileHero {
+  color:#f4f7fa;
+  background:radial-gradient(ellipse at 88% 0%,rgba(238,102,64,.22),transparent 48%),linear-gradient(115deg,#1c2b3b,#182332);
+  border-color:#344050;
+}
+:root[data-presto-theme="dark"] .driverProfileEyebrow,
+:root[data-presto-theme="dark"] .driverProfileClose,
+:root[data-presto-theme="dark"] .driverProfileHeroStats>span {
+  background:#243447;
+  border-color:#415163;
+  color:#f1b59c;
+}
+:root[data-presto-theme="dark"] .driverProfileHeroText h2,
+:root[data-presto-theme="dark"] .driverProfileHeroStats strong,
+:root[data-presto-theme="dark"] .driverProfileToolbar h3,
+:root[data-presto-theme="dark"] .driverProfileSectionTitle h3,
+:root[data-presto-theme="dark"] .driverProfileInfo>strong,
+:root[data-presto-theme="dark"] .driverProfilePayHead strong,
+:root[data-presto-theme="dark"] .driverProfilePayValue strong {color:#f1f6fa}
+:root[data-presto-theme="dark"] .driverProfileToolbar,
+:root[data-presto-theme="dark"] .driverProfileSectionTitle {border-color:#324255}
+:root[data-presto-theme="dark"] .driverProfileInfo,
+:root[data-presto-theme="dark"] .driverProfileEquipmentCard,
+:root[data-presto-theme="dark"] .driverProfileVehiclePhotos>div,
+:root[data-presto-theme="dark"] .driverProfilePaymentCard,
+:root[data-presto-theme="dark"] .driverProfileNotes,
+:root[data-presto-theme="dark"] .driverProfileFields :is(input,select),
+:root[data-presto-theme="dark"] .driverProfilePayEdit input,
+:root[data-presto-theme="dark"] .driverProfileNotesInput {
+  background:#1b2b3a;
+  border-color:#34485c;
+  color:#e8eef4;
+}
+:root[data-presto-theme="dark"] .driverProfileInfo>span,
+:root[data-presto-theme="dark"] .driverProfileSectionTitle p,
+:root[data-presto-theme="dark"] .driverProfilePayHead small {color:#a7b7c6}
+:root[data-presto-theme="dark"] .driverProfilePayValue {background:#162432;border-color:#304255}
+:root[data-presto-theme="dark"] .driverProfileFooter {
+  background:rgba(25,36,49,.97);
+  border-color:#354657;
+}
+:root[data-presto-theme="dark"] .driverProfileDone,
+:root[data-presto-theme="dark"] .driverProfileCancel {
+  background:#283a4b;color:#e1eaf2;border-color:#45576b;
+}
+:root[data-presto-theme="dark"] .driverProfileEdit {background:#3c2d2b;color:#ffbd9f;border-color:#7d4d3e}
+:root[data-presto-theme="dark"] .driverProfileMiniIcon {background:#442f2b;border-color:#684537}
+:root[data-presto-theme="dark"] .driverProfileEquipmentCard.isYes {background:linear-gradient(120deg,#1c352f,#1b2b3a);border-color:#366451}
+:root[data-presto-theme="dark"] .driverProfileEquipmentCard>span {color:#d3e1e9}
+:root[data-presto-theme="dark"] .driverProfilePaymentCard.disabled {opacity:.8}
+
+@media (max-width:740px) {
+  .driverProfileOverlay {padding:8px;align-items:center}
+  .driverProfileDialog {width:100%;max-height:calc(100dvh - 16px);border-radius:20px}
+  .driverProfileHero {padding:20px 18px 19px}
+  .driverProfileHeroTop {gap:10px}
+  .driverProfileEyebrow {font-size:10px;padding:8px 10px}
+  .driverProfileClose {width:38px;height:38px}
+  .driverProfileAvatar {width:79px;height:79px;flex-basis:79px;border-radius:20px}
+  .driverProfileHeroMain {gap:13px;margin-top:18px}
+  .driverProfileHeroText h2 {font-size:23px}
+  .driverProfileHeroStats {gap:8px;margin-top:16px;padding-top:14px}
+  .driverProfileHeroStats>span {padding:8px 10px;font-size:11px}
+  .driverProfileBody {padding:20px 16px 28px}
+  .driverProfileToolbar h3 {font-size:17px}
+  .driverProfileSectionTitle {margin-top:23px}
+  .driverProfileSectionTitle h3 {font-size:15px}
+  .driverProfileInfoGrid,.driverProfileFields {grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+  .driverProfileInfo {padding:13px 12px;min-height:79px}
+  .driverProfileInfo>strong {font-size:13px}
+  .driverProfileEquipment {grid-template-columns:1fr;gap:9px}
+  .driverProfileEquipmentCard {min-height:59px}
+  .driverProfilePayments {grid-template-columns:1fr 1fr;gap:9px}
+  .driverProfilePaymentCard {padding:12px}
+  .driverProfileFooter {padding:12px 15px calc(12px + env(safe-area-inset-bottom,0px))}
+}
+@media (max-width:530px) {
+  .driverProfileHeroMain {flex-wrap:nowrap}
+  .driverProfileHeroText h2 {font-size:20px}
+  .driverProfileHeroStats {display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+  .driverProfileHeroStats>span {min-width:0;flex-wrap:wrap;line-height:1.4}
+  .driverProfileInfoGrid,.driverProfileFields,.driverProfilePayments {grid-template-columns:minmax(0,1fr)}
+  .driverProfileToolbar {align-items:flex-start}
+  .driverProfileToolbar .driverProfileEdit,.driverProfileToolbar .driverProfileCancel {width:100%;min-height:44px}
+  .driverProfileSectionTitle .driverProfileEdit {flex:1 1 100%;min-height:44px}
+  .driverProfileInfo {min-height:72px}
+  .driverProfileFooter>div {display:grid;grid-template-columns:1fr;width:100%}
+  .driverProfileFooter>div>button {width:100%;min-height:46px}
+  .driverProfileFooter>div:has(.driverProfileSave) {grid-template-columns:1fr 1.2fr}
+}
+@media (max-width:350px) {
+  .driverProfileHeroMain {flex-wrap:wrap}
+  .driverProfileHeroStats {grid-template-columns:1fr}
+  .driverProfileFooter>div:has(.driverProfileSave) {grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:reduce) {
+  .driverProfileDialog {animation:none}
+  .driverProfileDialog * {transition:none!important}
+  .driverProfilePaymentCard.enabled:hover,
+  .driverProfileEdit:hover {transform:none}
+}
