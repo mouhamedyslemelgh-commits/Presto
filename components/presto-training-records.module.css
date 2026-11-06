@@ -66,3 +66,53 @@
 .dialog .error{margin:0 24px 15px}
 @media(max-width:1050px){.intro{align-items:flex-start;flex-direction:column}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:620px){.intro{padding:17px}.intro h2{font-size:21px}.intro .actions{width:100%;display:grid;grid-template-columns:1fr 1fr}.intro .actions button{white-space:normal;padding:11px 9px;font-size:12px}.stats{gap:9px}.metric{padding:13px}.metric strong{font-size:24px}.toolbar{display:grid;grid-template-columns:1fr;gap:9px}.search{width:100%;max-width:none}.toolbar select{width:100%}.cards{grid-template-columns:1fr}.card{padding:15px}.fields{grid-template-columns:1fr;padding:16px}.dialogHeader{padding:17px}.dialogHeader h2{font-size:18px}.dialog{border-radius:17px}.formActions{padding:15px 16px 18px}.status{margin-inline-start:0}.cardTop{align-items:flex-start}}
+
+
+/* A single visual language across PRESTO training, roster and profile */
+.root{padding-top:8px}
+.intro{background:linear-gradient(115deg,#fff7f0,#fff,#fff9f5);border:1px solid #f2d9cd;border-radius:23px;box-shadow:0 9px 27px #d5783e0d}
+.intro h2{font-weight:900;color:#27354a}
+.eyebrow{color:#dd5427}
+.intro p{color:#697481}
+.add{background:linear-gradient(105deg,#f15e2e,#e44419);box-shadow:0 7px 22px #ed5d3335;cursor:pointer}
+.add:hover{background:#db4f24}
+.outline{cursor:pointer}
+.stats{gap:12px}
+.metric{border-color:#f1e7df;background:linear-gradient(145deg,#fff,#fffaf6);box-shadow:0 4px 15px #ab70450d}
+.metric strong{font-weight:900;color:#d64e24;font-size:30px}
+.metric svg{color:#ed6232}
+.toolbar{padding:5px 0}
+.card{border-color:#eddfd5;background:#fff;box-shadow:0 10px 28px #2a2c360b;transition:transform .18s,box-shadow .18s}
+.card:hover{transform:translateY(-2px);box-shadow:0 15px 32px #2a2c3614}
+.picture{width:71px;height:71px;border-radius:16px;border:1px solid #f6d9c7}
+.picture img{object-position:center 12%}
+.person h3{color:#2c3745;font-weight:850}
+.status[data-status=completed]{background:#e8f9ee;color:#13855e}
+.details{padding-top:11px;border-top:1px solid #f0e9e4}
+.linkTag{display:inline-flex;align-items:center;gap:7px;border:1px solid #cef1df;border-radius:25px;padding:7px 11px;color:#15734f;background:#eefaf3;font-weight:700;font-size:11px}
+.cardActions{border-color:#f4e7df}
+.cardActions button{cursor:pointer}
+.cardActions button:hover{background:#ffefe5}
+.dialog{border:1px solid #f2e0d4;box-shadow:0 24px 75px #111e3540}
+.dialogHeader{background:linear-gradient(105deg,#f35427,#cc3b16);color:#fff;border-bottom:0}
+.dialogHeader h2{color:#fff;font-weight:900}
+.dialogHeader .eyebrow{color:#ffddce}
+.dialogHeader button{background:#ffffff32;color:#fff;cursor:pointer}
+.fields{background:linear-gradient(180deg,#fff,#fffaf7)}
+.fields>label{color:#4c5c6d;font-size:13px}
+.fields input:not([type=file]):focus,.fields textarea:focus,.fields select:focus{border-color:#ee6a3d;box-shadow:0 0 0 3px #fee7dc}
+.driverLink{grid-column:1/-1;background:#fff5ec;border:1px solid #f4dccb;border-radius:15px;padding:14px}
+.driverLink small{font-size:11px;color:#876650;line-height:1.65;font-weight:500}
+.photoPreview img{object-position:center 12%}
+@media(max-width:620px){
+ .intro{gap:15px;padding:17px}
+ .metric{padding:14px}
+ .metric strong{font-size:27px}
+ .picture{width:58px;height:58px}
+ .cardTop{flex-wrap:wrap}
+ .cardActions button{min-height:40px}
+ .dialog{max-height:calc(100dvh - 12px)}
+ .overlay{padding:6px}
+ .fields{padding:16px;gap:13px}
+}
+@media(prefers-reduced-motion:reduce){.card,.add{transition:none}}
