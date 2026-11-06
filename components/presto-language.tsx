@@ -36,6 +36,7 @@ const ar:Record<string,string>={
   "Registre des livreurs": "سجل السائقين",
   "Registre des remises": "سجل تسليم المستلزمات",
   "Livreurs et véhicules": "تسجيل السائقين والمركبات",
+  "Formations à l’application": "سجل المتدربين على استخدام التطبيق",
   "Suivi des équipements": "متابعة المعدات",
   "Comptes Mobile Money": "حسابات الدفع الإلكتروني",
   "Rapports & analyses": "التقارير والتحليلات",
