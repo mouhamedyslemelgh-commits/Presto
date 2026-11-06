@@ -493,16 +493,23 @@ export default function SharedDashboard(){
  onOpenTraining={person=>openTraining(person?{id:person.id,name:person.name,phone:person.phone,city:person.city}:undefined)}
  onFixNumbering={async changes=>{
   if(!prestoCloud||!admin)throw Error(language==='ar'?'يلزم تسجيل الدخول كمسؤول.':'Connexion administrateur nécessaire.');
-  // Ascending positions free each former slot before the next update.
-  for(const change of [...changes].sort((a,b)=>a.position-b.position)){
-   if(change.position<1||change.previous<1)throw Error('Invalid roster sequence.');
-   const {data,error}=await prestoCloud.from('presto_drivers')
-    .update({pdf_position:change.position})
-    .eq('id',change.id).eq('pdf_position',change.previous).select('id');
-   if(error)throw Error(error.message);
-   if(data?.length!==1)throw Error(language==='ar'?'تغير السجل أثناء العملية. حدّث الصفحة ثم حاول مجددًا.':'La fiche a changé. Actualisez puis réessayez.');
+  const positions=new Set<number>();
+  const ids=new Set(changes.map(change=>change.id));
+  const occupied=new Set(rows.filter(row=>!ids.has(row.id)&&row.pdf_position!=null).map(row=>row.pdf_position));
+  for(const change of changes){
+   if(!Number.isSafeInteger(change.position)||change.position<1||positions.has(change.position)||occupied.has(change.position))
+    throw Error(language==='ar'?'يوجد تعارض في ترتيب السائقين. حدّث الصفحة وراجع القائمة أولاً.':'Conflit de numérotation. Actualisez et vérifiez le registre.');
+   positions.add(change.position);
   }
-  await load();
+  try{
+   for(const change of [...changes].sort((a,b)=>a.position-b.position)){
+    const query=prestoCloud.from('presto_drivers').update({pdf_position:change.position}).eq('id',change.id);
+    const {data,error}=await (change.previous===null?query.is('pdf_position',null):query.eq('pdf_position',change.previous)).select('id');
+    if(error)throw Error(error.message);
+    if(data?.length!==1)throw Error(language==='ar'?'تغير السجل أثناء التحديث، تم حفظ التغييرات الناجحة فقط.':'Le registre a changé, certaines modifications ont été appliquées.');
+   }
+   void mirrorExcel();
+  }finally{await load();}
  }}
  onUpdate={async(id,patch)=>{
   if(!prestoCloud||!admin)throw Error(language==='ar'?'تسجيل الدخول مطلوب لتعديل السجل.':'Connexion requise.');
