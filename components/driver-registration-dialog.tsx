@@ -158,7 +158,7 @@ export default function DriverRegistrationDialog({values,language,isEdit,mode='a
       </select></div></label>
       <div className="driverVehiclePhotos">
        {([
-        {field:'person' as const,label:L('صورة السائق','Photo du livreur'),current:photoUrls?.person,Icon:UserRound},
+        {field:'person' as const,label:L('صورة السائق','Photo du livreur'),current:'/images/presto-uniform-rider.webp',Icon:UserRound},
         {field:'vehicle' as const,label:L('صورة المركبة','Photo du véhicule'),current:photoUrls?.vehicle,Icon:Bike}
        ]).map(item=><label key={item.field} className={'driverVehiclePhotoPicker '+((previews[item.field]||item.current)?'hasPhoto':'')}>
         <span className="driverVehiclePhotoTitle"><item.Icon size={17}/>{item.label}</span>

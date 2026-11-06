@@ -23,7 +23,7 @@ export default function EquipmentCard({driver,photo,ar,maskPhone}:Props){
   let current=true;
   setReady(false);setError(false);
   async function draw(){
-   const portrait=photo?await loadPhoto(photo):null;
+   const portrait=await loadPhoto('/images/presto-uniform-rider.webp');
    if(!current)return;
    const canvas=ref.current,ctx=canvas?.getContext('2d');
    if(!canvas||!ctx)return;
