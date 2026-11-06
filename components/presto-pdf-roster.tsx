@@ -36,6 +36,7 @@ export default function PrestoPdfRoster({rows,photos,language,editable,onUpdate,
  const ar=language==='ar';
  const L=(a:string,b:string)=>ar?a:b;
  const [query,setQuery]=useState('');
+ const [statusFilter,setStatusFilter]=useState<'all'|'complete'|'partial'|'missing'>('all');
  const [showOther,setShowOther]=useState(true);
  const [selected,setSelected]=useState<number|null>(null);
  const [tab,setTab]=useState<'profile'|'card'>('profile');
@@ -64,7 +65,11 @@ export default function PrestoPdfRoster({rows,photos,language,editable,onUpdate,
   catch(error){setNumberMessage(error instanceof Error?error.message:L('تعذر حفظ الترقيم.','Erreur de numérotation.'));}
   finally{setFixingNumbers(false);}
  };
- const filtered=roster.filter(x=>[x.name,x.phone,x.pdf_source_phone,x.presto_reference,x.license_plate,positionFor(x)].join(' ').toLowerCase().includes(query.trim().toLowerCase()));
+ const filtered=roster.filter(x=>{
+  const match=[x.name,x.phone,x.pdf_source_phone,x.presto_reference,x.license_plate,positionFor(x)].join(' ').toLowerCase().includes(query.trim().toLowerCase());
+  const state=statusFilter==='all'||(statusFilter==='complete'&&x.bag&&x.shirt)||(statusFilter==='partial'&&(x.bag||x.shirt)&&!(x.bag&&x.shirt))||(statusFilter==='missing'&&!x.bag&&!x.shirt);
+  return match&&state;
+ });
  const summary={all:roster.length,both:roster.filter(x=>x.bag&&x.shirt).length,partial:roster.filter(x=>(x.bag||x.shirt)&&!(x.bag&&x.shirt)).length,none:roster.filter(x=>!x.bag&&!x.shirt).length};
  const person=roster.find(x=>x.id===selected);
  const viewPerson=(x:RosterDriver)=>{setSelected(x.id);setEdit(false);setTab('profile');setMessage('');};
@@ -96,7 +101,7 @@ export default function PrestoPdfRoster({rows,photos,language,editable,onUpdate,
     [summary.both,L('الحقيبة والقميص','Sac et chemise'),L('معدات مكتملة','Équipement complet'),'#fff5f0'],
     [summary.partial,L('جزئيًا','Partiel'),L('قطعة واحدة','Un équipement'),'#fff6f1'],
     [summary.none,L('لا شيء','Aucun'),L('لم يستلم','Aucune remise'),'#fff1eb']
-   ].map(([number,title,desc,background],i)=><div className={styles.stat} style={{background:String(background)}} key={i}><strong className={i===1?styles.green:i===2?styles.orange:styles.ink}>{number as number}</strong><b>{title as string}</b><small>{desc as string}</small></div>)}
+   ].map(([number,title,desc],i)=>{const Icon=[Users,PackageCheck,Shirt,ClipboardCheck][i];const percentage=summary.all?Math.round(Number(number)/summary.all*100):0;return <div className={styles.stat} key={i}><div className={styles.statTop}><span className={styles.statIcon}><Icon size={19} strokeWidth={2.25}/></span><span className={styles.statPercent}>{percentage}%</span></div><strong className={i===1?styles.green:i===2?styles.orange:styles.ink}>{number as number}</strong><b>{title as string}</b><small>{desc as string}</small><div className={styles.statTrack} role="progressbar" aria-label={title as string} aria-valuenow={Number(number)} aria-valuemin={0} aria-valuemax={summary.all||1}><span style={{width:percentage+'%'}}/></div></div>})}
   </div>
   <div className={styles.actions}>
    <label className={styles.search}><Search size={18}/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder={L('ابحث بالاسم أو الهاتف أو رقم السائق أو اللوحة','Rechercher un livreur, un numéro, une plaque')}/></label>
@@ -105,6 +110,7 @@ export default function PrestoPdfRoster({rows,photos,language,editable,onUpdate,
    {onShowTraining&&<button className={styles.chip} type="button" onClick={onShowTraining}><GraduationCap size={17}/>{L('عرض سجل المتدربين','Registre des formations')}</button>}
    {editable&&onFixNumbering&&corrections.length>0&&<button className={styles.chip} disabled={fixingNumbers} type="button" onClick={()=>void fixNumbering()}><Check size={17}/>{fixingNumbers?L('جار حفظ الترتيب...','Mise à jour...'):L('حفظ الترقيم حتى '+fullRoster.length,'Enregistrer les numéros jusqu’à '+fullRoster.length)}</button>}
   </div>
+  <div className={styles.statusToolbar} role="group" aria-label={L('تصفية حالة التسليم','Filtrer les remises')}><span className={styles.statusToolbarLabel}>{L('حالة التسليم','Statut')}</span><div className={styles.statusPills}>{([['all',L('الجميع','Tous'),summary.all],['complete',L('مكتمل','Complets'),summary.both],['partial',L('جزئي','Partiels'),summary.partial],['missing',L('لم يستلم','Non remis'),summary.none]] as const).map(([key,label,count])=><button type="button" key={key} aria-pressed={statusFilter===key} className={statusFilter===key?styles.statusPillActive:styles.statusPill} onClick={()=>setStatusFilter(key)}>{label}<b>{count}</b></button>)}</div><span className={styles.resultCount}>{L('النتائج','Résultats')}: <strong>{filtered.length}</strong> / {roster.length}</span></div>
   {numberMessage&&<p className={styles.numberNotice} role="status">{numberMessage}</p>}
   {onOpenTraining&&<div className={styles.trainingInvite} role="region" aria-label={L('تسجيل المتدربين','Enregistrer des participants')}>
    <span className={styles.trainingIcon}><GraduationCap size={25}/></span>
