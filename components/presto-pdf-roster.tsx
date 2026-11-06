@@ -12,7 +12,7 @@ export type RosterDriver={
  pdf_source_date?:string|null;latest_training_date?:string;latest_trainer?:string;
 };
 type Update={license_plate?:string;presto_reference?:string;training_completed?:boolean|null;bag?:boolean;shirt?:boolean;delivery_date?:string};
-type NumberCorrection={id:number;previous:number;position:number};
+type NumberCorrection={id:number;previous:number|null;position:number};
 type Props={
  rows:RosterDriver[];photos:Record<string,string>;language:string;editable:boolean;
  onUpdate:(id:number,payload:Update)=>Promise<void>;
@@ -53,11 +53,14 @@ export default function PrestoPdfRoster({rows,photos,language,editable,onUpdate,
  const rankById=new Map(fullRoster.map((x,i)=>[x.id,i+1]));
  const roster=showOther?fullRoster:canonical;
  const positionFor=(x:RosterDriver)=>rankById.get(x.id)??0;
- const corrections:NumberCorrection[]=canonical.map((row,index)=>({id:row.id,previous:row.pdf_position||0,position:index+1})).filter(item=>item.previous!==item.position);
+ // Supplementary recipient rows carry database IDs such as 199–201.
+ // Store their sequential display position in pdf_position, without ever
+ // changing the immutable primary key or historical rider reference.
+ const corrections:NumberCorrection[]=extras.map((row,index)=>({id:row.id,previous:null,position:canonical.length+index+1}));
  const fixNumbering=async()=>{
   if(!editable||!onFixNumbering||fixingNumbers||!corrections.length)return;
   setFixingNumbers(true);setNumberMessage('');
-  try{await onFixNumbering(corrections);setNumberMessage(L('حُفظ الترقيم المتسلسل في قاعدة البيانات.','La numérotation a été enregistrée dans la base.'));}
+  try{await onFixNumbering(corrections);setNumberMessage(L('حُفظت أرقام السائقين الإضافيين دون تغيير معرّفاتهم.','Numéros des livreurs supplémentaires enregistrés, identifiants inchangés.'));}
   catch(error){setNumberMessage(error instanceof Error?error.message:L('تعذر حفظ الترقيم.','Erreur de numérotation.'));}
   finally{setFixingNumbers(false);}
  };
@@ -100,7 +103,7 @@ export default function PrestoPdfRoster({rows,photos,language,editable,onUpdate,
    {extras.length>0&&<button className={styles.chip} type="button" onClick={()=>setShowOther(!showOther)}>{showOther?L('عرض القائمة الأصلية فقط','Liste d’origine'):L('عرض السائقين الإضافيين','Autres livreurs')} ({extras.length}) <ChevronDown size={15}/></button>}
    <button className={styles.chip} type="button" onClick={exportCSV}><Download size={16}/>{L('تصدير الجدول','Exporter CSV')}</button>
    {onShowTraining&&<button className={styles.chip} type="button" onClick={onShowTraining}><GraduationCap size={17}/>{L('عرض سجل المتدربين','Registre des formations')}</button>}
-   {editable&&onFixNumbering&&corrections.length>0&&<button className={styles.chip} disabled={fixingNumbers} type="button" onClick={()=>void fixNumbering()}><Check size={17}/>{fixingNumbers?L('جار حفظ الترتيب...','Mise à jour...'):L('تثبيت الترقيم 1 إلى '+canonical.length,'Corriger les numéros 1 à '+canonical.length)}</button>}
+   {editable&&onFixNumbering&&corrections.length>0&&<button className={styles.chip} disabled={fixingNumbers} type="button" onClick={()=>void fixNumbering()}><Check size={17}/>{fixingNumbers?L('جار حفظ الترتيب...','Mise à jour...'):L('حفظ الترقيم حتى '+fullRoster.length,'Enregistrer les numéros jusqu’à '+fullRoster.length)}</button>}
   </div>
   {numberMessage&&<p className={styles.numberNotice} role="status">{numberMessage}</p>}
   {onOpenTraining&&<div className={styles.trainingInvite} role="region" aria-label={L('تسجيل المتدربين','Enregistrer des participants')}>
