@@ -9,13 +9,14 @@ export type RosterDriver={
  city?:string;vehicle_type?:string;app_code?:string;delivery_date?:string;
  observations?:string;driver_photo_path?:string;license_plate?:string;presto_reference?:string;
  pdf_position?:number|null;training_completed?:boolean|null;pdf_source_phone?:string;
- pdf_source_date?:string|null;
+ pdf_source_date?:string|null;latest_training_date?:string;latest_trainer?:string;
 };
 type Update={license_plate?:string;presto_reference?:string;training_completed?:boolean|null;bag?:boolean;shirt?:boolean;delivery_date?:string};
 type Props={
  rows:RosterDriver[];photos:Record<string,string>;language:string;editable:boolean;
  onUpdate:(id:number,payload:Update)=>Promise<void>;
  onOpenTraining?:(person?:RosterDriver)=>void;
+ onShowTraining?:()=>void;
 };
 const present=(text?:string|null)=>String(text||'').trim()||'—';
 function dateDisplay(date?:string|null){
@@ -29,7 +30,7 @@ function normalizedDate(date?:string|null){
  return match?match[3]+'-'+match[2]+'-'+match[1]:String(date||'').slice(0,10);
 }
 const fileDate='06/11/2026';
-export default function PrestoPdfRoster({rows,photos,language,editable,onUpdate,onOpenTraining}:Props){
+export default function PrestoPdfRoster({rows,photos,language,editable,onUpdate,onOpenTraining,onShowTraining}:Props){
  const ar=language==='ar';
  const L=(a:string,b:string)=>ar?a:b;
  const [query,setQuery]=useState('');
@@ -86,7 +87,7 @@ export default function PrestoPdfRoster({rows,photos,language,editable,onUpdate,
    <label className={styles.search}><Search size={18}/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder={L('ابحث بالاسم أو الهاتف أو رقم السائق أو اللوحة','Rechercher un livreur, un numéro, une plaque')}/></label>
    {extras.length>0&&<button className={styles.chip} type="button" onClick={()=>setShowOther(!showOther)}>{showOther?L('عرض القائمة الأصلية فقط','Liste d’origine'):L('عرض السائقين الإضافيين','Autres livreurs')} ({extras.length}) <ChevronDown size={15}/></button>}
    <button className={styles.chip} type="button" onClick={exportCSV}><Download size={16}/>{L('تصدير الجدول','Exporter CSV')}</button>
-   {onOpenTraining&&<button className={styles.chip} type="button" onClick={()=>onOpenTraining()}><GraduationCap size={17}/>{L('عرض سجل المتدربين','Registre des formations')}</button>}
+   {onShowTraining&&<button className={styles.chip} type="button" onClick={onShowTraining}><GraduationCap size={17}/>{L('عرض سجل المتدربين','Registre des formations')}</button>}
   </div>
   {onOpenTraining&&<div className={styles.trainingInvite} role="region" aria-label={L('تسجيل المتدربين','Enregistrer des participants')}>
    <span className={styles.trainingIcon}><GraduationCap size={25}/></span>
@@ -127,6 +128,8 @@ export default function PrestoPdfRoster({rows,photos,language,editable,onUpdate,
       <div><IdCard size={17}/><small>{L('رقم اللوحة','Immatriculation')}</small><strong dir="ltr">{present(person.license_plate)}</strong></div>
       <div><CalendarDays size={17}/><small>{L('تاريخ التسليم','Date de remise')}</small><strong dir="ltr">{dateDisplay(person.pdf_source_date||person.delivery_date)}</strong></div>
       <div><GraduationCap size={17}/><small>{L('التكوين','Formation')}</small><strong>{person.training_completed===true?L('مكتمل','Terminée'):person.training_completed===false?L('غير مكتمل','Non terminée'):L('غير مسجل','Non renseigné')}</strong></div>
+      {person.latest_training_date&&<div><CalendarDays size={17}/><small>{L('آخر تاريخ تدريب','Dernière formation')}</small><strong dir="ltr">{dateDisplay(person.latest_training_date)}</strong></div>}
+      {person.latest_trainer&&<div><UserRound size={17}/><small>{L('المدرب','Formateur')}</small><strong>{person.latest_trainer}</strong></div>}
       <div><MapPin size={17}/><small>{L('المدينة','Ville')}</small><strong>{present(person.city)}</strong></div>
       <div><ClipboardCheck size={17}/><small>{L('كود التطبيق','Code application')}</small><strong>{present(person.app_code)}</strong></div>
      </div>
