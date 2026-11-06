@@ -1,7 +1,7 @@
 'use client';
 
 import {useMemo,useState} from 'react';
-import {ArrowLeft,ArrowRight,CalendarDays,Check,ChevronDown,ClipboardCheck,Download,FileBadge,FileText,GraduationCap,IdCard,MapPin,PackageCheck,Pencil,Phone,Printer,Search,Shirt,UserRound,Users,X} from 'lucide-react';
+import {ArrowLeft,ArrowRight,CalendarDays,Check,ChevronDown,ClipboardCheck,Download,FileBadge,FileText,GraduationCap,IdCard,MapPin,PackageCheck,Pencil,Phone,Plus,Printer,Search,Shirt,UserRound,Users,X} from 'lucide-react';
 import styles from './presto-pdf-roster.module.css';
 
 export type RosterDriver={
@@ -15,7 +15,7 @@ type Update={license_plate?:string;presto_reference?:string;training_completed?:
 type Props={
  rows:RosterDriver[];photos:Record<string,string>;language:string;editable:boolean;
  onUpdate:(id:number,payload:Update)=>Promise<void>;
- onOpenTraining?:()=>void;
+ onOpenTraining?:(person?:RosterDriver)=>void;
 };
 const present=(text?:string|null)=>String(text||'').trim()||'—';
 function dateDisplay(date?:string|null){
@@ -42,9 +42,13 @@ export default function PrestoPdfRoster({rows,photos,language,editable,onUpdate,
  const [form,setForm]=useState<Update>({});
  const canonical=useMemo(()=>[...rows].filter(x=>x.pdf_position!=null).sort((a,b)=>(a.pdf_position||0)-(b.pdf_position||0)),[rows]);
  const extras=useMemo(()=>[...rows].filter(x=>x.pdf_position==null&&x.bag).sort((a,b)=>a.id-b.id),[rows]);
- const roster=showOther?[...canonical,...extras]:canonical;
- const positionFor=(x:RosterDriver)=>x.pdf_position??(100+extras.findIndex(e=>e.id===x.id));
- const filtered=roster.filter(x=>[x.name,x.phone,x.pdf_source_phone,x.presto_reference,x.license_plate,x.pdf_position].join(' ').toLowerCase().includes(query.trim().toLowerCase()));
+ // Display positions belong to the visible roster order, never to database IDs.
+ // Historic PDF import numbers such as 199/200/201 must display as 100/101/102.
+ const fullRoster=[...canonical,...extras];
+ const rankById=new Map(fullRoster.map((x,i)=>[x.id,i+1]));
+ const roster=showOther?fullRoster:canonical;
+ const positionFor=(x:RosterDriver)=>rankById.get(x.id)??0;
+ const filtered=roster.filter(x=>[x.name,x.phone,x.pdf_source_phone,x.presto_reference,x.license_plate,positionFor(x)].join(' ').toLowerCase().includes(query.trim().toLowerCase()));
  const summary={all:roster.length,both:roster.filter(x=>x.bag&&x.shirt).length,partial:roster.filter(x=>(x.bag||x.shirt)&&!(x.bag&&x.shirt)).length,none:roster.filter(x=>!x.bag&&!x.shirt).length};
  const person=roster.find(x=>x.id===selected);
  const viewPerson=(x:RosterDriver)=>{setSelected(x.id);setEdit(false);setTab('profile');setMessage('');};
@@ -82,14 +86,19 @@ export default function PrestoPdfRoster({rows,photos,language,editable,onUpdate,
    <label className={styles.search}><Search size={18}/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder={L('ابحث بالاسم أو الهاتف أو رقم السائق أو اللوحة','Rechercher un livreur, un numéro, une plaque')}/></label>
    {extras.length>0&&<button className={styles.chip} type="button" onClick={()=>setShowOther(!showOther)}>{showOther?L('عرض القائمة الأصلية فقط','Liste d’origine'):L('عرض السائقين الإضافيين','Autres livreurs')} ({extras.length}) <ChevronDown size={15}/></button>}
    <button className={styles.chip} type="button" onClick={exportCSV}><Download size={16}/>{L('تصدير الجدول','Exporter CSV')}</button>
-   {onOpenTraining&&<button className={styles.chip} type="button" onClick={onOpenTraining}><GraduationCap size={17}/>{L('بيانات تدريب إضافية','Autres formations')}</button>}
+   {onOpenTraining&&<button className={styles.chip} type="button" onClick={()=>onOpenTraining()}><GraduationCap size={17}/>{L('عرض سجل المتدربين','Registre des formations')}</button>}
   </div>
+  {onOpenTraining&&<div className={styles.trainingInvite} role="region" aria-label={L('تسجيل المتدربين','Enregistrer des participants')}>
+   <span className={styles.trainingIcon}><GraduationCap size={25}/></span>
+   <div><strong>{L('التدريب مرتبط بملف كل سائق','Formation reliée au dossier livreur')}</strong><p>{L('أضف المتدربين وسجّل تاريخ التدريب والمدرب والحالة. ينعكس إكمال التدريب على ملف السائق المطابق.','Enregistrez les participants, la date et le formateur. La formation terminée sera liée au livreur correspondant.')}</p></div>
+   {editable&&<button type="button" className={styles.trainingAdd} onClick={()=>onOpenTraining()}><Plus size={18}/>{L('إضافة متدرب','Ajouter un participant')}</button>}
+  </div>}
   <div className={styles.tableScroller}>
    <table className={styles.table}>
     <thead><tr><th>#</th><th>{L('السائق','Livreur')}</th><th>{L('الهاتف','Téléphone')}</th><th>{L('اللوحة','Plaque')}</th><th>{L('الحقيبة','Sac')}</th><th>{L('القميص','Chemise')}</th><th>{L('التكوين','Formation')}</th><th>{L('سلم في','Date')}</th></tr></thead>
     <tbody>{filtered.map((d,i)=><tr key={d.id} onClick={()=>viewPerson(d)} tabIndex={0} role="button" onKeyDown={e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();viewPerson(d);}}} aria-label={L('افتح ملف السائق','Ouvrir la fiche du livreur')+' '+d.name}>
       <td className={styles.serial}>{positionFor(d)}</td>
-      <td className={styles.driverName}><strong>{d.name}</strong><small>#{present(d.presto_reference)}</small></td>
+      <td className={styles.driverName}><div className={styles.nameCell}><img src="/images/presto-uniform-rider.webp" alt="" loading="lazy"/><span><strong>{d.name}</strong><small>#{present(d.presto_reference)}</small></span></div></td>
       <td className={styles.phone} dir="ltr">{d.pdf_source_phone||d.phone}</td>
       <td>{d.license_plate?<span className={styles.plate} dir="ltr">{d.license_plate}<span className={styles.plateFlag}>◉</span></span>:<span className={styles.dash}>—</span>}</td>
       <td>{badge(d.bag)}</td><td>{badge(d.shirt)}</td><td>{badge(d.training_completed)}</td>
@@ -98,10 +107,18 @@ export default function PrestoPdfRoster({rows,photos,language,editable,onUpdate,
    </table>
    {!filtered.length&&<p className={styles.noResults}>{L('لا توجد نتائج مطابقة.','Aucun résultat.')}</p>}
   </div>
+  <div className={styles.mobileCards}>
+   {filtered.map(d=><button type="button" key={d.id} className={styles.mobileCard} onClick={()=>viewPerson(d)}>
+    <span className={styles.mobileTop}><span className={styles.mobileNumber}>#{positionFor(d)}</span><span className={styles.mobileAvatar}><img src="/images/presto-uniform-rider.webp" alt="" loading="lazy"/></span><span className={styles.mobileIdentity}><strong>{d.name}</strong><small>PRESTO #{present(d.presto_reference)}</small></span><ArrowLeft size={18}/></span>
+    <span className={styles.mobileMeta}><span><Phone size={13}/><bdi>{d.pdf_source_phone||d.phone}</bdi></span><span><IdCard size={13}/><bdi>{present(d.license_plate)}</bdi></span></span>
+    <span className={styles.mobileStatus}><span><PackageCheck size={15}/>{L('الحقيبة','Sac')}{badge(d.bag)}</span><span><Shirt size={15}/>{L('القميص','Chemise')}{badge(d.shirt)}</span><span><GraduationCap size={15}/>{L('التدريب','Formation')}{badge(d.training_completed)}</span></span>
+   </button>)}
+   {!filtered.length&&<p className={styles.noResults}>{L('لا توجد نتائج مطابقة.','Aucun résultat.')}</p>}
+  </div>
   <div className={styles.foot}><span>بريستو موريتانيا · {L('للاستخدام الداخلي','Usage interne')}</span><span>{L('المرجع: القائمة المرفقة بتاريخ 6 نوفمبر 2026','Référence : document du 6 novembre 2026')} · {filtered.length} / {roster.length}</span></div>
   {person&&<div className={styles.overlay} onMouseDown={e=>{if(e.target===e.currentTarget&&!working)setSelected(null)}}><div className={styles.modal} role="dialog" aria-modal="true" aria-label={L('ملف السائق','Dossier livreur')}>
     <div className={styles.modalHead}><div className={styles.modalHeadline}><span className={styles.overline}>PRESTO · #{present(person.presto_reference)}</span><h2>{L('الملف الشخصي للسائق','Profil du livreur')}</h2></div><button className={styles.iconButton} onClick={()=>setSelected(null)} aria-label={L('إغلاق','Fermer')}><X size={21}/></button></div>
-    <div className={styles.hero}><div className={styles.avatar}><img src="/images/presto-uniform-rider.webp" alt={person.name} style={{objectPosition:'center 17%'}}/></div><div><small>{L('سائق PRESTO','Livreur PRESTO')}</small><h3>{person.name}</h3><span><IdCard size={14}/> #{present(person.presto_reference)} · {L('رقم في القائمة','Rang')} {person.pdf_position??'—'}</span></div><div className={styles.heroLogo}><img src="/logos/presto.webp" alt="PRESTO"/></div></div>
+    <div className={styles.hero}><div className={styles.avatar}><img src="/images/presto-uniform-rider.webp" alt={person.name} style={{objectPosition:'center 17%'}}/></div><div><small>{L('سائق PRESTO','Livreur PRESTO')}</small><h3>{person.name}</h3><span><IdCard size={14}/> #{present(person.presto_reference)} · {L('رقم في القائمة','Rang')} {positionFor(person)}</span></div><div className={styles.heroLogo}><img src="/logos/presto.webp" alt="PRESTO"/></div></div>
     <div className={styles.tabs}><button className={tab==='profile'?styles.active:''} onClick={()=>setTab('profile')}><FileText size={16}/>{L('الملف الكامل','Dossier')}</button><button className={tab==='card'?styles.active:''} onClick={()=>setTab('card')}><IdCard size={16}/>{L('بطاقة السائق','Carte du livreur')}</button></div>
     {message&&<p role="status" className={styles.notice}>{message}</p>}
     {tab==='profile'?<div className={styles.modalContent}>
@@ -123,13 +140,13 @@ export default function PrestoPdfRoster({rows,photos,language,editable,onUpdate,
       <label className={styles.checkBox}><input type="checkbox" checked={Boolean(form.bag)} onChange={e=>setForm({...form,bag:e.target.checked})}/>{L('استلم الحقيبة','Sac remis')}</label>
       <label className={styles.checkBox}><input type="checkbox" checked={Boolean(form.shirt)} onChange={e=>setForm({...form,shirt:e.target.checked})}/>{L('استلم القميص','Chemise remise')}</label>
      </div>}
-     <div className={styles.profileButtons}>{editable&&(edit?<><button className={styles.secondary} disabled={working} onClick={()=>setEdit(false)}>{L('إلغاء','Annuler')}</button><button className={styles.primary} disabled={working} onClick={()=>void save()}>{working?L('جار الحفظ...','Enregistrement...'):L('حفظ التعديلات','Enregistrer')}</button></>:<button className={styles.secondary} onClick={()=>editPerson(person)}><Pencil size={16}/>{L('تعديل البيانات','Modifier')}</button>)}<button className={styles.primary} onClick={()=>setTab('card')}><IdCard size={17}/>{L('عرض البطاقة','Voir la carte')}</button></div>
+     <div className={styles.profileButtons}>{onOpenTraining&&editable&&<button className={styles.secondary} type="button" onClick={()=>{setSelected(null);onOpenTraining(person);}}><GraduationCap size={17}/>{L('تسجيل تدريب السائق','Enregistrer sa formation')}</button>}{editable&&(edit?<><button className={styles.secondary} disabled={working} onClick={()=>setEdit(false)}>{L('إلغاء','Annuler')}</button><button className={styles.primary} disabled={working} onClick={()=>void save()}>{working?L('جار الحفظ...','Enregistrement...'):L('حفظ التعديلات','Enregistrer')}</button></>:<button className={styles.secondary} onClick={()=>editPerson(person)}><Pencil size={16}/>{L('تعديل البيانات','Modifier')}</button>)}<button className={styles.primary} onClick={()=>setTab('card')}><IdCard size={17}/>{L('عرض البطاقة','Voir la carte')}</button></div>
     </div>:<div className={styles.cardView}>
       <div className={styles.printCard}>
-       <div className={styles.cardTop}><img src="/logos/presto.webp" alt="PRESTO"/><span>PRESTO · <b>{L('بطاقة تعريف السائق','CARTE LIVREUR')}</b></span></div>
+       <div className={styles.cardTop}><img src="/logos/presto.webp" alt="PRESTO"/><span>PRESTO · <b>{L('بطاقة تعريف السائق','CARTE LIVREUR')}</b></span><strong className={styles.cardRank}>N° {positionFor(person)}</strong></div>
        <div className={styles.cardBody}><div className={styles.cardPhoto}><img src="/images/presto-uniform-rider.webp" alt={person.name} style={{objectPosition:'center 17%'}}/></div><div><small>{L('الاسم الكامل','Nom complet')}</small><h3>{person.name}</h3><span>#{present(person.presto_reference)}</span><p><Phone size={14}/> <bdi>{person.pdf_source_phone||person.phone}</bdi></p><p><IdCard size={14}/> <bdi>{present(person.license_plate)}</bdi></p></div></div>
        <div className={styles.cardBottom}><span><Check size={17}/>{L('الحقيبة','Sac')} {person.bag?'✓':'—'}</span><span><Check size={17}/>{L('القميص','Chemise')} {person.shirt?'✓':'—'}</span><span><GraduationCap size={17}/>{L('التكوين','Formation')} {person.training_completed?'✓':'—'}</span></div>
-       <footer>PRESTO · MAURITANIE <b>#{present(person.presto_reference)}</b></footer>
+       <footer><span>PRESTO · MAURITANIE</span><b>{L('سجل رقم','N° dossier')} {positionFor(person)} · #{present(person.presto_reference)}</b></footer>
       </div>
       <p className={styles.printHint}>{L('اضغط طباعة ثم اختر «حفظ بصيغة PDF» إذا أردت تنزيل البطاقة.','Imprimez ou choisissez « Enregistrer en PDF ».')}</p>
       <div className={styles.profileButtons}><button className={styles.secondary} onClick={()=>setTab('profile')}><ArrowRight size={17}/>{L('العودة للملف','Retour au profil')}</button><button className={styles.primary} onClick={()=>window.print()}><Printer size={17}/>{L('طباعة / حفظ PDF','Imprimer / enregistrer PDF')}</button></div>
