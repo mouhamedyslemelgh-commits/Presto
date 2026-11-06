@@ -91,8 +91,8 @@ export default function SharedDashboard(){
   return byPhone;
  },[trainingRecords]);
  const rosterRows=useMemo(()=>rows.map(driver=>{
-  const phone=phoneDigits(driver.pdf_source_phone||driver.phone);
-  const training=phone.length>=7?latestTraining.get(phone):undefined;
+  const numbers=[driver.phone,driver.pdf_source_phone||''].map(phoneDigits).filter(number=>number.length>=7);
+  const training=numbers.map(number=>latestTraining.get(number)).find(Boolean);
   if(!training)return driver;
   return {...driver,training_completed:training.training_status==='completed',
    latest_training_date:training.training_date,latest_trainer:training.trainer};
@@ -448,7 +448,7 @@ export default function SharedDashboard(){
     <button type="button" className="excelQuickDownload" disabled={exporting||loading||rows.length===0} onClick={()=>{void exportXlsx(null,'all','').catch(error=>setMsg((language==='ar'?'تعذر تنزيل ملف Excel: ':'Téléchargement Excel impossible : ')+(error instanceof Error?error.message:'Erreur')));}} aria-label={language==='ar'?'تنزيل جميع سجلات السائقين بصيغة Excel':'Télécharger tous les livreurs en Excel'}><Download size={18}/>{exporting?(language==='ar'?'جار التنزيل...':'Téléchargement...'):(language==='ar'?'تنزيل Excel كامل':'Télécharger Excel')}</button>
     <ExcelImporter onImport={importDrivers} publicSite/>
     <PrestoPdfImporter onImport={importPdf} disabled={!admin||loading}/>
-   </>}{(view==='registration'||view==='training')&&<PrestoPdfImporter onImport={importPdf} disabled={!admin||loading}/>}{view==='drivers'&&<button className="primary" onClick={()=>openEditor(null,'legacy')}><Plus size={16}/>{language==='ar'?'إضافة سجل تسليم':'Ajouter une remise'}</button>}{view==='registration'&&<button className="primary" onClick={()=>openEditor(null,'registration')}><Plus size={16}/>{language==='ar'?'تسجيل سائق ومركبة':'Enregistrer livreur et véhicule'}</button>}{view!=='registration'&&view!=='training'&&<ExcelExportDialog drivers={rows} busy={exporting} onExport={exportXlsx}/>}</div></div>
+   </>}{(view==='registration'||view==='training')&&<PrestoPdfImporter onImport={importPdf} disabled={!admin||loading}/>}{view==='training'&&admin&&<button className="primary" type="button" onClick={()=>openTraining()}><Plus size={17}/>{language==='ar'?'إضافة متدرب':'Ajouter un participant'}</button>}{view==='drivers'&&<button className="primary" onClick={()=>openEditor(null,'legacy')}><Plus size={16}/>{language==='ar'?'إضافة سجل تسليم':'Ajouter une remise'}</button>}{view==='registration'&&<button className="primary" onClick={()=>openEditor(null,'registration')}><Plus size={16}/>{language==='ar'?'تسجيل سائق ومركبة':'Enregistrer livreur et véhicule'}</button>}{view!=='registration'&&view!=='training'&&<ExcelExportDialog drivers={rows} busy={exporting} onExport={exportXlsx}/>}</div></div>
   {view==='dashboard'&&<section className="dashboardWelcome" aria-label={language==='ar'?'ملخص العمليات':'Résumé opérationnel'}>
    <div><span className="dashboardWelcomeTag">PRESTO · {language==='ar'?'مركز العمليات':'CENTRE OPÉRATIONNEL'}</span>
     <h2>{language==='ar'?'إدارة السائقين بشكل أوضح وأسهل':'Une vision claire de vos opérations'}</h2>
@@ -473,8 +473,21 @@ export default function SharedDashboard(){
   {view==='drivers'&&<section className="panel fullTable driverRegisterPanel"><div className="panelTitle driverRegisterPanelTitle"><div><span className="driverRegisterOverline">PRESTO · {language==='ar'?'سجل تسليم المعدات':'REGISTRE DES REMISES'}</span><h2>{t("Registre des remises")}</h2><p>{language==='ar'?'ترقيم متسلسل من أول سائق إلى آخر سائق مسجل':'Numérotation continue du premier au dernier livreur'}</p></div><div className="driverRegisterRecordCount"><strong>{totals.all}</strong><small>{language==='ar'?'إجمالي السائقين':'Livreurs au total'}</small></div></div><div className="controls driverRegisterSearch"><label><Search size={18}/><input value={search} onChange={e=>setSearch(e.target.value)} placeholder={language==='ar'?'ابحث بالاسم أو رقم الهاتف أو الترتيب':'Rechercher par nom, téléphone ou numéro'}/></label><span>{language==='ar'?('عرض '+filtered.length+' من '+totals.all):('Affichage de '+filtered.length+' sur '+totals.all)}</span></div>{table(filtered)}</section>}
   {view==='registration'&&<section className="panel fullTable driverRegisterPanel driverVehicleRegisterPanel"><div className="panelTitle driverRegisterPanelTitle"><div><span className="driverRegisterOverline">PRESTO · {language==='ar'?'تسجيل السائقين والمركبات':'LIVREURS ET VÉHICULES'}</span><h2>{language==='ar'?'سجل السائقين والمركبات':'Registre des livreurs et véhicules'}</h2><p>{language==='ar'?'الاسم، المدينة، نوع المركبة، الصور، الهاتف وكود التطبيق — دون القميص والحقيبة':'Nom, ville, véhicule, photos, téléphone et code application — sans les équipements'}</p></div><div className="driverRegisterRecordCount"><strong>{registrationRows.length}</strong><small>{language==='ar'?'سائقون ومركبات':'Livreurs enregistrés'}</small></div></div><div className="controls driverRegisterSearch"><label><Search size={18}/><input value={search} onChange={e=>setSearch(e.target.value)} placeholder={language==='ar'?'ابحث بالاسم أو الهاتف أو المدينة أو المركبة':'Rechercher nom, téléphone, ville ou véhicule'}/></label><span>{language==='ar'?'عرض '+registeredFiltered.length+' من '+registrationRows.length:'Affichage de '+registeredFiltered.length+' sur '+registrationRows.length}</span></div>{table(registeredFiltered,false,'registration')}</section>}
   {view==='training'&&<><PrestoPdfRoster rows={rosterRows} photos={photoUrls} language={language} editable={admin}
- onShowTraining={()=>{setShowManualTraining(true);setTrainingPrefill(null);}}
+ onShowTraining={()=>{setShowManualTraining(true);setTrainingPrefill(null);setTimeout(()=>document.getElementById('presto-training-records')?.scrollIntoView({behavior:'smooth',block:'start'}),80);}}
  onOpenTraining={openTraining}
+ onFixNumbering={async changes=>{
+  if(!prestoCloud||!admin)throw Error(language==='ar'?'يلزم تسجيل الدخول كمسؤول.':'Connexion administrateur nécessaire.');
+  // Ascending positions free each former slot before the next update.
+  for(const change of [...changes].sort((a,b)=>a.position-b.position)){
+   if(change.position<1||change.previous<1)throw Error('Invalid roster sequence.');
+   const {data,error}=await prestoCloud.from('presto_drivers')
+    .update({pdf_position:change.position})
+    .eq('id',change.id).eq('pdf_position',change.previous).select('id');
+   if(error)throw Error(error.message);
+   if(data?.length!==1)throw Error(language==='ar'?'تغير السجل أثناء العملية. حدّث الصفحة ثم حاول مجددًا.':'La fiche a changé. Actualisez puis réessayez.');
+  }
+  await load();
+ }}
  onUpdate={async(id,patch)=>{
   if(!prestoCloud||!admin)throw Error(language==='ar'?'تسجيل الدخول مطلوب لتعديل السجل.':'Connexion requise.');
   const nextPatch=patch.delivery_date?{...patch,pdf_source_date:patch.delivery_date}:patch;
