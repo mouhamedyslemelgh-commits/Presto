@@ -108,7 +108,7 @@ export default function PrestoPdfRoster({rows,photos,language,editable,onUpdate,
   {numberMessage&&<p className={styles.numberNotice} role="status">{numberMessage}</p>}
   {onOpenTraining&&<div className={styles.trainingInvite} role="region" aria-label={L('تسجيل المتدربين','Enregistrer des participants')}>
    <span className={styles.trainingIcon}><GraduationCap size={25}/></span>
-   <div><strong>{L('التدريب مرتبط بملف كل سائق','Formation reliée au dossier livreur')}</strong><p>{L('أضف المتدربين وسجّل تاريخ التدريب والمدرب والحالة. ينعكس إكمال التدريب على ملف السائق المطابق.','Enregistrez les participants, la date et le formateur. La formation terminée sera liée au livreur correspondant.')}</p></div>
+   <div><strong>{L('التدريب مرتبط بملف كل سائق','Formation reliée au dossier livreur')}</strong><p>{L('أضف المتدربين وسجّل تاريخ التدريب والتطبيق والنتيجة. ينعكس إكمال التدريب على ملف السائق المطابق.','Enregistrez les participants, la date et le résultat. La formation terminée sera liée au livreur correspondant.')}</p></div>
    {editable&&<button type="button" className={styles.trainingAdd} onClick={()=>onOpenTraining()}><Plus size={18}/>{L('إضافة متدرب','Ajouter un participant')}</button>}
   </div>}
   <div className={styles.tableScroller}>
@@ -146,7 +146,6 @@ export default function PrestoPdfRoster({rows,photos,language,editable,onUpdate,
       <div><CalendarDays size={17}/><small>{L('تاريخ التسليم','Date de remise')}</small><strong dir="ltr">{dateDisplay(person.pdf_source_date||person.delivery_date)}</strong></div>
       <div><GraduationCap size={17}/><small>{L('التكوين','Formation')}</small><strong>{person.training_completed===true?L('مكتمل','Terminée'):person.training_completed===false?L('غير مكتمل','Non terminée'):L('غير مسجل','Non renseigné')}</strong></div>
       {person.latest_training_date&&<div><CalendarDays size={17}/><small>{L('آخر تاريخ تدريب','Dernière formation')}</small><strong dir="ltr">{dateDisplay(person.latest_training_date)}</strong></div>}
-      {person.latest_trainer&&<div><UserRound size={17}/><small>{L('المدرب','Formateur')}</small><strong>{person.latest_trainer}</strong></div>}
       <div><MapPin size={17}/><small>{L('المدينة','Ville')}</small><strong>{present(person.city)}</strong></div>
       <div><ClipboardCheck size={17}/><small>{L('كود التطبيق','Code application')}</small><strong>{present(person.app_code)}</strong></div>
      </div>
