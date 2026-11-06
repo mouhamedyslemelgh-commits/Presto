@@ -1,5 +1,5 @@
 'use client';
-import {useCallback,useEffect,useMemo,useState} from 'react';
+import {useCallback,useEffect,useMemo,useState,type FormEvent} from 'react';
 import {prestoCloud} from '../lib/presto-cloud';
 import {Award,CalendarDays,Camera,CheckCircle2,ClipboardList,Download,Edit3,Image as ImageIcon,MapPin,Phone,Plus,Search,Trash2,UserRound,Users,X} from 'lucide-react';
 import styles from './presto-training-records.module.css';
@@ -67,11 +67,12 @@ export default function PrestoTrainingRecords({language,editable=true}:{language
  const filtered=useMemo(()=>items.filter(x=>(filter==='all'||x.training_status===filter)&&
   [x.name,x.phone,x.city,x.trainer,x.training_location,x.notes,String(x.id)].join(' ').toLocaleLowerCase().includes(search.toLocaleLowerCase().trim())),[items,filter,search]);
  const stats={total:items.length,completed:items.filter(x=>x.training_status==='completed').length,in_progress:items.filter(x=>x.training_status==='in_progress').length,needs_review:items.filter(x=>x.training_status==='needs_review').length};
+ const metrics:[string,number,typeof Users][]=[[L('إجمالي المسجلين','Inscrits'),stats.total,Users],[L('أكملوا التدريب','Formations terminées'),stats.completed,CheckCircle2],[L('قيد التدريب','En formation'),stats.in_progress,ClipboardList],[L('تحتاج مراجعة','À revoir'),stats.needs_review,Award]];
  const edit=(row?:RecordRow)=>{
   setSelectedId(row?.id??null);setDraft(row?{name:row.name,phone:row.phone,city:row.city,photo_path:row.photo_path,training_date:row.training_date,trainer:row.trainer,training_location:row.training_location,training_status:row.training_status,app_type:row.app_type,notes:row.notes}:blank());
   setFile(null);setSuccess('');setError('');setOpen(true);
  };
- const save=async(event:React.FormEvent<HTMLFormElement>)=>{
+ const save=async(event:FormEvent<HTMLFormElement>)=>{
   event.preventDefault();
   if(!prestoCloud||!editable||saving)return;
   if(!draft.name.trim()||!draft.phone.trim()||!draft.training_date){setError(L('الاسم والهاتف وتاريخ التدريب مطلوبة.','Nom, téléphone et date sont obligatoires.'));return;}
@@ -81,7 +82,7 @@ export default function PrestoTrainingRecords({language,editable=true}:{language
    if(file){
     if(!['image/jpeg','image/png','image/webp'].includes(file.type)||file.size>5*1024*1024)throw new Error(L('الصورة يجب أن تكون JPG أو PNG أو WebP وأقل من 5MB.','Photo JPG, PNG ou WebP, maximum 5 Mo.'));
     const ext=file.type==='image/png'?'png':file.type==='image/webp'?'webp':'jpg';
-    const key='drivers/training-'+crypto.randomUUID()+'.'+ext;
+    const key='training/'+crypto.randomUUID()+'.'+ext;
     const {error:uploadError}=await prestoCloud.storage.from('presto-driver-photos').upload(key,file,{contentType:file.type,upsert:false});
     if(uploadError)throw uploadError;
     photoPath=key;
@@ -114,7 +115,7 @@ export default function PrestoTrainingRecords({language,editable=true}:{language
    <div className={styles.actions}><button className={styles.outline} onClick={exportCSV} disabled={!filtered.length}><Download size={17}/>{L('تصدير Excel/CSV','Exporter CSV/Excel')}</button>{editable&&<button className={styles.add} onClick={()=>edit()}><Plus size={18}/>{L('إضافة متدرب','Ajouter une personne')}</button>}</div>
   </div>
   <div className={styles.stats}>
-   {[[L('إجمالي المسجلين','Inscrits'),stats.total,Users],[L('أكملوا التدريب','Formations terminées'),stats.completed,CheckCircle2],[L('قيد التدريب','En formation'),stats.in_progress,ClipboardList],[L('تحتاج مراجعة','À revoir'),stats.needs_review,Award]].map(([label,count,Icon],i)=><div className={styles.metric} key={i}><span>{label as string}</span><strong>{count as number}</strong>{<Icon size={19}/>}</div>)}
+   {metrics.map(([label,count,Icon],i)=><div className={styles.metric} key={i}><span>{label as string}</span><strong>{count as number}</strong>{<Icon size={19}/>}</div>)}
   </div>
   <div className={styles.toolbar}><label className={styles.search}><Search size={18}/><input value={search} onChange={e=>setSearch(e.target.value)} placeholder={L('بحث بالاسم أو الهاتف أو المدرب...','Rechercher nom, téléphone, formateur...')}/></label><select aria-label={L('تصفية حسب حالة التدريب','Filtrer par statut')} value={filter} onChange={e=>setFilter(e.target.value as typeof filter)}><option value="all">{L('جميع الحالات','Tous les statuts')}</option><option value="completed">{statusLabel('completed')}</option><option value="in_progress">{statusLabel('in_progress')}</option><option value="needs_review">{statusLabel('needs_review')}</option></select><span>{filtered.length} / {items.length}</span></div>
   {error&&<p role="alert" className={styles.error}>{error}</p>}
