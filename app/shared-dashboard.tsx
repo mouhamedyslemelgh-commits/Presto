@@ -15,6 +15,8 @@ import {EquipmentPanel,MobileMoneyPanel,OperationsReports} from '../components/p
 import {useLanguage,LanguageSwitcher} from '../components/presto-language';
 import {PrestoAppearanceControl,PrestoAppearanceSettings} from '../components/presto-appearance';
 import ExcelImporter from '../components/excel-importer';
+import PrestoPdfImporter from '../components/presto-pdf-importer';
+import {type PdfRecord} from '../lib/presto-pdf';
 import ExcelExportDialog,{type ExcelExportScope} from '../components/excel-export-dialog';
 import {downloadPrestoXlsx} from '../lib/presto-excel-export';
 import {normalizeHeader,type ImportedDriver,type ImportMode} from '../lib/presto-excel';
@@ -208,6 +210,77 @@ export default function SharedDashboard(){
    throw Error('Importation partielle possible. Vérifiez le registre avant de réessayer. '+(e instanceof Error?e.message:''));
   }
  };
+ const importPdf=async(records:PdfRecord[],mode:'add'|'merge')=>{
+  if(!prestoCloud||!admin)throw Error(language==='ar'?'صلاحية الإدارة مطلوبة لحفظ البيانات.':'Droits administrateur requis.');
+  const {data:auth}=await prestoCloud.auth.getUser();
+  if(!auth.user)throw Error(language==='ar'?'سجّل الدخول أولاً لحفظ البيانات.':'Connectez-vous avant d’enregistrer.');
+  let added=0,updated=0,skipped=0;
+  const normalizePhone=(phone:string)=>phone.replace(/\D/g,'');
+  const knownDrivers=[...rows];
+  const trainingResponse=await prestoCloud.from('presto_training_records').select('id,name,phone,training_date').limit(2000);
+  const hasTraining=records.some(r=>r.destination==='training');
+  if(hasTraining&&trainingResponse.error)throw Error(trainingResponse.error.message);
+  const knownTraining=[...(trainingResponse.data||[])];
+  try{
+   for(const record of records){
+    const name=record.name.trim().slice(0,100);
+    const phone=record.phone.trim().slice(0,30);
+    if(!name){skipped++;continue;}
+    if(record.destination==='training'){
+     if(!phone||!record.training_date||!(/^\d{4}-\d{2}-\d{2}$/.test(record.training_date))){
+      skipped++;continue;
+     }
+     const payload:Record<string,unknown>={name,phone,training_date:record.training_date};
+     for(const key of ['city','trainer','training_location','training_status','app_type'] as const)
+      if(record[key]!==undefined&&record[key]!=='')payload[key]=record[key];
+     if(record.observations)payload.notes=record.observations.slice(0,1200);
+     const existing=knownTraining.find(x=>x.training_date===record.training_date&&
+      normalizePhone(x.phone)===normalizePhone(phone));
+     if(existing){
+      if(mode==='add'){skipped++;continue;}
+      const {error}=await prestoCloud.from('presto_training_records').update(payload).eq('id',existing.id);
+      if(error)throw Error(error.message);
+      updated++;
+     }else{
+      const {data,error}=await prestoCloud.from('presto_training_records').insert(payload).select('id').single();
+      if(error)throw Error(error.message);
+      knownTraining.push({id:data.id,name,phone,training_date:record.training_date});
+      added++;
+     }
+     continue;
+    }
+    const payload:Record<string,unknown>={name};
+    if(phone)payload.phone=phone;
+    for(const key of ['city','vehicle_type','app_code','delivery_date','observations',
+     'bag','shirt','verified','bankily','masrvi','sedad','click',
+     'bankily_account','masrvi_account','sedad_account','click_account'] as const){
+     const val=record[key];
+     if(val!==undefined&&val!=='')payload[key]=val;
+    }
+    const existing=knownDrivers.find(x=>{
+     const matchPhone=Boolean(phone&&normalizePhone(phone)&&normalizePhone(x.phone)===normalizePhone(phone));
+     return matchPhone||(!phone&&normalizeHeader(x.name)===normalizeHeader(name));
+    });
+    if(existing){
+     if(mode==='add'){skipped++;continue;}
+     const {error}=await prestoCloud.from('presto_drivers').update(payload).eq('id',existing.id);
+     if(error)throw Error(error.message);
+     updated++;
+    }else{
+     const {data,error}=await prestoCloud.from('presto_drivers').insert({phone:'',...payload}).select('id').single();
+     if(error)throw Error(error.message);
+     knownDrivers.push({...emptyRow(),...payload,phone,id:data.id} as Row);
+     added++;
+    }
+   }
+   await load();
+   const sheets=await mirrorExcel();
+   return {added,updated,skipped,googleSheets:sheets};
+  }catch(error){
+   await load();
+   throw Error((language==='ar'?'قد يكون الحفظ جزئيًا. راجع السجلات قبل إعادة المحاولة. ':'Enregistrement partiel possible. Vérifiez les fiches avant de réessayer. ')+(error instanceof Error?error.message:''));
+  }
+ };
  const del=async(id:number)=>{
   if(!prestoCloud||!admin||!window.confirm(t('Supprimer définitivement ce livreur pour tous les visiteurs ?')))return;
   await mutate(()=>prestoCloud.from('presto_drivers').delete().eq('id',id));
@@ -332,7 +405,8 @@ export default function SharedDashboard(){
   <main><div className="pageHead"><div><h1>{t(titles[view])}</h1><p>{t('Informations synchronisées entre tous les visiteurs')} · {t(loading?'Chargement...':'Actualisées automatiquement')}</p></div><div className="headActions">{view!=='registration'&&view!=='training'&&<>
     <button type="button" className="excelQuickDownload" disabled={exporting||loading||rows.length===0} onClick={()=>{void exportXlsx(null,'all','').catch(error=>setMsg((language==='ar'?'تعذر تنزيل ملف Excel: ':'Téléchargement Excel impossible : ')+(error instanceof Error?error.message:'Erreur')));}} aria-label={language==='ar'?'تنزيل جميع سجلات السائقين بصيغة Excel':'Télécharger tous les livreurs en Excel'}><Download size={18}/>{exporting?(language==='ar'?'جار التنزيل...':'Téléchargement...'):(language==='ar'?'تنزيل Excel كامل':'Télécharger Excel')}</button>
     <ExcelImporter onImport={importDrivers} publicSite/>
-   </>}{view==='drivers'&&<button className="primary" onClick={()=>openEditor(null,'legacy')}><Plus size={16}/>{language==='ar'?'إضافة سجل تسليم':'Ajouter une remise'}</button>}{view==='registration'&&<button className="primary" onClick={()=>openEditor(null,'registration')}><Plus size={16}/>{language==='ar'?'تسجيل سائق ومركبة':'Enregistrer livreur et véhicule'}</button>}{view!=='registration'&&view!=='training'&&<ExcelExportDialog drivers={rows} busy={exporting} onExport={exportXlsx}/>}</div></div>
+    <PrestoPdfImporter onImport={importPdf} disabled={!admin||loading}/>
+   </>}{(view==='registration'||view==='training')&&<PrestoPdfImporter onImport={importPdf} disabled={!admin||loading}/>}{view==='drivers'&&<button className="primary" onClick={()=>openEditor(null,'legacy')}><Plus size={16}/>{language==='ar'?'إضافة سجل تسليم':'Ajouter une remise'}</button>}{view==='registration'&&<button className="primary" onClick={()=>openEditor(null,'registration')}><Plus size={16}/>{language==='ar'?'تسجيل سائق ومركبة':'Enregistrer livreur et véhicule'}</button>}{view!=='registration'&&view!=='training'&&<ExcelExportDialog drivers={rows} busy={exporting} onExport={exportXlsx}/>}</div></div>
   {view==='dashboard'&&<section className="dashboardWelcome" aria-label={language==='ar'?'ملخص العمليات':'Résumé opérationnel'}>
    <div><span className="dashboardWelcomeTag">PRESTO · {language==='ar'?'مركز العمليات':'CENTRE OPÉRATIONNEL'}</span>
     <h2>{language==='ar'?'إدارة السائقين بشكل أوضح وأسهل':'Une vision claire de vos opérations'}</h2>
