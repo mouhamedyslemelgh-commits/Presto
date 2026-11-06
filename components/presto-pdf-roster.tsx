@@ -12,11 +12,13 @@ export type RosterDriver={
  pdf_source_date?:string|null;latest_training_date?:string;latest_trainer?:string;
 };
 type Update={license_plate?:string;presto_reference?:string;training_completed?:boolean|null;bag?:boolean;shirt?:boolean;delivery_date?:string};
+type NumberCorrection={id:number;previous:number;position:number};
 type Props={
  rows:RosterDriver[];photos:Record<string,string>;language:string;editable:boolean;
  onUpdate:(id:number,payload:Update)=>Promise<void>;
  onOpenTraining?:(person?:RosterDriver)=>void;
  onShowTraining?:()=>void;
+ onFixNumbering?:(changes:NumberCorrection[])=>Promise<void>;
 };
 const present=(text?:string|null)=>String(text||'').trim()||'—';
 function dateDisplay(date?:string|null){
@@ -30,7 +32,7 @@ function normalizedDate(date?:string|null){
  return match?match[3]+'-'+match[2]+'-'+match[1]:String(date||'').slice(0,10);
 }
 const fileDate='06/11/2026';
-export default function PrestoPdfRoster({rows,photos,language,editable,onUpdate,onOpenTraining,onShowTraining}:Props){
+export default function PrestoPdfRoster({rows,photos,language,editable,onUpdate,onOpenTraining,onShowTraining,onFixNumbering}:Props){
  const ar=language==='ar';
  const L=(a:string,b:string)=>ar?a:b;
  const [query,setQuery]=useState('');
@@ -39,6 +41,8 @@ export default function PrestoPdfRoster({rows,photos,language,editable,onUpdate,
  const [tab,setTab]=useState<'profile'|'card'>('profile');
  const [edit,setEdit]=useState(false);
  const [working,setWorking]=useState(false);
+ const [fixingNumbers,setFixingNumbers]=useState(false);
+ const [numberMessage,setNumberMessage]=useState('');
  const [message,setMessage]=useState('');
  const [form,setForm]=useState<Update>({});
  const canonical=useMemo(()=>[...rows].filter(x=>x.pdf_position!=null).sort((a,b)=>(a.pdf_position||0)-(b.pdf_position||0)),[rows]);
@@ -49,6 +53,14 @@ export default function PrestoPdfRoster({rows,photos,language,editable,onUpdate,
  const rankById=new Map(fullRoster.map((x,i)=>[x.id,i+1]));
  const roster=showOther?fullRoster:canonical;
  const positionFor=(x:RosterDriver)=>rankById.get(x.id)??0;
+ const corrections:NumberCorrection[]=canonical.map((row,index)=>({id:row.id,previous:row.pdf_position||0,position:index+1})).filter(item=>item.previous!==item.position);
+ const fixNumbering=async()=>{
+  if(!editable||!onFixNumbering||fixingNumbers||!corrections.length)return;
+  setFixingNumbers(true);setNumberMessage('');
+  try{await onFixNumbering(corrections);setNumberMessage(L('حُفظ الترقيم المتسلسل في قاعدة البيانات.','La numérotation a été enregistrée dans la base.'));}
+  catch(error){setNumberMessage(error instanceof Error?error.message:L('تعذر حفظ الترقيم.','Erreur de numérotation.'));}
+  finally{setFixingNumbers(false);}
+ };
  const filtered=roster.filter(x=>[x.name,x.phone,x.pdf_source_phone,x.presto_reference,x.license_plate,positionFor(x)].join(' ').toLowerCase().includes(query.trim().toLowerCase()));
  const summary={all:roster.length,both:roster.filter(x=>x.bag&&x.shirt).length,partial:roster.filter(x=>(x.bag||x.shirt)&&!(x.bag&&x.shirt)).length,none:roster.filter(x=>!x.bag&&!x.shirt).length};
  const person=roster.find(x=>x.id===selected);
@@ -88,7 +100,9 @@ export default function PrestoPdfRoster({rows,photos,language,editable,onUpdate,
    {extras.length>0&&<button className={styles.chip} type="button" onClick={()=>setShowOther(!showOther)}>{showOther?L('عرض القائمة الأصلية فقط','Liste d’origine'):L('عرض السائقين الإضافيين','Autres livreurs')} ({extras.length}) <ChevronDown size={15}/></button>}
    <button className={styles.chip} type="button" onClick={exportCSV}><Download size={16}/>{L('تصدير الجدول','Exporter CSV')}</button>
    {onShowTraining&&<button className={styles.chip} type="button" onClick={onShowTraining}><GraduationCap size={17}/>{L('عرض سجل المتدربين','Registre des formations')}</button>}
+   {editable&&onFixNumbering&&corrections.length>0&&<button className={styles.chip} disabled={fixingNumbers} type="button" onClick={()=>void fixNumbering()}><Check size={17}/>{fixingNumbers?L('جار حفظ الترتيب...','Mise à jour...'):L('تثبيت الترقيم 1 إلى '+canonical.length,'Corriger les numéros 1 à '+canonical.length)}</button>}
   </div>
+  {numberMessage&&<p className={styles.numberNotice} role="status">{numberMessage}</p>}
   {onOpenTraining&&<div className={styles.trainingInvite} role="region" aria-label={L('تسجيل المتدربين','Enregistrer des participants')}>
    <span className={styles.trainingIcon}><GraduationCap size={25}/></span>
    <div><strong>{L('التدريب مرتبط بملف كل سائق','Formation reliée au dossier livreur')}</strong><p>{L('أضف المتدربين وسجّل تاريخ التدريب والمدرب والحالة. ينعكس إكمال التدريب على ملف السائق المطابق.','Enregistrez les participants, la date et le formateur. La formation terminée sera liée au livreur correspondant.')}</p></div>
@@ -139,7 +153,7 @@ export default function PrestoPdfRoster({rows,photos,language,editable,onUpdate,
       <label>{L('اللوحة','Plaque')}<input value={form.license_plate||''} onChange={e=>setForm({...form,license_plate:e.target.value})} maxLength={30}/></label>
       <label>{L('رقم السائق','N° livreur')}<input value={form.presto_reference||''} onChange={e=>setForm({...form,presto_reference:e.target.value})} maxLength={32}/></label>
       <label>{L('تاريخ التسليم','Date de remise')}<input type="date" value={form.delivery_date||''} onChange={e=>setForm({...form,delivery_date:e.target.value})}/></label>
-      <label>{L('حالة التكوين','Formation')}<select value={String(form.training_completed)} onChange={e=>setForm({...form,training_completed:e.target.value==='true'?true:e.target.value==='false'?false:null})}><option value="true">{L('مكتمل','Terminée')}</option><option value="false">{L('لم يكمل','Non terminée')}</option><option value="null">{L('غير مسجل','Non renseigné')}</option></select></label>
+      <div className={styles.trainingEditTip}><GraduationCap size={17}/><span>{L('تحديث حالة التدريب يتم عبر سجل المتدربين المرتبط بهذا السائق.','La formation se met à jour depuis le registre des participants relié à ce livreur.')}</span></div>
       <label className={styles.checkBox}><input type="checkbox" checked={Boolean(form.bag)} onChange={e=>setForm({...form,bag:e.target.checked})}/>{L('استلم الحقيبة','Sac remis')}</label>
       <label className={styles.checkBox}><input type="checkbox" checked={Boolean(form.shirt)} onChange={e=>setForm({...form,shirt:e.target.checked})}/>{L('استلم القميص','Chemise remise')}</label>
      </div>}
