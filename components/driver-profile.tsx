@@ -1,13 +1,13 @@
 'use client';
 import {useEffect,useState} from 'react';
-import {X,UserRound,Phone,CalendarDays,PackageCheck,Shirt,ClipboardCheck,Edit3,Save,Check,ShieldCheck,Wallet,Hash,StickyNote,ArrowUpRight,Bike,MapPin,KeyRound} from 'lucide-react';
+import {X,UserRound,Phone,CalendarDays,PackageCheck,Shirt,ClipboardCheck,Edit3,Save,Check,ShieldCheck,Wallet,Hash,StickyNote,ArrowUpRight,Bike,MapPin,KeyRound,GraduationCap} from 'lucide-react';
 import {useLanguage} from './presto-language';
 export type ProfilePayment='bankily'|'masrvi'|'sedad'|'click';
 export type ProfileDriver={
  id:number;name:string;phone:string;bag:boolean;shirt:boolean;verified:boolean;
  payments:Record<ProfilePayment,boolean>;
  paymentNumbers?:Partial<Record<ProfilePayment,string>>;
- deliveryDate?:string;observations?:string;city?:string;vehicleType?:string;appCode?:string;driverPhotoPath?:string;vehiclePhotoPath?:string;
+ deliveryDate?:string;observations?:string;city?:string;vehicleType?:string;appCode?:string;driverPhotoPath?:string;vehiclePhotoPath?:string;trainingCompleted?:boolean|null;trainingDate?:string;trainer?:string;
 };
 const providers:{key:ProfilePayment;name:string;accent:string;logo:string}[]=[
  {key:'bankily',name:'Bankily',accent:'#168f99',logo:'/logos/bankily.webp'},
@@ -15,8 +15,8 @@ const providers:{key:ProfilePayment;name:string;accent:string;logo:string}[]=[
  {key:'sedad',name:'Sedad',accent:'#26976a',logo:'/logos/sedad.webp'},
  {key:'click',name:'CLICK',accent:'#1681ad',logo:'/logos/click.webp'}
 ];
-type Props={driver:ProfileDriver;displayNumber?:number;onSave:(next:ProfileDriver)=>void|Promise<void>;onClose:()=>void;readOnly?:boolean;maskPhone?:boolean;photoUrls?:Record<string,string>};
-export default function DriverProfile({driver,displayNumber,onSave,onClose,readOnly=false,maskPhone=false,photoUrls={}}:Props){
+type Props={driver:ProfileDriver;displayNumber?:number;onSave:(next:ProfileDriver)=>void|Promise<void>;onClose:()=>void;readOnly?:boolean;maskPhone?:boolean;photoUrls?:Record<string,string>;onGoTraining?:()=>void};
+export default function DriverProfile({driver,displayNumber,onSave,onClose,readOnly=false,maskPhone=false,photoUrls={},onGoTraining}:Props){
  const {language,t}=useLanguage(),ar=language==='ar';
  const [draft,setDraft]=useState<ProfileDriver>({...driver,payments:{...driver.payments},paymentNumbers:{...driver.paymentNumbers}});
  const [editing,setEditing]=useState(false),[saving,setSaving]=useState(false),[error,setError]=useState('');
@@ -66,6 +66,12 @@ export default function DriverProfile({driver,displayNumber,onSave,onClose,readO
     {info('تاريخ التسليم','Date de remise',draft.deliveryDate||'')}
     {info('الترتيب في السجل','Rang du livreur',String(rank))}
    </div>}
+   <div className="driverProfileSectionTitle"><div className="driverProfileMiniIcon"><GraduationCap size={18}/></div><div><h3>{ar?'سجل التدريب':'Formation à l’application'}</h3><p>{ar?'هذه الحالة مرتبطة بسجل المتدربين في PRESTO':'État lié au registre des formations PRESTO'}</p></div>{onGoTraining&&<button type="button" className="driverProfileEdit" onClick={onGoTraining}><GraduationCap size={15}/>{readOnly?(ar?'عرض التدريب':'Voir la formation'):(ar?'إضافة تدريب':'Ajouter une formation')}</button>}</div>
+   <div className="driverProfileInfoGrid">
+    {info('حالة التدريب','Statut de formation',draft.trainingCompleted===true?(ar?'أكمل التدريب':'Formation terminée'):draft.trainingCompleted===false?(ar?'لم يكمل التدريب':'Formation non terminée'):(ar?'غير مسجل':'Non renseigné'))}
+    {info('تاريخ آخر تدريب','Dernière formation',draft.trainingDate||'')}
+    {info('اسم المدرب','Formateur',draft.trainer||'')}
+   </div>
    <div className="driverProfileSectionTitle"><div className="driverProfileMiniIcon"><Bike size={18}/></div><div><h3>{ar?'السائق والمركبة':'Livreur et véhicule'}</h3><p>{ar?'الصور مرتبطة بسجل هذا السائق':'Photos associées à cette fiche'}</p></div></div>
    <div className="driverProfileVehiclePhotos">
     <div><span>{ar?'صورة السائق':'Photo du livreur'}</span><img src="/images/presto-uniform-rider.webp" alt={ar?'صورة سائق بريستو':'Portrait PRESTO'}/></div>
