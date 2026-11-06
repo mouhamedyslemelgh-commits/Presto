@@ -28,9 +28,6 @@ function normalizedDate(date?:string|null){
  const match=String(date||'').match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
  return match?match[3]+'-'+match[2]+'-'+match[1]:String(date||'').slice(0,10);
 }
-function driverPosition(row:RosterDriver,index:number){
- return row.pdf_position??(100+index);
-}
 const fileDate='06/11/2026';
 export default function PrestoPdfRoster({rows,photos,language,editable,onUpdate,onOpenTraining}:Props){
  const ar=language==='ar';
@@ -46,6 +43,7 @@ export default function PrestoPdfRoster({rows,photos,language,editable,onUpdate,
  const canonical=useMemo(()=>[...rows].filter(x=>x.pdf_position!=null).sort((a,b)=>(a.pdf_position||0)-(b.pdf_position||0)),[rows]);
  const extras=useMemo(()=>[...rows].filter(x=>x.pdf_position==null&&x.bag).sort((a,b)=>a.id-b.id),[rows]);
  const roster=showOther?[...canonical,...extras]:canonical;
+ const positionFor=(x:RosterDriver)=>x.pdf_position??(100+extras.findIndex(e=>e.id===x.id));
  const filtered=roster.filter(x=>[x.name,x.phone,x.pdf_source_phone,x.presto_reference,x.license_plate,x.pdf_position].join(' ').toLowerCase().includes(query.trim().toLowerCase()));
  const summary={all:roster.length,both:roster.filter(x=>x.bag&&x.shirt).length,partial:roster.filter(x=>(x.bag||x.shirt)&&!(x.bag&&x.shirt)).length,none:roster.filter(x=>!x.bag&&!x.shirt).length};
  const person=roster.find(x=>x.id===selected);
@@ -61,7 +59,7 @@ export default function PrestoPdfRoster({rows,photos,language,editable,onUpdate,
  const badge=(yes:boolean|null|undefined)=>yes===true?<Check className={styles.check} aria-label={L('نعم','Oui')} size={20} strokeWidth={3}/>:<span className={styles.dash} aria-label={L('لا أو غير مسجل','Non ou non renseigné')}>—</span>;
  const exportCSV=()=>{
   const header=['#','الاسم','رقم السائق','الهاتف','اللوحة','الحقيبة','القميص','التكوين','سلم في'];
-  const body=filtered.map((d,i)=>[String(driverPosition(d,i)),d.name,d.presto_reference||'',d.pdf_source_phone||d.phone,d.license_plate||'',d.bag?'نعم':'لا',d.shirt?'نعم':'لا',d.training_completed===true?'نعم':d.training_completed===false?'لا':'غير مسجل',dateDisplay(d.pdf_source_date||d.delivery_date)]);
+  const body=filtered.map((d,i)=>[String(positionFor(d)),d.name,d.presto_reference||'',d.pdf_source_phone||d.phone,d.license_plate||'',d.bag?'نعم':'لا',d.shirt?'نعم':'لا',d.training_completed===true?'نعم':d.training_completed===false?'لا':'غير مسجل',dateDisplay(d.pdf_source_date||d.delivery_date)]);
   const lines=[header,...body].map(line=>line.map(x=>'"'+String(x).replaceAll('"','""')+'"').join(';'));
   const blob=new Blob(['\uFEFF'+lines.join('\r\n')],{type:'text/csv;charset=utf-8'});
   const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='PRESTO-equipes-formation-2026-11-06.csv';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
@@ -90,7 +88,7 @@ export default function PrestoPdfRoster({rows,photos,language,editable,onUpdate,
    <table className={styles.table}>
     <thead><tr><th>#</th><th>{L('السائق','Livreur')}</th><th>{L('الهاتف','Téléphone')}</th><th>{L('اللوحة','Plaque')}</th><th>{L('الحقيبة','Sac')}</th><th>{L('القميص','Chemise')}</th><th>{L('التكوين','Formation')}</th><th>{L('سلم في','Date')}</th></tr></thead>
     <tbody>{filtered.map((d,i)=><tr key={d.id} onClick={()=>viewPerson(d)} tabIndex={0} role="button" onKeyDown={e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();viewPerson(d);}}} aria-label={L('افتح ملف السائق','Ouvrir la fiche du livreur')+' '+d.name}>
-      <td className={styles.serial}>{driverPosition(d,i)}</td>
+      <td className={styles.serial}>{positionFor(d)}</td>
       <td className={styles.driverName}><strong>{d.name}</strong><small>#{present(d.presto_reference)}</small></td>
       <td className={styles.phone} dir="ltr">{d.pdf_source_phone||d.phone}</td>
       <td>{d.license_plate?<span className={styles.plate} dir="ltr">{d.license_plate}<span className={styles.plateFlag}>◉</span></span>:<span className={styles.dash}>—</span>}</td>
