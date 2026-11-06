@@ -229,3 +229,356 @@
 .numberNotice{margin:7px 0 13px;padding:13px 15px;border-radius:12px;border:1px solid #cbe3d3;background:#f1faf3;color:#256c4b;font-weight:750;font-size:12px;line-height:1.6}
 .trainingEditTip{display:flex;align-items:center;gap:8px;grid-column:1/-1;border:1px solid #f1dccf;background:#fff3e9;border-radius:12px;padding:12px;color:#90543d;font-size:12px;line-height:1.65;font-weight:700}
 .trainingEditTip svg{flex-shrink:0;color:#e75f33}
+
+
+/* PRESTO driver dossier / identity card — 2026-11-06 visual refinement */
+/* Compact, legible dialog with balanced spacing on wide and narrow screens. */
+.overlay{
+ z-index:1050;
+ padding:clamp(9px,2.5vw,28px);
+ background:rgba(12,22,35,.68);
+ -webkit-backdrop-filter:blur(7px);
+ backdrop-filter:blur(7px);
+}
+.modal{
+ width:min(920px,100%);
+ max-height:calc(100dvh - clamp(18px,5vw,56px));
+ overflow:auto;
+ overscroll-behavior:contain;
+ scrollbar-width:thin;
+ border:1px solid rgba(255,255,255,.84);
+ border-radius:26px;
+ background:#fff;
+ box-shadow:0 32px 110px rgba(9,24,39,.33);
+}
+.modalHead{
+ align-items:center;
+ padding:22px clamp(18px,3vw,34px) 20px;
+ background:#fff;
+ border-bottom:1px solid #f0e8e2;
+}
+.modalHeadline .overline{
+ display:inline-flex;
+ width:max-content;
+ padding:5px 10px;
+ border-radius:999px;
+ background:#fff1e9;
+ color:#bd421e;
+ font-size:11px;
+ letter-spacing:.02em;
+}
+.modalHeadline h2{
+ margin:8px 0 0;
+ font-size:clamp(20px,2.5vw,27px);
+ line-height:1.4;
+ color:#222c3b;
+}
+.iconButton{
+ width:42px;
+ height:42px;
+ border:1px solid #e8eaf0;
+ border-radius:13px;
+ background:#f8f9fb;
+ transition:background .18s,transform .18s;
+}
+.iconButton:hover{background:#fff0e8;transform:rotate(90deg)}
+.iconButton:focus-visible,.tabs button:focus-visible,.profileButtons button:focus-visible{
+ outline:3px solid #ffaf82;
+ outline-offset:3px;
+}
+.hero{
+ display:grid;
+ grid-template-columns:104px minmax(0,1fr) auto;
+ align-items:center;
+ gap:22px;
+ padding:23px clamp(18px,3vw,34px);
+ min-height:160px;
+ background:linear-gradient(115deg,#fff 4%,#fff8f3 57%,#ffeddf 100%);
+ border-bottom:1px solid #f4e6db;
+}
+.avatar{
+ width:104px;
+ height:104px;
+ border-radius:21px;
+ border:3px solid #fff;
+ box-shadow:0 9px 26px rgba(227,97,41,.18);
+ background:#fff3e8;
+}
+.hero small{
+ font-size:12px;
+ font-weight:800;
+ color:#ca542e;
+}
+.hero h3{
+ margin:5px 0 7px;
+ font-size:clamp(20px,2.5vw,28px);
+ line-height:1.35;
+ color:#212b39;
+}
+.hero span{font-size:13px;line-height:1.6}
+.heroLogo{
+ align-self:center;
+ margin-inline-start:auto;
+ padding:11px 14px;
+ border:1px solid #f6e1d3;
+ background:#fff;
+ border-radius:17px;
+ box-shadow:0 5px 20px #9b512014;
+}
+.heroLogo img{width:77px;height:47px;object-fit:contain}
+.tabs{
+ position:relative;
+ gap:8px;
+ padding:12px clamp(18px,3vw,34px) 0;
+ background:#fff;
+ border-bottom:1px solid #ebeaf0;
+}
+.tabs button{
+ min-height:48px;
+ padding:11px 19px;
+ border-radius:12px 12px 0 0;
+ font-size:13px;
+ font-weight:850;
+ color:#637182;
+ transition:color .16s,background .16s;
+}
+.tabs button:hover{background:#fff5ed;color:#b54b28}
+.tabs .active{background:#fff7f2;color:#d65025;border-bottom-color:#e85026}
+.modalContent{padding:clamp(18px,3vw,32px)}
+.detailGrid{gap:13px}
+.detailGrid>div{
+ min-height:88px;
+ display:grid;
+ grid-template-columns:24px 1fr;
+ align-content:center;
+ gap:5px 12px;
+ padding:16px 18px;
+ background:#fff;
+ border:1px solid #e9edf1;
+ border-radius:15px;
+ box-shadow:0 3px 12px #202a3310;
+}
+.detailGrid>div svg{grid-row:span 2;align-self:center;color:#e65c30}
+.detailGrid small{font-size:12px;color:#738195}
+.detailGrid strong{font-size:15px;color:#273448;line-height:1.5}
+.statusLine{gap:11px}
+.statusLine>div{border-radius:13px;min-height:52px}
+.profileButtons{gap:10px;margin-top:22px}
+.primary,.secondary{
+ min-height:46px;
+ padding:12px 19px;
+ font-size:13px;
+ border-radius:12px;
+}
+.primary{background:linear-gradient(100deg,#e44220,#fa762e);box-shadow:0 6px 17px rgba(228,65,32,.21)}
+.primary:hover{background:linear-gradient(100deg,#d73416,#ee631e)}
+.secondary{background:#fff4eb;color:#a54827;border-color:#f4d7c7}
+/* A single polished PRESTO card is reused for on-screen display and printing. */
+.cardView{
+ padding:clamp(18px,3vw,30px);
+ background:radial-gradient(ellipse at 50% 2%,#fff5ef 0%,#fff 68%);
+}
+.printCard{
+ width:min(100%,640px);
+ border:1px solid #f1d6c8;
+ border-radius:22px;
+ background:#fff;
+ box-shadow:0 20px 50px rgba(139,74,42,.16),0 2px 8px rgba(27,29,35,.05);
+}
+.printCard:before{
+ height:5px;
+ background:linear-gradient(90deg,#e73621,#fa6026 65%,#ffab45);
+}
+.cardTop{
+ display:flex;
+ min-height:96px;
+ gap:16px;
+ padding:20px 24px;
+ background:linear-gradient(112deg,#c92d1e 0%,#ed4723 52%,#fa8d33 100%);
+}
+.cardTop img{
+ width:77px;
+ height:58px;
+ padding:5px;
+ border-radius:13px;
+ background:#fff;
+ box-shadow:0 3px 9px #87261230;
+}
+.cardTop>span{
+ display:grid;
+ gap:5px;
+ text-align:center;
+ direction:ltr;
+ font-size:12px;
+ letter-spacing:.02em;
+}
+.cardTop b{font-size:16px;letter-spacing:0}
+.cardRank{
+ align-self:center;
+ padding:10px 13px;
+ border-radius:12px;
+ font-size:15px;
+ background:#ffffff17;
+ border:1px solid #ffffffa8;
+ color:#fff;
+}
+.cardBody{
+ display:grid;
+ grid-template-columns:132px minmax(0,1fr);
+ align-items:center;
+ gap:26px;
+ padding:27px 29px;
+ min-height:219px;
+}
+.cardBody>div:last-child{min-width:0}
+.cardPhoto{
+ width:132px;
+ height:155px;
+ border:1px solid #f3cab2;
+ border-radius:18px;
+ background:linear-gradient(130deg,#fff7f1,#ffe8d4);
+ box-shadow:0 6px 22px #a3582c16;
+}
+.cardBody small{font-size:12px;color:#7b8a98}
+.cardBody h3{
+ margin:6px 0 10px;
+ font-size:clamp(20px,2.4vw,25px);
+ font-weight:900;
+ line-height:1.35;
+ color:#202b3d;
+}
+.cardBody span{
+ padding:5px 12px;
+ border-radius:9px;
+ font-size:13px;
+ background:#fff0e5;
+ color:#c33f1d;
+}
+.cardBody p{
+ display:flex;
+ align-items:center;
+ gap:9px;
+ margin:10px 0 0;
+ color:#435266;
+ font-size:15px;
+ line-height:1.5;
+ overflow-wrap:anywhere;
+}
+.cardBody p svg{flex-shrink:0}
+.cardBottom{
+ background:#fff9f4;
+ border-block:1px solid #f4e7db;
+ gap:0;
+}
+.cardBottom span{
+ gap:8px;
+ padding:15px 9px;
+ color:#26764d;
+ font-size:12px;
+ font-weight:850;
+ border-inline-end:1px solid #f2e7dd;
+}
+.cardBottom span:last-child{border:0}
+.cardBottom span[data-state="no"]{color:#986d58}
+.cardBottom span[data-state="no"] svg{opacity:.45}
+.printCard footer{
+ min-height:49px;
+ padding:13px 24px;
+ background:#fff;
+ color:#667788;
+ font-size:11px;
+}
+.printCard footer b{color:#b64b2d}
+.printHint{
+ max-width:640px;
+ margin:16px auto 0;
+ color:#68798b;
+ font-size:12px;
+ line-height:1.65;
+}
+.cardView .profileButtons{
+ max-width:640px;
+ margin:20px auto 0;
+ justify-content:space-between;
+}
+@media(max-width:650px){
+ .overlay{padding:8px;align-items:center}
+ .modal{
+  max-height:calc(100dvh - 16px);
+  border-radius:19px;
+ }
+ .modalHead{padding:17px 16px}
+ .modalHeadline h2{font-size:20px}
+ .hero{
+  grid-template-columns:74px minmax(0,1fr);
+  gap:14px;
+  min-height:114px;
+  padding:17px;
+ }
+ .avatar{width:74px;height:74px;border-radius:17px}
+ .hero h3{font-size:19px}
+ .hero span{font-size:11px;flex-wrap:wrap}
+ .heroLogo{display:none}
+ .tabs{padding:7px 12px 0;gap:3px}
+ .tabs button{flex:1;justify-content:center;padding:11px 7px;font-size:12px}
+ .modalContent{padding:14px}
+ .detailGrid{gap:9px}
+ .detailGrid>div{padding:12px;min-height:75px;gap:4px 7px;grid-template-columns:20px 1fr}
+ .detailGrid strong{font-size:13px}
+ .detailGrid small{font-size:11px}
+ .cardView{padding:14px}
+ .cardTop{min-height:74px;padding:12px 14px;gap:8px}
+ .cardTop img{width:58px;height:47px}
+ .cardTop>span{font-size:10px}
+ .cardTop b{font-size:12px}
+ .cardRank{font-size:11px;padding:7px 8px}
+ .cardBody{
+  grid-template-columns:90px minmax(0,1fr);
+  gap:13px;
+  padding:17px;
+  min-height:155px;
+ }
+ .cardPhoto{width:90px;height:115px;border-radius:13px}
+ .cardBody h3{font-size:17px}
+ .cardBody p{font-size:12px;gap:5px;margin-top:7px}
+ .cardBody span{font-size:11px}
+ .cardBottom span{font-size:10px;padding:11px 4px;gap:4px}
+ .cardBottom span svg{width:14px}
+ .printCard footer{padding:11px 13px;font-size:9px}
+ .cardView .profileButtons{flex-direction:column-reverse;align-items:stretch}
+ .cardView .profileButtons button{width:100%}
+}
+@media(max-width:370px){
+ .cardTop b{font-size:10px}
+ .cardBody{grid-template-columns:74px minmax(0,1fr);gap:10px;padding:11px}
+ .cardPhoto{width:74px;height:100px}
+ .cardBody h3{font-size:15px}
+ .cardBottom span{font-size:9px}
+ .printCard footer{gap:6px}
+ .detailGrid{grid-template-columns:1fr}
+}
+@media(prefers-reduced-motion:reduce){
+ .iconButton,.tabs button,.primary,.secondary{transition:none}
+}
+@media print{
+ @page{size:A4 portrait;margin:12mm}
+ .printCard{
+  position:fixed!important;
+  top:24mm!important;
+  right:calc((100% - 145mm)/2)!important;
+  left:auto!important;
+  width:145mm!important;
+  max-width:145mm!important;
+  border:1px solid #ecc9b4!important;
+  box-shadow:none!important;
+  border-radius:5mm!important;
+  overflow:hidden!important;
+  print-color-adjust:exact!important;
+  -webkit-print-color-adjust:exact!important;
+ }
+ .printCard .cardTop{min-height:22mm!important}
+ .printCard .cardBody{min-height:48mm!important}
+ .printCard .cardPhoto{width:30mm!important;height:36mm!important}
+ .printCard .cardBody{grid-template-columns:30mm minmax(0,1fr)!important}
+ .printCard .cardBottom span{font-size:10pt!important}
+}
