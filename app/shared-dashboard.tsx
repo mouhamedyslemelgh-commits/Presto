@@ -1,6 +1,6 @@
 // @ts-nocheck
 'use client';
-import {useCallback,useEffect,useRef,useState} from 'react';
+import {useCallback,useEffect,useMemo,useRef,useState} from 'react';
 import {prestoCloud} from '../lib/presto-cloud';
 import {savePrestoExcelSnapshot,downloadSavedPrestoExcel} from '../lib/presto-excel-cloud';
 import {EquipmentCardDialog} from '../components/equipment-card';
@@ -26,6 +26,9 @@ type Pay='bankily'|'masrvi'|'sedad'|'click';
 type Row={id:number;name:string;phone:string;bag:boolean;shirt:boolean;verified:boolean;bankily:boolean;masrvi:boolean;sedad:boolean;click:boolean;bankily_account:string;masrvi_account:string;sedad_account:string;click_account:string;delivery_date:string;observations:string;city:string;vehicle_type:string;app_code:string;driver_photo_path:string;vehicle_photo_path:string;license_plate?:string;presto_reference?:string;pdf_position?:number|null;training_completed?:boolean|null;pdf_source_phone?:string;pdf_source_date?:string|null};
 const profileData=(d:Row)=>({id:d.id,name:d.name,phone:d.phone,bag:d.bag,shirt:d.shirt,verified:d.verified,payments:{bankily:d.bankily,masrvi:d.masrvi,sedad:d.sedad,click:d.click},paymentNumbers:{bankily:d.bankily_account,masrvi:d.masrvi_account,sedad:d.sedad_account,click:d.click_account},deliveryDate:d.delivery_date,observations:d.observations,city:d.city,vehicleType:d.vehicle_type,appCode:d.app_code,driverPhotoPath:d.driver_photo_path,vehiclePhotoPath:d.vehicle_photo_path});
 type View='dashboard'|'drivers'|'registration'|'training'|'equipment'|'mobile'|'reports'|'settings';
+type TrainingEntry={id:number;name:string;phone:string;training_status:'completed'|'in_progress'|'needs_review';training_date:string;trainer:string};
+type TrainingPrefill={id:number;name:string;phone:string;city:string};
+const phoneDigits=(value:string)=>String(value||'').replace(/\D/g,'');
 const pays:[Pay,string,string,string][]=[['bankily','Bankily','BPM','#228e99'],['masrvi','Masrvi','BMCI','#6949a7'],['sedad','Sedad','BMI','#22966a'],['click','CLICK','BNM','#2480a9']];
 const menus:[View,string,typeof Users][]=[['dashboard',"Vue d’ensemble",LayoutDashboard],['drivers','Registre des remises',Users],['registration','Livreurs et véhicules',Bike],['training','Formations à l’application',GraduationCap],['equipment','Équipements',Package],['mobile','Mobile Money',Wallet],['reports','Rapports',ChartNoAxesColumn],['settings','Paramètres',Settings]];
 const emptyRow=():Row=>({id:0,name:'',phone:'',bag:false,shirt:false,verified:false,bankily:false,masrvi:false,sedad:false,click:false,bankily_account:'',masrvi_account:'',sedad_account:'',click_account:'',delivery_date:'',observations:'',city:'',vehicle_type:'',app_code:'',driver_photo_path:'',vehicle_photo_path:''});
@@ -57,11 +60,48 @@ export default function SharedDashboard(){
  const [claimCode,setClaimCode]=useState(''),[claiming,setClaiming]=useState(false);
  const [legacyCount,setLegacyCount]=useState(0),[legacyUploading,setLegacyUploading]=useState(false);
  const [showManualTraining,setShowManualTraining]=useState(false);
+ const [trainingOpenRequest,setTrainingOpenRequest]=useState(0);
+ const [trainingPrefill,setTrainingPrefill]=useState<TrainingPrefill|null>(null);
+ const [trainingRecords,setTrainingRecords]=useState<TrainingEntry[]>([]);
+ const trainingSequence=useRef(0);
  useEffect(()=>{
   const onKeyDown=(event:KeyboardEvent)=>{if(event.key==='Escape')setOpenMenu(false)};
   window.addEventListener('keydown',onKeyDown);
   return ()=>window.removeEventListener('keydown',onKeyDown);
  },[]);
+ const refreshTraining=useCallback(async()=>{
+  if(!prestoCloud||!userId){setTrainingRecords([]);return;}
+  const request=++trainingSequence.current;
+  const {data,error}=await prestoCloud.from('presto_training_records')
+   .select('id,name,phone,training_date,training_status,trainer')
+   .order('training_date',{ascending:false}).order('id',{ascending:false}).limit(2000);
+  if(!error&&request===trainingSequence.current)setTrainingRecords((data??[]) as TrainingEntry[]);
+ },[userId]);
+ useEffect(()=>{
+  void refreshTraining();
+  const poll=setInterval(()=>{if(document.visibilityState==='visible')void refreshTraining();},20000);
+  return ()=>{clearInterval(poll);trainingSequence.current++;};
+ },[refreshTraining]);
+ const latestTraining=useMemo(()=>{
+  const byPhone=new Map<string,TrainingEntry>();
+  for(const record of trainingRecords){
+   const number=phoneDigits(record.phone);
+   if(number.length>=7&&!byPhone.has(number))byPhone.set(number,record);
+  }
+  return byPhone;
+ },[trainingRecords]);
+ const rosterRows=useMemo(()=>rows.map(driver=>{
+  const phone=phoneDigits(driver.pdf_source_phone||driver.phone);
+  const training=phone.length>=7?latestTraining.get(phone):undefined;
+  if(!training)return driver;
+  return {...driver,training_completed:training.training_status==='completed',
+   latest_training_date:training.training_date,latest_trainer:training.trainer};
+ }),[rows,latestTraining]);
+ const openTraining=(person?:{id:number;name:string;phone:string;city?:string})=>{
+  setTrainingPrefill(person?{id:person.id,name:person.name,phone:person.phone,city:person.city||''}:null);
+  setShowManualTraining(true);
+  setTrainingOpenRequest(number=>number+1);
+ };
  const loadSequence=useRef(0);
  const load=useCallback(async()=>{
   if(!prestoCloud){setLoading(false);return;}
@@ -432,8 +472,9 @@ export default function SharedDashboard(){
   </div><div className="sectionHeading"><h2>{t("MOYENS DE PAIEMENT")}</h2><small>{t("Comptes enregistrés")}</small></div><div className="paymentGrid">{pays.map(([k,name,bank,color])=><button className="payment" key={k} onClick={()=>go('mobile')} style={{'--c':color} as React.CSSProperties}><div className="paymentHeader"><span className="paymentLogo"><img src={'/logos/'+k+'.webp'} alt={name} width={54} height={54}/></span><div><b>{name}</b><small>{bank}</small></div><strong>{count(k)}</strong></div><div className="track"><div style={{width:pct(count(k))+'%'}}/></div></button>)}</div><div className="bottomGrid"><section className="panel register"><div className="panelTitle"><div><h2>{t("Registre des remises")}</h2><p>{t("Les cinq derniers livreurs")}</p></div><button className="secondary" onClick={()=>go('drivers')}>{t("Voir le registre")}</button></div>{table(orderedRows.slice(-5).reverse(),true)}</section><aside className="attention"><small>{t("POINT D’ATTENTION")}</small><strong>{totals.missing}</strong><span>{t("sans mobile money")}</span><hr/><h3>{t("Priorité opérationnelle")}</h3><p>{t("Relancer les livreurs sans compte actif.")}</p><button onClick={()=>go('drivers')}>{t("Voir les dossiers à relancer")}<ArrowUpRight size={15}/></button></aside></div></>}
   {view==='drivers'&&<section className="panel fullTable driverRegisterPanel"><div className="panelTitle driverRegisterPanelTitle"><div><span className="driverRegisterOverline">PRESTO · {language==='ar'?'سجل تسليم المعدات':'REGISTRE DES REMISES'}</span><h2>{t("Registre des remises")}</h2><p>{language==='ar'?'ترقيم متسلسل من أول سائق إلى آخر سائق مسجل':'Numérotation continue du premier au dernier livreur'}</p></div><div className="driverRegisterRecordCount"><strong>{totals.all}</strong><small>{language==='ar'?'إجمالي السائقين':'Livreurs au total'}</small></div></div><div className="controls driverRegisterSearch"><label><Search size={18}/><input value={search} onChange={e=>setSearch(e.target.value)} placeholder={language==='ar'?'ابحث بالاسم أو رقم الهاتف أو الترتيب':'Rechercher par nom, téléphone ou numéro'}/></label><span>{language==='ar'?('عرض '+filtered.length+' من '+totals.all):('Affichage de '+filtered.length+' sur '+totals.all)}</span></div>{table(filtered)}</section>}
   {view==='registration'&&<section className="panel fullTable driverRegisterPanel driverVehicleRegisterPanel"><div className="panelTitle driverRegisterPanelTitle"><div><span className="driverRegisterOverline">PRESTO · {language==='ar'?'تسجيل السائقين والمركبات':'LIVREURS ET VÉHICULES'}</span><h2>{language==='ar'?'سجل السائقين والمركبات':'Registre des livreurs et véhicules'}</h2><p>{language==='ar'?'الاسم، المدينة، نوع المركبة، الصور، الهاتف وكود التطبيق — دون القميص والحقيبة':'Nom, ville, véhicule, photos, téléphone et code application — sans les équipements'}</p></div><div className="driverRegisterRecordCount"><strong>{registrationRows.length}</strong><small>{language==='ar'?'سائقون ومركبات':'Livreurs enregistrés'}</small></div></div><div className="controls driverRegisterSearch"><label><Search size={18}/><input value={search} onChange={e=>setSearch(e.target.value)} placeholder={language==='ar'?'ابحث بالاسم أو الهاتف أو المدينة أو المركبة':'Rechercher nom, téléphone, ville ou véhicule'}/></label><span>{language==='ar'?'عرض '+registeredFiltered.length+' من '+registrationRows.length:'Affichage de '+registeredFiltered.length+' sur '+registrationRows.length}</span></div>{table(registeredFiltered,false,'registration')}</section>}
-  {view==='training'&&<><PrestoPdfRoster rows={rows} photos={photoUrls} language={language} editable={admin}
- onOpenTraining={()=>setShowManualTraining(x=>!x)}
+  {view==='training'&&<><PrestoPdfRoster rows={rosterRows} photos={photoUrls} language={language} editable={admin}
+ onShowTraining={()=>{setShowManualTraining(true);setTrainingPrefill(null);}}
+ onOpenTraining={openTraining}
  onUpdate={async(id,patch)=>{
   if(!prestoCloud||!admin)throw Error(language==='ar'?'تسجيل الدخول مطلوب لتعديل السجل.':'Connexion requise.');
   const nextPatch=patch.delivery_date?{...patch,pdf_source_date:patch.delivery_date}:patch;
@@ -442,7 +483,15 @@ export default function SharedDashboard(){
   await load();
   void mirrorExcel();
  }}/>
- {showManualTraining&&<div style={{marginTop:24}}><PrestoTrainingRecords language={language} editable={admin}/></div>}</>}
+ {showManualTraining&&<div id="presto-training-records" style={{marginTop:24}}>
+  <div className="prestoTrainingSectionHead">
+   <div><span>PRESTO · FORMATION</span><h2>{language==='ar'?'سجل المتدربين وتفاصيل التدريب':'Registre des participants et formations'}</h2>
+    <p>{language==='ar'?'يُحفظ التدريب في سجل مستقل وتُحدّث حالة السائق المطابق في ملفه.':'Chaque session est conservée et le statut du livreur correspondant est actualisé.'}</p></div>
+   <button className="secondary" onClick={()=>setShowManualTraining(false)} type="button"><X size={17}/>{language==='ar'?'إخفاء السجل':'Masquer'}</button>
+  </div>
+  <PrestoTrainingRecords language={language} editable={admin} drivers={rows.map(d=>({id:d.id,name:d.name,phone:d.phone,city:d.city}))}
+   openRequest={trainingOpenRequest} prefillDriver={trainingPrefill} onSaved={async()=>{await load();await refreshTraining();void mirrorExcel();}}/>
+ </div>}</>}
   {view==='equipment'&&<EquipmentPanel drivers={orderedRows} language={language} onOpen={setSelectedId} onCard={setCardId} readonly={!admin} onToggle={(id,key,val)=>{void setFlag(id,key,val)}}/>}
   {view==='mobile'&&<MobileMoneyPanel drivers={orderedRows} language={language} onOpen={setSelectedId} onCard={setCardId} readonly={!admin} onToggle={(id,key,val)=>{void setFlag(id,key,val)}}/>}
   {view==='reports'&&<OperationsReports drivers={orderedRows} language={language} exportAction={<ExcelExportDialog drivers={rows} busy={exporting} variant="wide" onExport={exportXlsx}/>}/>}
