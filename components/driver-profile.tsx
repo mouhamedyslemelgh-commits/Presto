@@ -70,7 +70,6 @@ export default function DriverProfile({driver,displayNumber,onSave,onClose,readO
    <div className="driverProfileInfoGrid">
     {info('حالة التدريب','Statut de formation',draft.trainingCompleted===true?(ar?'أكمل التدريب':'Formation terminée'):draft.trainingCompleted===false?(ar?'لم يكمل التدريب':'Formation non terminée'):(ar?'غير مسجل':'Non renseigné'))}
     {info('تاريخ آخر تدريب','Dernière formation',draft.trainingDate||'')}
-    {info('اسم المدرب','Formateur',draft.trainer||'')}
    </div>
    <div className="driverProfileSectionTitle"><div className="driverProfileMiniIcon"><Bike size={18}/></div><div><h3>{ar?'السائق والمركبة':'Livreur et véhicule'}</h3><p>{ar?'الصور مرتبطة بسجل هذا السائق':'Photos associées à cette fiche'}</p></div></div>
    <div className="driverProfileVehiclePhotos">
