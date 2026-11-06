@@ -93,7 +93,6 @@ export default function PrestoPdfImporter({disabled=false,onImport}:Props){
          <label>{L('المدينة','Ville')}<input value={record.city??''} maxLength={90} onChange={e=>patch(i,{city:e.target.value})}/></label>
          {record.destination==='training'?<>
           <label>{L('تاريخ التدريب','Date de formation')}<input type="date" value={record.training_date??''} onChange={e=>patch(i,{training_date:e.target.value})}/></label>
-          <label>{L('المدرب','Formateur')}<input value={record.trainer??''} maxLength={100} onChange={e=>patch(i,{trainer:e.target.value})}/></label>
           <label>{L('مكان التدريب','Lieu de formation')}<input value={record.training_location??''} maxLength={120} onChange={e=>patch(i,{training_location:e.target.value})}/></label>
           <label>{L('الحالة','Statut')}<select value={record.training_status??'completed'} onChange={e=>patch(i,{training_status:e.target.value as PdfRecord['training_status']})}>
            <option value="completed">{L('مكتمل','Terminé')}</option>
