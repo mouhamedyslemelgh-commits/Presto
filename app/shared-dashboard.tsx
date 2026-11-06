@@ -259,7 +259,7 @@ export default function SharedDashboard(){
   let added=0,updated=0,skipped=0;
   const normalizePhone=(phone:string)=>phone.replace(/\D/g,'');
   const knownDrivers=[...rows];
-  const trainingResponse=await prestoCloud.from('presto_training_records').select('id,name,phone,training_date').limit(2000);
+  const trainingResponse=await prestoCloud.from('presto_training_records').select('id,name,phone,training_date,app_type').limit(2000);
   const hasTraining=records.some(r=>r.destination==='training');
   if(hasTraining&&trainingResponse.error)throw Error(trainingResponse.error.message);
   const knownTraining=[...(trainingResponse.data||[])];
@@ -277,7 +277,7 @@ export default function SharedDashboard(){
       if(record[key]!==undefined&&record[key]!=='')payload[key]=record[key];
      if(record.observations)payload.notes=record.observations.slice(0,1200);
      const existing=knownTraining.find(x=>x.training_date===record.training_date&&
-      normalizePhone(x.phone)===normalizePhone(phone));
+      normalizePhone(x.phone)===normalizePhone(phone)&&x.app_type===(record.app_type||'driver'));
      if(existing){
       if(mode==='add'){skipped++;continue;}
       const {error}=await prestoCloud.from('presto_training_records').update(payload).eq('id',existing.id);
@@ -286,8 +286,16 @@ export default function SharedDashboard(){
      }else{
       const {data,error}=await prestoCloud.from('presto_training_records').insert(payload).select('id').single();
       if(error)throw Error(error.message);
-      knownTraining.push({id:data.id,name,phone,training_date:record.training_date});
+      knownTraining.push({id:data.id,name,phone,training_date:record.training_date,app_type:record.app_type||'driver'});
       added++;
+     }
+     const matchingDrivers=knownDrivers.filter(d=>[d.phone,d.pdf_source_phone||''].some(value=>
+      normalizePhone(value).length>=7&&normalizePhone(value)===normalizePhone(phone)));
+     if(matchingDrivers.length===1){
+      const {error}=await prestoCloud.from('presto_drivers').update({
+       training_completed:(record.training_status||'completed')==='completed'
+      }).eq('id',matchingDrivers[0].id);
+      if(error)throw Error(error.message);
      }
      continue;
     }
@@ -316,6 +324,7 @@ export default function SharedDashboard(){
     }
    }
    await load();
+   await refreshTraining();
    const sheets=await mirrorExcel();
    return {added,updated,skipped,googleSheets:sheets};
   }catch(error){
