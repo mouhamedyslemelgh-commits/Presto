@@ -12,6 +12,7 @@ import DriverRegistrationDialog from '../components/driver-registration-dialog';
 import DriverRegisterTable from '../components/driver-register-table';
 import InactiveDrivers from '../components/presto-inactive-drivers';
 import PrestoTrainingRecords from '../components/presto-training-records';
+import PrestoAppGuide from '../components/presto-app-guide';
 import PrestoPdfRoster from '../components/presto-pdf-roster';
 import {EquipmentPanel,MobileMoneyPanel,OperationsReports} from '../components/presto-operations-panels';
 import {useLanguage,LanguageSwitcher} from '../components/presto-language';
@@ -23,16 +24,16 @@ import ExcelExportDialog,{type ExcelExportScope} from '../components/excel-expor
 import {downloadPrestoXlsx} from '../lib/presto-excel-export';
 import {downloadRegisteredDriversExcel} from '../lib/presto-registered-excel';
 import {normalizeHeader,type ImportedDriver,type ImportMode} from '../lib/presto-excel';
-import {LayoutDashboard,Users,Package,Wallet,ChartNoAxesColumn,Settings,Bike,GraduationCap,ArrowUpRight,Download,Plus,Search,Edit3,Trash2,Menu,X,Check,ShieldAlert,LogIn,LogOut,RefreshCw} from 'lucide-react';
+import {LayoutDashboard,Users,Package,Wallet,ChartNoAxesColumn,Settings,Bike,GraduationCap,BookOpen,ArrowUpRight,Download,Plus,Search,Edit3,Trash2,Menu,X,Check,ShieldAlert,LogIn,LogOut,RefreshCw} from 'lucide-react';
 type Pay='bankily'|'masrvi'|'sedad'|'click';
 type Row={id:number;name:string;phone:string;bag:boolean;shirt:boolean;verified:boolean;bankily:boolean;masrvi:boolean;sedad:boolean;click:boolean;bankily_account:string;masrvi_account:string;sedad_account:string;click_account:string;delivery_date:string;observations:string;city:string;vehicle_type:string;app_code:string;driver_photo_path:string;vehicle_photo_path:string;license_plate?:string;presto_reference?:string;pdf_position?:number|null;training_completed?:boolean|null;pdf_source_phone?:string;pdf_source_date?:string|null};
 const profileData=(d:Row)=>({id:d.id,name:d.name,phone:d.phone,bag:d.bag,shirt:d.shirt,verified:d.verified,payments:{bankily:d.bankily,masrvi:d.masrvi,sedad:d.sedad,click:d.click},paymentNumbers:{bankily:d.bankily_account,masrvi:d.masrvi_account,sedad:d.sedad_account,click:d.click_account},deliveryDate:d.delivery_date,observations:d.observations,city:d.city,vehicleType:d.vehicle_type,appCode:d.app_code,driverPhotoPath:d.driver_photo_path,vehiclePhotoPath:d.vehicle_photo_path,trainingCompleted:d.training_completed,trainingDate:(d as Row&{latest_training_date?:string}).latest_training_date,trainer:(d as Row&{latest_trainer?:string}).latest_trainer});
-type View='dashboard'|'drivers'|'registration'|'training'|'equipment'|'mobile'|'reports'|'settings'|'inactive'|'untrained';
+type View='dashboard'|'drivers'|'registration'|'training'|'equipment'|'mobile'|'reports'|'settings'|'inactive'|'untrained'|'appguide';
 type TrainingEntry={id:number;name:string;phone:string;training_status:'completed'|'in_progress'|'needs_review'|'not_trained';training_date:string|null;trainer:string};
 type TrainingPrefill={id:number;name:string;phone:string;city:string};
 const phoneDigits=(value:string)=>String(value||'').replace(/\D/g,'');
 const pays:[Pay,string,string,string][]=[['bankily','Bankily','BPM','#228e99'],['masrvi','Masrvi','BMCI','#6949a7'],['sedad','Sedad','BMI','#22966a'],['click','CLICK','BNM','#2480a9']];
-const menus:[View,string,typeof Users][]=[['dashboard',"Vue d’ensemble",LayoutDashboard],['drivers','Registre des remises',Users],['registration','Livreurs et véhicules',Bike],['untrained','لم يقوموا بالتكوين',GraduationCap],['inactive','سائقون لديهم حقيبة ولا يعملون',Users],['training','Formations à l’application',GraduationCap],['equipment','Équipements',Package],['mobile','Mobile Money',Wallet],['reports','Rapports',ChartNoAxesColumn],['settings','Paramètres',Settings]];
+const menus:[View,string,typeof Users][]=[['dashboard',"Vue d’ensemble",LayoutDashboard],['drivers','Registre des remises',Users],['registration','Livreurs et véhicules',Bike],['untrained','لم يقوموا بالتكوين',GraduationCap],['inactive','سائقون لديهم حقيبة ولا يعملون',Users],['training','Formations à l’application',GraduationCap],['appguide','شرح تطبيق PRESTO و Prestoman',BookOpen],['equipment','Équipements',Package],['mobile','Mobile Money',Wallet],['reports','Rapports',ChartNoAxesColumn],['settings','Paramètres',Settings]];
 const emptyRow=():Row=>({id:0,name:'',phone:'',bag:false,shirt:false,verified:false,bankily:false,masrvi:false,sedad:false,click:false,bankily_account:'',masrvi_account:'',sedad_account:'',click_account:'',delivery_date:'',observations:'',city:'',vehicle_type:'',app_code:'',driver_photo_path:'',vehicle_photo_path:''});
 const hasPay=(d:Row)=>d.bankily||d.masrvi||d.sedad||d.click;
 const complete=(d:Row)=>d.bag&&d.shirt&&d.verified&&hasPay(d);
@@ -468,7 +469,7 @@ export default function SharedDashboard(){
  const go=(v:View)=>{setView(v);setOpenMenu(false);setSearch('');window.scrollTo(0,0)};
  const openEditor=(d:Row|null,mode:'registration'|'legacy')=>{setDialogMode(mode);setEditing(d?{...d}:emptyRow())};
  const table=(items:Row[],preview=false,mode:'equipment'|'registration'='equipment')=> <DriverRegisterTable photoUrls={photoUrls} items={items} ranks={mode==='registration'?registrationPositions:positions} language={language} preview={preview} mode={mode} editable={admin} onOpen={setSelectedId} onCard={setCardId} onEdit={d=>openEditor(d,mode==='registration'?'registration':'legacy')} onDelete={id=>void del(id)}/>;
- const titles:Record<View,string>={untrained:'لم يقوموا بالتكوين',inactive:'سائقون لديهم حقيبة ولا يعملون',dashboard:'Pilotage des livreurs',drivers:'Registre des remises',registration:'Livreurs et véhicules',training:'Formations à l’application',equipment:'Suivi des équipements',mobile:'Comptes Mobile Money',reports:'Rapports & analyses',settings:'Paramètres'};
+ const titles:Record<View,string>={untrained:'لم يقوموا بالتكوين',inactive:'سائقون لديهم حقيبة ولا يعملون',dashboard:'Pilotage des livreurs',drivers:'Registre des remises',registration:'Livreurs et véhicules',training:'Formations à l’application',appguide:'شرح تطبيق PRESTO و Prestoman',equipment:'Suivi des équipements',mobile:'Comptes Mobile Money',reports:'Rapports & analyses',settings:'Paramètres'};
  return <div ref={motionRoot} className="shell" dir={language==='ar'?'rtl':'ltr'}>
   <aside className={'sidebar '+(openMenu?'open':'')}><div className="brand"><div className="brandImageFrame"><img src="/logos/presto.webp" alt="PRESTO بريستو" width={310} height={170}/></div><span className="brandSub">{t("OPERATIONS · LIVREURS")}</span></div><div className="sideCaption">{t("ESPACE DE TRAVAIL")}</div><nav id="presto-primary-navigation" aria-label={language==='ar'?'القائمة الرئيسية':'Navigation principale'}>{menus.map(([v,title,Icon])=><button type="button" key={v} aria-current={view===v?'page':undefined} className={view===v?'selected':''} onClick={()=>go(v)}><Icon size={17}/>{t(title)}</button>)}</nav><div className="sideFoot"><small>{t("BASE PARTAGÉE")}</small><strong>{city}</strong><small>{company} · {t('Cloud Sync')}</small></div></aside>
   {openMenu&&<div className="shade" onClick={()=>setOpenMenu(false)}/>}
@@ -543,6 +544,7 @@ export default function SharedDashboard(){
   <PrestoTrainingRecords language={language} editable={admin} drivers={rows.map(d=>({id:d.id,name:d.name,phone:d.pdf_source_phone||d.phone,city:d.city}))}
    openRequest={trainingOpenRequest} prefillDriver={trainingPrefill} onSaved={async()=>{await load();await refreshTraining();void mirrorExcel();}}/>
  </div>}</>}
+  {view==='appguide'&&<PrestoAppGuide language={language}/>}
   {view==='equipment'&&<EquipmentPanel drivers={orderedRows} language={language} onOpen={setSelectedId} onCard={setCardId} readonly={!admin} onToggle={(id,key,val)=>{void setFlag(id,key,val)}}/>}
   {view==='mobile'&&<MobileMoneyPanel drivers={orderedRows} language={language} onOpen={setSelectedId} onCard={setCardId} readonly={!admin} onToggle={(id,key,val)=>{void setFlag(id,key,val)}}/>}
   {view==='reports'&&<OperationsReports drivers={orderedRows} language={language} exportAction={<ExcelExportDialog drivers={rows} busy={exporting} variant="wide" onExport={exportXlsx}/>}/>}
