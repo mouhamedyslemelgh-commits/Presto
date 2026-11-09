@@ -17,9 +17,9 @@ const blank=():Draft=>({
 });
 const isStatus=(value:string):value is Status=>['completed','in_progress','needs_review','not_trained'].includes(value);
 type LinkedDriver={id:number;name:string;phone:string;city?:string};
-type Props={language:string;editable?:boolean;drivers?:LinkedDriver[];openRequest?:number;prefillDriver?:LinkedDriver|null;onSaved?:()=>void|Promise<void>};
+type Props={initialFilter?:Status;language:string;editable?:boolean;drivers?:LinkedDriver[];openRequest?:number;prefillDriver?:LinkedDriver|null;onSaved?:()=>void|Promise<void>};
 const phoneDigits=(value:string)=>String(value||'').replace(/\D/g,'');
-export default function PrestoTrainingRecords({language,editable=true,drivers=[],openRequest=0,prefillDriver=null,onSaved}:Props){
+export default function PrestoTrainingRecords({initialFilter,language,editable=true,drivers=[],openRequest=0,prefillDriver=null,onSaved}:Props){
  const ar=language==='ar';
  const L=(a:string,f:string)=>ar?a:f;
  const [items,setItems]=useState<RecordRow[]>([]);
@@ -29,7 +29,7 @@ export default function PrestoTrainingRecords({language,editable=true,drivers=[]
  const [error,setError]=useState('');
  const [success,setSuccess]=useState('');
  const [search,setSearch]=useState('');
- const [filter,setFilter]=useState<'all'|Status>('all');
+ const [filter,setFilter]=useState<'all'|Status>(initialFilter||'all');
  const [open,setOpen]=useState(false);
  // Keep the underlying dashboard fixed while the registration form is open.
  useEffect(()=>{
@@ -161,19 +161,32 @@ export default function PrestoTrainingRecords({language,editable=true,drivers=[]
   }catch(e){setError(e instanceof Error?e.message:L('تعذر التحديث.','Mise à jour impossible.'));}
   finally{setSaving(false);}
  };
- const exportCSV=()=>{
-  const headers=['N°','Nom / الاسم','Téléphone / الهاتف','Ville / المدينة','Date / التاريخ','Lieu / المكان','Application','Statut / الحالة','Notes / ملاحظات'];
-  const rows=filtered.map((x,i)=>[i+1,x.name,x.phone,x.city,x.training_date,x.training_location,x.app_type,x.training_status,x.notes]);
-  const quote=(v:unknown)=>'"'+String(v??'').replaceAll('"','""')+'"';
-  const csv='\uFEFF'+[headers,...rows].map(row=>row.map(quote).join(';')).join('\r\n');
-  const url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));
-  const a=document.createElement('a');a.href=url;a.download='PRESTO-training-records.csv';a.click();
-  setTimeout(()=>URL.revokeObjectURL(url),1000);
+ const [exporting,setExporting]=useState(false);
+ const exportExcel=async()=>{
+  if(exporting)return;
+  setExporting(true);setError('');
+  try{
+   const {Workbook}=await import('exceljs');
+   const workbook=new Workbook();
+   const sheet=workbook.addWorksheet(L('سجل التكوين','Formations'),{views:[{rightToLeft:ar,state:'frozen',ySplit:1}]});
+   sheet.addRow(['#',L('الاسم','Nom'),L('الهاتف','Téléphone'),L('المدينة','Ville'),L('تاريخ التكوين','Date de formation'),L('المكان','Lieu'),L('المكوّن','Formateur'),L('الحالة','Statut'),L('ملاحظات','Notes'),L('تاريخ التسجيل','Date d’inscription')]);
+   filtered.forEach((x,i)=>sheet.addRow([i+1,x.name,x.phone,x.city,x.training_date||'',x.training_location,x.trainer,statusLabel(x.training_status),x.notes,x.created_at]));
+   sheet.columns.forEach((c,i)=>{c.width=i===0?8:i===8?45:24;});
+   sheet.getColumn(3).numFmt='@';
+   sheet.getRow(1).eachCell(c=>{c.font={bold:true,color:{argb:'FFFFFFFF'}};c.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFED6A25'}};});
+   sheet.autoFilter={from:'A1',to:'J'+sheet.rowCount};
+   const buffer=await workbook.xlsx.writeBuffer();
+   const url=URL.createObjectURL(new Blob([buffer],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}));
+   const a=document.createElement('a');a.href=url;a.download='PRESTO-'+filter+'-training.xlsx';a.click();
+   setTimeout(()=>URL.revokeObjectURL(url),1000);
+  }catch(e){setError(e instanceof Error?e.message:L('تعذر تنزيل Excel','Export impossible'));}
+  finally{setExporting(false);}
  };
+
  return <section className={styles.root} dir={ar?'rtl':'ltr'}>
   <div className={styles.intro}>
    <div><span className={styles.eyebrow}>PRESTO · {L('سجل التدريب','REGISTRE DES FORMATIONS')}</span><h2>{L('سجل التكوين والمتدربين','Registre des formations et participants')}</h2><p>{L('إدارة من أتموا التكوين ومن لم يقوموا به بعد في قوائم مستقلة.','Gérez séparément les personnes formées et celles qui ne le sont pas encore.')}</p></div>
-   <div className={styles.actions}><button className={styles.outline} onClick={exportCSV} disabled={!filtered.length}><Download size={17}/>{L('تصدير Excel/CSV','Exporter CSV/Excel')}</button>{editable&&<><button className={styles.outline} onClick={()=>{setFilter('not_trained');edit(undefined,'not_trained')}}><Plus size={18}/>{L('إضافة شخص لم يتكوّن','Ajouter une personne non formée')}</button><button className={styles.add} onClick={()=>edit()}><Plus size={18}/>{L('إضافة متدرب','Ajouter une personne')}</button></>}</div>
+   <div className={styles.actions}><button className={styles.outline} onClick={()=>void exportExcel()} disabled={exporting||!filtered.length}><Download size={17}/>{L('تنزيل Excel','Télécharger Excel')}</button>{editable&&<><button className={styles.outline} onClick={()=>{setFilter('not_trained');edit(undefined,'not_trained')}}><Plus size={18}/>{L('إضافة شخص لم يتكوّن','Ajouter une personne non formée')}</button><button className={styles.add} onClick={()=>edit()}><Plus size={18}/>{L('إضافة متدرب','Ajouter une personne')}</button></>}</div>
   </div>
   <div className={styles.stats}>
    {metrics.map(([label,count,Icon],i)=><div className={styles.metric} key={i}><span>{label as string}</span><strong>{count as number}</strong>{<Icon size={19}/>}</div>)}
