@@ -4,7 +4,7 @@ import {prestoCloud} from '../lib/presto-cloud';
 import {Award,CalendarDays,Camera,CheckCircle2,ClipboardList,Download,Edit3,MapPin,Phone,Plus,Search,Trash2,UserRound,Users,X,GraduationCap,Link2,Save,FileText,Check,Smartphone,ShieldCheck} from 'lucide-react';
 import styles from './presto-training-records.module.css';
 
-type Status='completed'|'in_progress'|'needs_review';
+type Status='completed'|'in_progress'|'needs_review'|'not_trained';
 type RecordRow={
  id:number;name:string;phone:string;city:string;photo_path:string;
  training_date:string;trainer:string;training_location:string;
@@ -15,7 +15,7 @@ const blank=():Draft=>({
  name:'',phone:'',city:'',photo_path:'',training_date:new Date().toISOString().slice(0,10),
  trainer:'',training_location:'',training_status:'completed',app_type:'driver',notes:''
 });
-const isStatus=(value:string):value is Status=>['completed','in_progress','needs_review'].includes(value);
+const isStatus=(value:string):value is Status=>['completed','in_progress','needs_review','not_trained'].includes(value);
 type LinkedDriver={id:number;name:string;phone:string;city?:string};
 type Props={language:string;editable?:boolean;drivers?:LinkedDriver[];openRequest?:number;prefillDriver?:LinkedDriver|null;onSaved?:()=>void|Promise<void>};
 const phoneDigits=(value:string)=>String(value||'').replace(/\D/g,'');
@@ -83,13 +83,13 @@ export default function PrestoTrainingRecords({language,editable=true,drivers=[]
   const url=URL.createObjectURL(file);setPreview(url);
   return ()=>URL.revokeObjectURL(url);
  },[file]);
- const statusLabel=(s:Status)=>s==='completed'?L('أكمل التدريب','Formation terminée'):s==='in_progress'?L('قيد التدريب','En formation'):L('يحتاج مراجعة','À revoir');
+ const statusLabel=(s:Status)=>s==='completed'?L('أكمل التدريب','Formation terminée'):s==='in_progress'?L('قيد التدريب','En formation'):s==='not_trained'?L('لم يقم بالتكوين','Non formé'):L('يحتاج مراجعة','À revoir');
  const filtered=useMemo(()=>items.filter(x=>(filter==='all'||x.training_status===filter)&&
   [x.name,x.phone,x.city,x.training_location,x.notes,String(x.id)].join(' ').toLocaleLowerCase().includes(search.toLocaleLowerCase().trim())),[items,filter,search]);
- const stats={total:items.length,completed:items.filter(x=>x.training_status==='completed').length,in_progress:items.filter(x=>x.training_status==='in_progress').length,needs_review:items.filter(x=>x.training_status==='needs_review').length};
- const metrics:[string,number,typeof Users][]=[[L('إجمالي المسجلين','Inscrits'),stats.total,Users],[L('أكملوا التدريب','Formations terminées'),stats.completed,CheckCircle2],[L('قيد التدريب','En formation'),stats.in_progress,ClipboardList],[L('تحتاج مراجعة','À revoir'),stats.needs_review,Award]];
- const edit=(row?:RecordRow)=>{
-  const values=row?{name:row.name,phone:row.phone,city:row.city,photo_path:row.photo_path,training_date:row.training_date,trainer:row.trainer,training_location:row.training_location,training_status:row.training_status,app_type:row.app_type,notes:row.notes}:blank();
+ const stats={total:items.length,completed:items.filter(x=>x.training_status==='completed').length,in_progress:items.filter(x=>x.training_status==='in_progress').length,needs_review:items.filter(x=>x.training_status==='needs_review').length,not_trained:items.filter(x=>x.training_status==='not_trained').length};
+ const metrics:[string,number,typeof Users][]=[[L('إجمالي المسجلين','Inscrits'),stats.total,Users],[L('أكملوا التدريب','Formations terminées'),stats.completed,CheckCircle2],[L('قيد التدريب','En formation'),stats.in_progress,ClipboardList],[L('لم يقوموا بالتكوين','Non formés'),stats.not_trained,GraduationCap]];
+ const edit=(row?:RecordRow,initialStatus?:Status)=>{
+  const values=row?{name:row.name,phone:row.phone,city:row.city,photo_path:row.photo_path,training_date:row.training_date,trainer:row.trainer,training_location:row.training_location,training_status:row.training_status,app_type:row.app_type,notes:row.notes}:{...blank(),training_status:initialStatus||'completed'};
   const matches=drivers.filter(d=>phoneDigits(d.phone).length>=7&&phoneDigits(d.phone)===phoneDigits(values.phone));
   setLinkedDriverId(matches.length===1?matches[0].id:null);
   setSelectedId(row?.id??null);setDraft(values);setDriverSearch('');
@@ -108,7 +108,7 @@ export default function PrestoTrainingRecords({language,editable=true,drivers=[]
  const save=async(event:FormEvent<HTMLFormElement>)=>{
   event.preventDefault();
   if(!prestoCloud||!editable||saving)return;
-  if(!draft.name.trim()||!draft.phone.trim()||!draft.training_date){setError(L('الاسم والهاتف وتاريخ التدريب مطلوبة.','Nom, téléphone et date sont obligatoires.'));return;}
+  if(!draft.name.trim()||!draft.phone.trim()||(draft.training_status!=='not_trained'&&!draft.training_date)){setError(L('الاسم والهاتف مطلوبان، وتاريخ التدريب مطلوب عند إجرائه.','Nom et téléphone obligatoires ; date requise pour une formation effectuée.'));return;}
   if(linkedDriver&&phoneDigits(linkedDriver.phone)!==phoneDigits(draft.phone)){
    setError(L('رقم الهاتف يختلف عن السائق المحدد. اختر السائق مرة أخرى أو صحّح الرقم.','Le téléphone est différent de celui du livreur sélectionné. Corrigez-le ou changez de livreur.'));return;
   }
@@ -124,7 +124,7 @@ export default function PrestoTrainingRecords({language,editable=true,drivers=[]
     if(uploadError)throw uploadError;
     photoPath=key;
    }
-   const payload={...draft,name:draft.name.trim(),phone:draft.phone.trim(),city:draft.city.trim(),trainer:draft.trainer.trim(),training_location:draft.training_location.trim(),notes:draft.notes.trim(),photo_path:photoPath};
+   const payload={...draft,training_date:draft.training_status==='not_trained'?null:draft.training_date,name:draft.name.trim(),phone:draft.phone.trim(),city:draft.city.trim(),trainer:draft.trainer.trim(),training_location:draft.training_location.trim(),notes:draft.notes.trim(),photo_path:photoPath};
    if(selectedId===null&&items.some(row=>phoneDigits(row.phone)===phoneDigits(payload.phone)&&row.training_date===payload.training_date&&row.app_type===payload.app_type)){
     throw new Error(L('هذا المتدرب مسجل بالفعل في نفس التاريخ ولنفس التطبيق. افتح سجله وعدّله بدل تكراره.','Ce participant a déjà une fiche pour cette date et cette application. Modifiez-la au lieu de la dupliquer.'));
    }
@@ -147,6 +147,20 @@ export default function PrestoTrainingRecords({language,editable=true,drivers=[]
   const {error:delError}=await prestoCloud.from('presto_training_records').delete().eq('id',row.id);
   if(delError)setError(delError.message);else{setSuccess(L('تم حذف سجل التدريب.','Fiche de formation supprimée.'));await refresh();await onSaved?.();}
  };
+ const markCompleted=async(row:RecordRow)=>{
+  if(!prestoCloud||!editable||saving)return;
+  const date=new Date().toISOString().slice(0,10);
+  setSaving(true);setError('');
+  try{
+   const {error:upError}=await prestoCloud.from('presto_training_records').update({training_status:'completed',training_date:date}).eq('id',row.id);
+   if(upError)throw upError;
+   const matches=drivers.filter(d=>phoneDigits(d.phone).length>=7&&phoneDigits(d.phone)===phoneDigits(row.phone));
+   if(matches.length===1){const {error:driverError}=await prestoCloud.from('presto_drivers').update({training_completed:true}).eq('id',matches[0].id);if(driverError)setError(driverError.message);}
+   setSuccess(L('تم نقل الشخص إلى المتدربين الذين أكملوا التكوين.','Personne transférée aux formations terminées.'));
+   await refresh();await onSaved?.();
+  }catch(e){setError(e instanceof Error?e.message:L('تعذر التحديث.','Mise à jour impossible.'));}
+  finally{setSaving(false);}
+ };
  const exportCSV=()=>{
   const headers=['N°','Nom / الاسم','Téléphone / الهاتف','Ville / المدينة','Date / التاريخ','Lieu / المكان','Application','Statut / الحالة','Notes / ملاحظات'];
   const rows=filtered.map((x,i)=>[i+1,x.name,x.phone,x.city,x.training_date,x.training_location,x.app_type,x.training_status,x.notes]);
@@ -158,20 +172,21 @@ export default function PrestoTrainingRecords({language,editable=true,drivers=[]
  };
  return <section className={styles.root} dir={ar?'rtl':'ltr'}>
   <div className={styles.intro}>
-   <div><span className={styles.eyebrow}>PRESTO · {L('سجل التدريب','REGISTRE DES FORMATIONS')}</span><h2>{L('الأشخاص الذين تلقوا تدريب التطبيق','Personnes formées à l’application')}</h2><p>{L('سجل مستقل يوثّق حضور التدريب: الاسم والهاتف وتاريخ التدريب ونوع التطبيق والنتيجة.','Un registre indépendant : identité, téléphone, date, application et résultat de formation.')}</p></div>
-   <div className={styles.actions}><button className={styles.outline} onClick={exportCSV} disabled={!filtered.length}><Download size={17}/>{L('تصدير Excel/CSV','Exporter CSV/Excel')}</button>{editable&&<button className={styles.add} onClick={()=>edit()}><Plus size={18}/>{L('إضافة متدرب','Ajouter une personne')}</button>}</div>
+   <div><span className={styles.eyebrow}>PRESTO · {L('سجل التدريب','REGISTRE DES FORMATIONS')}</span><h2>{L('سجل التكوين والمتدربين','Registre des formations et participants')}</h2><p>{L('إدارة من أتموا التكوين ومن لم يقوموا به بعد في قوائم مستقلة.','Gérez séparément les personnes formées et celles qui ne le sont pas encore.')}</p></div>
+   <div className={styles.actions}><button className={styles.outline} onClick={exportCSV} disabled={!filtered.length}><Download size={17}/>{L('تصدير Excel/CSV','Exporter CSV/Excel')}</button>{editable&&<><button className={styles.outline} onClick={()=>{setFilter('not_trained');edit(undefined,'not_trained')}}><Plus size={18}/>{L('إضافة شخص لم يتكوّن','Ajouter une personne non formée')}</button><button className={styles.add} onClick={()=>edit()}><Plus size={18}/>{L('إضافة متدرب','Ajouter une personne')}</button></>}</div>
   </div>
   <div className={styles.stats}>
    {metrics.map(([label,count,Icon],i)=><div className={styles.metric} key={i}><span>{label as string}</span><strong>{count as number}</strong>{<Icon size={19}/>}</div>)}
   </div>
-  <div className={styles.toolbar}><label className={styles.search}><Search size={18}/><input value={search} onChange={e=>setSearch(e.target.value)} placeholder={L('بحث بالاسم أو الهاتف أو المدينة...','Rechercher nom, téléphone, ville...')}/></label><select aria-label={L('تصفية حسب حالة التدريب','Filtrer par statut')} value={filter} onChange={e=>setFilter(e.target.value as typeof filter)}><option value="all">{L('جميع الحالات','Tous les statuts')}</option><option value="completed">{statusLabel('completed')}</option><option value="in_progress">{statusLabel('in_progress')}</option><option value="needs_review">{statusLabel('needs_review')}</option></select><span>{filtered.length} / {items.length}</span></div>
+  <nav className="presto-training-tabs" aria-label={L('فئات التكوين','Catégories de formation')}><button type="button" aria-pressed={filter==='all'} onClick={()=>setFilter('all')}>{L('جميع المسجلين','Tous')} ({stats.total})</button><button type="button" aria-pressed={filter==='not_trained'} onClick={()=>setFilter('not_trained')}>{L('لم يقوموا بالتكوين','Non formés')} ({stats.not_trained})</button><button type="button" aria-pressed={filter==='completed'} onClick={()=>setFilter('completed')}>{L('أكملوا التكوين','Formés')} ({stats.completed})</button></nav>
+  <div className={styles.toolbar}><label className={styles.search}><Search size={18}/><input value={search} onChange={e=>setSearch(e.target.value)} placeholder={L('بحث بالاسم أو الهاتف أو المدينة...','Rechercher nom, téléphone, ville...')}/></label><select aria-label={L('تصفية حسب حالة التدريب','Filtrer par statut')} value={filter} onChange={e=>setFilter(e.target.value as typeof filter)}><option value="all">{L('جميع الحالات','Tous les statuts')}</option><option value="completed">{statusLabel('completed')}</option><option value="in_progress">{statusLabel('in_progress')}</option><option value="needs_review">{statusLabel('needs_review')}</option><option value="not_trained">{statusLabel('not_trained')}</option></select><span>{filtered.length} / {items.length}</span></div>
   {error&&<p role="alert" className={styles.error}>{error}</p>}
   {success&&<p role="status" className={styles.success}>{success}</p>}
-  {loading?<p className={styles.empty}>{L('جار تحميل السجلات...','Chargement des fiches...')}</p>:!filtered.length?<div className={styles.empty}><ClipboardList size={35}/><strong>{L('لا توجد سجلات تدريب حتى الآن','Aucune fiche de formation')}</strong><span>{L('أضف أول شخص بعد تدريبه على التطبيق.','Ajoutez une personne après sa formation.')}</span></div>:<div className={styles.cards}>{filtered.map((row,i)=><article className={styles.card} key={row.id}><div className={styles.cardTop}><div className={styles.picture}><img src="/images/presto-uniform-rider.webp" alt={row.name}/></div><div className={styles.person}><small>#{String(filtered.length-i).padStart(3,'0')}</small><h3>{row.name}</h3><a href={'tel:'+row.phone}><Phone size={14}/><bdi>{row.phone}</bdi></a></div><span className={styles.status} data-status={isStatus(row.training_status)?row.training_status:'needs_review'}>{statusLabel(row.training_status)}</span></div>
-    <dl className={styles.details}><div><dt><CalendarDays size={15}/>{L('تاريخ التدريب','Date')}</dt><dd>{row.training_date||'—'}</dd></div><div><dt><MapPin size={15}/>{L('المدينة / المكان','Ville / lieu')}</dt><dd>{[row.city,row.training_location].filter(Boolean).join(' · ')||'—'}</dd></div><div><dt><ClipboardList size={15}/>{L('التطبيق','Application')}</dt><dd>{row.app_type==='driver'?L('تطبيق السائق','Livreur'):row.app_type==='customer'?L('تطبيق الزبون','Client'):L('التطبيقان','Les deux')}</dd></div></dl>
+  {loading?<p className={styles.empty}>{L('جار تحميل السجلات...','Chargement des fiches...')}</p>:!filtered.length?<div className={styles.empty}><ClipboardList size={35}/><strong>{L('لا توجد سجلات تدريب حتى الآن','Aucune fiche de formation')}</strong><span>{filter==='not_trained'?L('أضف الأشخاص الذين لم يقوموا بالتكوين بعد.','Ajoutez les personnes qui n’ont pas encore suivi la formation.'):L('أضف أول شخص إلى السجل.','Ajoutez votre première personne.')}</span></div>:<div className={styles.cards}>{filtered.map((row,i)=><article className={styles.card} key={row.id}><div className={styles.cardTop}><div className={styles.picture}><img src="/images/presto-uniform-rider.webp" alt={row.name}/></div><div className={styles.person}><small>#{String(filtered.length-i).padStart(3,'0')}</small><h3>{row.name}</h3><a href={'tel:'+row.phone}><Phone size={14}/><bdi>{row.phone}</bdi></a></div><span className={styles.status} data-status={isStatus(row.training_status)?row.training_status:'needs_review'}>{statusLabel(row.training_status)}</span></div>
+    <dl className={styles.details}><div><dt><CalendarDays size={15}/>{L('تاريخ التدريب','Date')}</dt><dd>{row.training_status==='not_trained'?L('لم يتم بعد','Pas encore'):row.training_date||'—'}</dd></div><div><dt><MapPin size={15}/>{L('المدينة / المكان','Ville / lieu')}</dt><dd>{[row.city,row.training_location].filter(Boolean).join(' · ')||'—'}</dd></div><div><dt><ClipboardList size={15}/>{L('التطبيق','Application')}</dt><dd>{row.app_type==='driver'?L('تطبيق السائق','Livreur'):row.app_type==='customer'?L('تطبيق الزبون','Client'):L('التطبيقان','Les deux')}</dd></div></dl>
     {row.notes&&<p className={styles.notes}>{row.notes}</p>}
      {drivers.some(d=>phoneDigits(d.phone).length>=7&&phoneDigits(d.phone)===phoneDigits(row.phone))&&<span className={styles.linkTag}><CheckCircle2 size={15}/>{L('مرتبط بملف سائق PRESTO','Lié à un livreur PRESTO')}</span>}
-    {editable&&<div className={styles.cardActions}><button onClick={()=>edit(row)}><Edit3 size={15}/>{L('تعديل','Modifier')}</button><button className={styles.danger} onClick={()=>void remove(row)}><Trash2 size={15}/>{L('حذف','Supprimer')}</button></div>}
+    {editable&&<div className={styles.cardActions}>{row.training_status==='not_trained'&&<button disabled={saving} onClick={()=>void markCompleted(row)}><CheckCircle2 size={15}/>{L('إتمام التكوين','Marquer formé')}</button>}<button onClick={()=>edit(row)}><Edit3 size={15}/>{L('تعديل','Modifier')}</button><button className={styles.danger} onClick={()=>void remove(row)}><Trash2 size={15}/>{L('حذف','Supprimer')}</button></div>}
    </article>)}</div>}
   {open&&<div className={styles.overlay} onMouseDown={e=>{if(e.target===e.currentTarget&&!saving)setOpen(false)}}>
    <div className={styles.dialog} role="dialog" aria-modal="true" aria-labelledby="presto-training-dialog-title" aria-describedby="presto-training-dialog-description">
@@ -235,7 +250,7 @@ export default function PrestoTrainingRecords({language,editable=true,drivers=[]
         <label><span className={styles.fieldTitle}><MapPin size={16}/>{L('المدينة','Ville')}</span>
          <input maxLength={100} value={draft.city} onChange={e=>setDraft({...draft,city:e.target.value})} placeholder={L('مثال: نواكشوط','Ex. Nouakchott')}/></label>
         <label><span className={styles.fieldTitle}><CalendarDays size={16}/>{L('تاريخ التدريب','Date de formation')} <em>*</em></span>
-         <input required type="date" value={draft.training_date} onChange={e=>setDraft({...draft,training_date:e.target.value})}/></label>
+         <input required={draft.training_status!=='not_trained'} disabled={draft.training_status==='not_trained'} type="date" value={draft.training_date} onChange={e=>setDraft({...draft,training_date:e.target.value})}/></label>
         <label><span className={styles.fieldTitle}><MapPin size={16}/>{L('مكان التدريب','Lieu de formation')}</span>
          <input maxLength={120} value={draft.training_location} onChange={e=>setDraft({...draft,training_location:e.target.value})} placeholder={L('المقر أو الفرع (اختياري)','Centre ou agence (facultatif)')}/></label>
         <label><span className={styles.fieldTitle}><Smartphone size={16}/>{L('التطبيق','Application')}</span>
@@ -249,6 +264,7 @@ export default function PrestoTrainingRecords({language,editable=true,drivers=[]
           <option value="completed">{statusLabel('completed')}</option>
           <option value="in_progress">{statusLabel('in_progress')}</option>
           <option value="needs_review">{statusLabel('needs_review')}</option>
+          <option value="not_trained">{statusLabel('not_trained')}</option>
          </select>
         </label>
         <label className={styles.full}><span className={styles.fieldTitle}><FileText size={16}/>{L('ملاحظات إضافية','Notes complémentaires')}</span>
