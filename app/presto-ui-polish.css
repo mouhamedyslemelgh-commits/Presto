@@ -1,0 +1,31 @@
+/* PRESTO 2026 interface refinement: accessible, responsive, low-distraction */
+:root{--presto-accent:#ef653a;--presto-focus:#2563eb;--presto-radius:16px}
+html{scroll-behavior:smooth}
+body{font-synthesis:none;-webkit-font-smoothing:antialiased}
+button,a,input,select,textarea{transition:background-color .18s ease,border-color .18s ease,box-shadow .18s ease,transform .18s ease}
+:where(button,a,input,select,textarea):focus-visible{outline:3px solid var(--presto-focus)!important;outline-offset:3px}
+button:not(:disabled):active{transform:scale(.985)}
+.sidebar{box-shadow:8px 0 35px #0916270a}
+.sidebar nav a{transition:background-color .2s ease,color .2s ease,transform .2s ease}
+.sidebar nav a:hover{transform:translateX(2px)}
+[dir=rtl] .sidebar nav a:hover{transform:translateX(-2px)}
+.shell main,.shell .main{min-width:0}
+:where(.card,.statCard,.metricCard,.panel,.tableCard){border-radius:var(--presto-radius)}
+:where(input,select,textarea){max-width:100%}
+:where(input,select,textarea):not([type=checkbox]):not([type=radio]):focus{border-color:#ee784e;box-shadow:0 0 0 3px #ef653a22}
+:where(table){border-collapse:separate;border-spacing:0}
+:where(th){font-weight:750;letter-spacing:.01em}
+:where(td,th){vertical-align:middle}
+:where(tr):hover td{background-color:#f8fafc}
+:where(button){touch-action:manipulation}
+::selection{background:#fbd2c4;color:#242f3f}
+@media(max-width:800px){
+ .shell{max-width:100vw}
+ .sidebar{max-width:min(88vw,310px)}
+ :where(.card,.panel){border-radius:14px}
+ :where(button,input,select){min-height:40px}
+}
+@media(prefers-reduced-motion:reduce){
+ html{scroll-behavior:auto}
+ *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
