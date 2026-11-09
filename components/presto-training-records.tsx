@@ -168,16 +168,84 @@ export default function PrestoTrainingRecords({initialFilter,language,editable=t
   try{
    const {Workbook}=await import('exceljs');
    const workbook=new Workbook();
-   const sheet=workbook.addWorksheet(L('سجل التكوين','Formations'),{views:[{rightToLeft:ar,state:'frozen',ySplit:1}]});
-   sheet.addRow(['#',L('الاسم','Nom'),L('الهاتف','Téléphone'),L('المدينة','Ville'),L('تاريخ التكوين','Date de formation'),L('المكان','Lieu'),L('المكوّن','Formateur'),L('الحالة','Statut'),L('ملاحظات','Notes'),L('تاريخ التسجيل','Date d’inscription')]);
-   filtered.forEach((x,i)=>sheet.addRow([i+1,x.name,x.phone,x.city,x.training_date||'',x.training_location,x.trainer,statusLabel(x.training_status),x.notes,x.created_at]));
-   sheet.columns.forEach((c,i)=>{c.width=i===0?8:i===8?45:24;});
-   sheet.getColumn(3).numFmt='@';
-   sheet.getRow(1).eachCell(c=>{c.font={bold:true,color:{argb:'FFFFFFFF'}};c.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFED6A25'}};});
-   sheet.autoFilter={from:'A1',to:'J'+sheet.rowCount};
+   const now=new Date();
+   workbook.creator='PRESTO';
+   workbook.created=now;
+   workbook.modified=now;
+   const title=filter==='all'?L('سجل التكوين والمتدربين','Registre des formations'):statusLabel(filter);
+   workbook.title='PRESTO · '+title;
+   const sheet=workbook.addWorksheet(L('سجل التكوين','Formations'),{
+    views:[{rightToLeft:ar,state:'frozen',ySplit:8,showGridLines:false}],
+    properties:{defaultRowHeight:30,tabColor:{argb:'FFED6A25'}},
+    pageSetup:{paperSize:9,orientation:'landscape',fitToPage:true,fitToWidth:1,fitToHeight:0,
+     horizontalCentered:true,printTitlesRow:'8:8',margins:{left:0.25,right:0.25,top:0.4,bottom:0.4,header:0.2,footer:0.2}},
+    headerFooter:{oddFooter:'&LPRESTO&C&P / &N&R'+now.toISOString().slice(0,10)}
+   });
+   const ink='FF172335',orange='FFED6A25';
+   const align=ar?'right':'left';
+   sheet.columns=[{width:7},{width:30},{width:20},{width:22},{width:19},{width:24},{width:24},{width:27},{width:48},{width:21}];
+   const banner=(range:string,value:string,bg:string,fg:string,size:number)=>{
+    sheet.mergeCells(range);
+    const cell=sheet.getCell(range.split(':')[0]);
+    cell.value=value;
+    cell.fill={type:'pattern',pattern:'solid',fgColor:{argb:bg}};
+    cell.font={name:'Arial',size,bold:true,color:{argb:fg}};
+    cell.alignment={horizontal:align,vertical:'middle',wrapText:true,indent:1};
+   };
+   banner('A1:J2','PRESTO  |  '+title,ink,'FFFFFFFF',22);
+   sheet.getRow(1).height=28;sheet.getRow(2).height=28;
+   const exportedAt=new Intl.DateTimeFormat(ar?'ar-MR':'fr-FR',{dateStyle:'medium',timeStyle:'short',timeZone:'Africa/Nouakchott'}).format(now);
+   banner('A3:J3',L('تاريخ التصدير: ','Exporté le : ')+exportedAt,'FFF1F5F9','FF475569',11);
+   sheet.getRow(3).height=28;
+   banner('A5:C5',L('عدد الأشخاص','Personnes'),'FFFFF1E8','FF9A3412',11);
+   banner('A6:C6',String(filtered.length),'FFFFF1E8','FF9A3412',22);
+   banner('D5:F5',L('القائمة المحددة','Liste sélectionnée'),'FFF1F5F9',ink,11);
+   banner('D6:F6',title,'FFF1F5F9',ink,13);
+   banner('G5:J5',L('البحث الحالي','Recherche actuelle'),'FFF1F5F9',ink,11);
+   banner('G6:J6',search.trim()||L('جميع النتائج','Tous les résultats'),'FFF1F5F9','FF475569',12);
+   sheet.getRow(5).height=25;sheet.getRow(6).height=40;sheet.getRow(7).height=14;
+   const headings=['#',L('الاسم الكامل','Nom complet'),L('رقم الهاتف','Téléphone'),L('المدينة','Ville'),L('تاريخ التكوين','Date de formation'),L('مكان التكوين','Lieu de formation'),L('المكوّن','Formateur'),L('الحالة','Statut'),L('ملاحظات','Notes'),L('تاريخ التسجيل','Date d’inscription')];
+   const header=sheet.getRow(8);header.height=36;
+   headings.forEach((value,i)=>{
+    const cell=header.getCell(i+1);cell.value=value;
+    cell.font={name:'Arial',bold:true,size:11,color:{argb:'FFFFFFFF'}};
+    cell.fill={type:'pattern',pattern:'solid',fgColor:{argb:orange}};
+    cell.alignment={horizontal:'center',vertical:'middle',wrapText:true};
+   });
+   const excelDate=(value:string|null)=>{
+    if(!value)return null;
+    const date=new Date(value.length===10?value+'T12:00:00Z':value);
+    return Number.isNaN(date.getTime())?value:date;
+   };
+   const tones:Record<Status,[string,string]>={
+    completed:['FFE7F5ED','FF166534'],in_progress:['FFEAF2FF','FF1E40AF'],
+    needs_review:['FFFFF7DC','FF854D0E'],not_trained:['FFFFEDE3','FF9A3412']
+   };
+   filtered.forEach((x,i)=>{
+    const row=sheet.getRow(i+9);
+    const values=[i+1,x.name,x.phone,x.city,excelDate(x.training_date),x.training_location,x.trainer,statusLabel(x.training_status),x.notes,excelDate(x.created_at)];
+    values.forEach((value,j)=>{
+     const cell=row.getCell(j+1);cell.value=value;
+     cell.font={name:'Arial',size:11,bold:j===1,color:{argb:ink}};
+     cell.fill={type:'pattern',pattern:'solid',fgColor:{argb:i%2?'FFF5F7FA':'FFFFFFFF'}};
+     cell.alignment={vertical:'middle',horizontal:[0,2,4,7,9].includes(j)?'center':align,wrapText:true};
+     cell.border={bottom:{style:'hair',color:{argb:'FFE2E8F0'}}};
+    });
+    row.getCell(3).numFmt='@';
+    row.getCell(3).alignment={horizontal:'center',vertical:'middle',readingOrder:'ltr'};
+    row.getCell(5).numFmt='dd/mm/yyyy';row.getCell(10).numFmt='dd/mm/yyyy';
+    const [bg,fg]=tones[x.training_status]||tones.needs_review;
+    row.getCell(8).fill={type:'pattern',pattern:'solid',fgColor:{argb:bg}};
+    row.getCell(8).font={name:'Arial',size:11,bold:true,color:{argb:fg}};
+    // Estimate wrapped lines so long names and notes stay readable.
+    const lines=Math.max(...values.map((v,j)=>typeof v==='string'?v.split('\n').reduce((n,line)=>n+Math.max(1,Math.ceil(line.length/([5,28,18,20,17,22,22,25,44,19][j]))),0):1));
+    row.height=Math.min(409,Math.max(34,lines*16+12));
+   });
+   sheet.autoFilter={from:'A8',to:'J'+Math.max(8,sheet.rowCount)};
+   sheet.pageSetup.printArea='A1:J'+Math.max(8,sheet.rowCount);
    const buffer=await workbook.xlsx.writeBuffer();
    const url=URL.createObjectURL(new Blob([buffer],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}));
-   const a=document.createElement('a');a.href=url;a.download='PRESTO-'+filter+'-training.xlsx';a.click();
+   const a=document.createElement('a');a.href=url;a.download='PRESTO-'+filter+'-'+now.toISOString().slice(0,10)+'.xlsx';a.click();
    setTimeout(()=>URL.revokeObjectURL(url),1000);
   }catch(e){setError(e instanceof Error?e.message:L('تعذر تنزيل Excel','Export impossible'));}
   finally{setExporting(false);}
@@ -186,7 +254,7 @@ export default function PrestoTrainingRecords({initialFilter,language,editable=t
  return <section className={styles.root} dir={ar?'rtl':'ltr'}>
   <div className={styles.intro}>
    <div><span className={styles.eyebrow}>PRESTO · {L('سجل التدريب','REGISTRE DES FORMATIONS')}</span><h2>{L('سجل التكوين والمتدربين','Registre des formations et participants')}</h2><p>{L('إدارة من أتموا التكوين ومن لم يقوموا به بعد في قوائم مستقلة.','Gérez séparément les personnes formées et celles qui ne le sont pas encore.')}</p></div>
-   <div className={styles.actions}><button className={styles.outline} onClick={()=>void exportExcel()} disabled={exporting||!filtered.length}><Download size={17}/>{L('تنزيل Excel','Télécharger Excel')}</button>{editable&&<><button className={styles.outline} onClick={()=>{setFilter('not_trained');edit(undefined,'not_trained')}}><Plus size={18}/>{L('إضافة شخص لم يتكوّن','Ajouter une personne non formée')}</button><button className={styles.add} onClick={()=>edit()}><Plus size={18}/>{L('إضافة متدرب','Ajouter une personne')}</button></>}</div>
+   <div className={styles.actions}><button className={styles.outline} onClick={()=>void exportExcel()} disabled={exporting||!filtered.length}><Download size={17}/>{exporting?L('جار تجهيز الملف…','Préparation…'):L('تنزيل Excel','Télécharger Excel')+' · '+filtered.length}</button>{editable&&<><button className={styles.outline} onClick={()=>{setFilter('not_trained');edit(undefined,'not_trained')}}><Plus size={18}/>{L('إضافة شخص لم يتكوّن','Ajouter une personne non formée')}</button><button className={styles.add} onClick={()=>edit()}><Plus size={18}/>{L('إضافة متدرب','Ajouter une personne')}</button></>}</div>
   </div>
   <div className={styles.stats}>
    {metrics.map(([label,count,Icon],i)=><div className={styles.metric} key={i}><span>{label as string}</span><strong>{count as number}</strong>{<Icon size={19}/>}</div>)}
