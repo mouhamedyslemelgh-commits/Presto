@@ -176,52 +176,47 @@ export default function PrestoTrainingRecords({initialFilter,language,editable=t
    workbook.title='PRESTO · '+title;
    const sheet=workbook.addWorksheet(L('سجل التكوين','Formations'),{
     views:[{rightToLeft:ar,state:'frozen',ySplit:13,showGridLines:false}],
-    properties:{defaultRowHeight:30,tabColor:{argb:'FFED6A25'}},
+    properties:{defaultRowHeight:30,tabColor:{argb:'FFEA6A2B'}},
     pageSetup:{paperSize:9,orientation:'landscape',fitToPage:true,fitToWidth:1,fitToHeight:0,
      horizontalCentered:true,printTitlesRow:'13:13',margins:{left:0.25,right:0.25,top:0.4,bottom:0.4,header:0.2,footer:0.2}},
     headerFooter:{oddFooter:'&LPRESTO&C&P / &N&R'+now.toISOString().slice(0,10)}
    });
-   const ink='FF201E1C',orange='FFFF3D17';
+   const ink='FF20302E',orange='FFEA6A2B',cream='FFFBF7F1',muted='FF68776F';
    const align=ar?'right':'left';
-   sheet.columns=[{width:7},{width:30},{width:20},{width:22},{width:19},{width:24},{width:24},{width:27},{width:48},{width:21}];
-   const banner=(range:string,value:string,bg:string,fg:string,size:number)=>{
+   sheet.columns=[{width:7},{width:31},{width:20},{width:21},{width:20},{width:23},{width:23},{width:28},{width:48},{width:22}];
+   const banner=(range:string,value:string|number,bg:string,fg:string,size:number,bold=true)=>{
     sheet.mergeCells(range);
     const cell=sheet.getCell(range.split(':')[0]);
     cell.value=value;
     cell.fill={type:'pattern',pattern:'solid',fgColor:{argb:bg}};
-    cell.font={name:'Arial',size,bold:true,color:{argb:fg}};
+    cell.font={name:'Arial',size,bold,color:{argb:fg}};
     cell.alignment={horizontal:align,vertical:'middle',wrapText:true,indent:1};
    };
-   banner('A1:J1','',orange,orange,11);
-   sheet.getRow(1).height=5;sheet.getRow(2).height=12;
-   banner('A3:J3','PRESTO  |  '+title,'FFFFFFFF',ink,22);
-   sheet.getRow(3).height=42;
+   banner('A1:J1',L('PRESTO  /  مكتب شؤون السائقين','PRESTO  /  Bureau des livreurs'),cream,orange,12);
+   banner('A2:J3',L('سجل التكوين والمتدربين','Registre des formations'),cream,ink,25);
    const exportedAt=new Intl.DateTimeFormat(ar?'ar-MR':'fr-FR',{dateStyle:'medium',timeStyle:'short',timeZone:'Africa/Nouakchott'}).format(now);
-   banner('A4:J4',L('مكتب شؤون السائقين · تاريخ التصدير: ','Bureau des livreurs · Exporté le : ')+exportedAt,'FFFFFFFF','FF57534E',11);
-   sheet.getRow(4).height=28;sheet.getRow(5).height=12;
-   banner('A6:J6',L('متابعة التكوين','Suivi des formations'),'FFFAF8F6',orange,13);
-   banner('A7:J7',L('لم يقم بالتكوين: حدّد معه موعدًا للحضور إلى المكتب.','Non formé : convenir d’un rendez-vous au bureau.'),'FFFAF8F6',ink,12);
-   banner('A8:J8',L('أكمل التكوين: تُعرض حالة التكوين وتاريخه كما سُجّلا في الملف.','Formé : le statut et la date figurent tels qu’enregistrés dans la fiche.'),'FFFAF8F6',ink,12);
-   banner('A9:J9',L('دوّن نتيجة المتابعة في خانة الملاحظات داخل التطبيق قبل تنزيل نسخة جديدة.','Consignez le suivi dans les notes de l’application avant de télécharger une nouvelle copie.'),'FFFAF8F6',ink,12);
-   for(let r=6;r<=9;r++){
-    sheet.getRow(r).height=r===6?30:28;
-    const cell=sheet.getCell('A'+r);
-    cell.border={left:{style:'thin',color:{argb:'FFE5DDD6'}},right:{style:'thin',color:{argb:'FFE5DDD6'}},
-     ...(r===6?{top:{style:'thin' as const,color:{argb:'FFE5DDD6'}}}:{}),
-     ...(r===9?{bottom:{style:'thin' as const,color:{argb:'FFE5DDD6'}}}:{})};
-   }
-   sheet.getRow(10).height=14;
-   banner('A11:A11',String(filtered.length),'FF2563EB','FFFFFFFF',17);
-   banner('B11:J11',title,'FFFFFFFF',ink,17);
-   sheet.getRow(11).height=36;
-   banner('A12:J12',L('عدد الأشخاص: ','Personnes : ')+filtered.length+' · '+L('البحث: ','Recherche : ')+(search.trim()||L('جميع النتائج','Tous les résultats')),'FFFFFFFF','FF57534E',11);
-   sheet.getRow(12).height=26;
+   banner('A4:J4',L('القائمة: ','Liste : ')+title+'   ·   '+L('تاريخ التصدير: ','Exporté le : ')+exportedAt,cream,muted,11,false);
+   sheet.getRow(1).height=30;sheet.getRow(2).height=28;sheet.getRow(3).height=25;sheet.getRow(4).height=30;
+   sheet.getRow(5).height=14;
+   banner('A6:C6',L('إجمالي الأشخاص المعروضين','Personnes affichées'),'FFEDF5F0',muted,11,false);
+   banner('A7:C8',filtered.length,'FFEDF5F0',ink,25);
+   banner('D6:F6',L('القائمة المحددة','Liste sélectionnée'),'FFEDF5F0',muted,11,false);
+   banner('D7:F8',title,'FFEDF5F0',ink,16);
+   banner('G6:J6',L('نتائج البحث','Recherche'),'FFEDF5F0',muted,11,false);
+   banner('G7:J8',search.trim()||L('جميع النتائج','Tous les résultats'),'FFEDF5F0',ink,15);
+   sheet.getRow(6).height=26;sheet.getRow(7).height=25;sheet.getRow(8).height=25;sheet.getRow(9).height=14;
+   banner('A10:J10',L('متابعة التكوين','Suivi des formations'),cream,orange,12);
+   const guidance=filter==='not_trained'
+    ?L('حدّد موعد الحضور مع الشخص ودوّن نتيجة التواصل في التطبيق.','Convenez d’un rendez-vous et consignez le résultat dans l’application.')
+    :L('راجع حالة التكوين وتاريخه ودوّن ملاحظات المتابعة في التطبيق.','Vérifiez le statut et la date de formation, puis consignez le suivi dans l’application.');
+   banner('A11:J11',guidance,cream,muted,11,false);
+   sheet.getRow(10).height=24;sheet.getRow(11).height=28;sheet.getRow(12).height=16;
    const headings=['#',L('الاسم الكامل','Nom complet'),L('رقم الهاتف','Téléphone'),L('المدينة','Ville'),L('تاريخ التكوين','Date de formation'),L('مكان التكوين','Lieu de formation'),L('المكوّن','Formateur'),L('الحالة','Statut'),L('ملاحظات','Notes'),L('تاريخ التسجيل','Date d’inscription')];
-   const header=sheet.getRow(13);header.height=36;
+   const header=sheet.getRow(13);header.height=38;
    headings.forEach((value,i)=>{
     const cell=header.getCell(i+1);cell.value=value;
-    cell.font={name:'Arial',bold:true,size:11,color:{argb:ink}};
-    cell.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFFFFFFF'}};
+    cell.font={name:'Arial',bold:true,size:11,color:{argb:'FFFFFFFF'}};
+    cell.fill={type:'pattern',pattern:'solid',fgColor:{argb:ink}};
     cell.border={bottom:{style:'thin',color:{argb:ink}}};
     cell.alignment={horizontal:'center',vertical:'middle',wrapText:true};
    });
@@ -231,18 +226,18 @@ export default function PrestoTrainingRecords({initialFilter,language,editable=t
     return Number.isNaN(date.getTime())?value:date;
    };
    const tones:Record<Status,[string,string]>={
-    completed:['FFFFFFFF','FF006837'],in_progress:['FFFFFFFF','FF2563EB'],
-    needs_review:['FFFFFFFF','FF854D0E'],not_trained:['FFFFFFFF','FFFF3D17']
+    completed:['FFE9F4ED','FF18785D'],in_progress:['FFEAF1FB','FF345C8C'],
+    needs_review:['FFFFF4DC','FF8A631A'],not_trained:['FFFFEDE2','FFAD4D1E']
    };
    filtered.forEach((x,i)=>{
     const row=sheet.getRow(i+14);
     const values=[i+1,x.name,x.phone,x.city,excelDate(x.training_date),x.training_location,x.trainer,statusLabel(x.training_status),x.notes,excelDate(x.created_at)];
     values.forEach((value,j)=>{
      const cell=row.getCell(j+1);cell.value=value;
-     cell.font={name:'Arial',size:11,bold:j===1||j===2,color:{argb:j===2?'FF006837':ink}};
-     cell.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFFFFFFF'}};
+     cell.font={name:'Arial',size:11,bold:j===1||j===2,color:{argb:j===2?'FF18785D':ink}};
+     cell.fill={type:'pattern',pattern:'solid',fgColor:{argb:i%2?cream:'FFFFFFFF'}};
      cell.alignment={vertical:'middle',horizontal:[0,2,4,7,9].includes(j)?'center':align,wrapText:true};
-     cell.border={bottom:{style:'hair',color:{argb:'FFE5DDD6'}}};
+     cell.border={bottom:{style:'hair',color:{argb:'FFE4E9E4'}}};
     });
     row.getCell(3).numFmt='@';
     row.getCell(3).alignment={horizontal:'center',vertical:'middle',readingOrder:'ltr'};
@@ -252,7 +247,7 @@ export default function PrestoTrainingRecords({initialFilter,language,editable=t
     row.getCell(8).font={name:'Arial',size:11,bold:true,color:{argb:fg}};
     // Estimate wrapped lines so long names and notes stay readable.
     const lines=Math.max(...values.map((v,j)=>typeof v==='string'?v.split('\n').reduce((n,line)=>n+Math.max(1,Math.ceil(line.length/([5,28,18,20,17,22,22,25,44,19][j]))),0):1));
-    row.height=Math.min(409,Math.max(64,lines*16+12));
+    row.height=Math.min(409,Math.max(42,lines*17+14));
    });
    sheet.autoFilter={from:'A13',to:'J'+Math.max(13,sheet.rowCount)};
    sheet.pageSetup.printArea='A1:J'+Math.max(13,sheet.rowCount);
