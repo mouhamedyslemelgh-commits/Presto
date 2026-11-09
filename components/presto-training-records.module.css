@@ -482,3 +482,9 @@
 @media(prefers-reduced-motion:reduce){
  .photoCard,.fields input,.fields select,.fields textarea{transition:none}
 }
+
+/* Separate rosters for trained and not-yet-trained people */
+.rosterTabs{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0 12px}
+.rosterTabs button{border:1px solid var(--presto-border,#d7dfe7);border-radius:12px;padding:11px 16px;background:var(--presto-card,#fff);color:inherit;font:inherit;font-weight:700;cursor:pointer}
+.rosterTabs button[aria-pressed="true"]{background:#166534;color:#fff;border-color:#166534}
+.rosterTabs button:focus-visible{outline:3px solid #f59e0b;outline-offset:2px}
