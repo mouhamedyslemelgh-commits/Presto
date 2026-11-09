@@ -7,7 +7,7 @@ import styles from './presto-training-records.module.css';
 import extra from './presto-inactive.module.css';
 const groups=['يتصلون قليلاً','لم ينجزوا أي طلبية','عملوا ثم توقفوا'];
 const decisions=['موعد للتكوين','مهلة 7 أيام','اتصالان + رسالة','يُبلّغ المسؤول','عاد للعمل'];
-type Draft=Omit<InactiveRow,'id'>;
+type Draft=Omit<InactiveRow,'id'|'source_snapshot'>;
 const blank=():Draft=>({name:'',phone:'',app_code:'',group_no:1,trained:false,bag_date:'',last_seen:'',answered:'',reason:'',decision:''});
 export default function InactiveDrivers({language,editable=false}:{language:string;editable?:boolean}){
  const ar=language==='ar',L=(a:string,f:string)=>ar?a:f;
@@ -15,7 +15,7 @@ export default function InactiveDrivers({language,editable=false}:{language:stri
  const [open,setOpen]=useState(false),[busy,setBusy]=useState(false),[loading,setLoading]=useState(false),[exporting,setExporting]=useState(false);
  const [error,setError]=useState(''),[success,setSuccess]=useState(''),[search,setSearch]=useState(''),[group,setGroup]=useState(0),[training,setTraining]=useState('all');
  const dialog=useRef<HTMLDivElement>(null),addButton=useRef<HTMLButtonElement>(null);
- const load=useCallback(async()=>{if(!prestoCloud||!editable)return;setLoading(true);try{const r=await prestoCloud.from('presto_inactive_drivers').select('id,name,phone,app_code,group_no,trained,bag_date,last_seen,answered,reason,decision').order('id',{ascending:false});if(r.error)throw r.error;setRows(r.data||[]);}catch(e){setError(e instanceof Error?e.message:String(e))}finally{setLoading(false)}},[editable]);
+ const load=useCallback(async()=>{if(!prestoCloud||!editable)return;setLoading(true);try{const r=await prestoCloud.from('presto_inactive_drivers').select('id,name,phone,app_code,group_no,trained,bag_date,last_seen,answered,reason,decision,source_snapshot').order('id',{ascending:false});if(r.error)throw r.error;setRows(r.data||[]);}catch(e){setError(e instanceof Error?e.message:String(e))}finally{setLoading(false)}},[editable]);
  useEffect(()=>{if(editable)void load();else setRows([])},[editable,load]);
  useEffect(()=>{if(!open)return;const previous=document.body.style.overflow;document.body.style.overflow='hidden';const previousFocus=document.activeElement as HTMLElement|null;dialog.current?.querySelector<HTMLInputElement>('input')?.focus();const keys=(e:KeyboardEvent)=>{if(e.key==='Escape'&&!busy)setOpen(false);if(e.key==='Tab'){const nodes=dialog.current?.querySelectorAll<HTMLElement>('button:not([disabled]),input,select,textarea');if(!nodes?.length)return;const first=nodes[0],last=nodes[nodes.length-1];if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus()}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}}};document.addEventListener('keydown',keys);return()=>{document.body.style.overflow=previous;document.removeEventListener('keydown',keys);previousFocus?.focus()}},[open,busy]);
  const filtered=useMemo(()=>rows.filter(r=>(!group||r.group_no===group)&&(training==='all'||r.trained===(training==='yes'))&&(!search.trim()||[r.name,r.phone,r.app_code].some(v=>v.toLowerCase().includes(search.trim().toLowerCase())))),[rows,group,training,search]);
