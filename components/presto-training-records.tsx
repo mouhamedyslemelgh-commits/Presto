@@ -7,10 +7,10 @@ import styles from './presto-training-records.module.css';
 type Status='completed'|'in_progress'|'needs_review'|'not_trained';
 type RecordRow={
  id:number;name:string;phone:string;city:string;photo_path:string;
- training_date:string;trainer:string;training_location:string;
+ training_date:string|null;trainer:string;training_location:string;
  training_status:Status;app_type:string;notes:string;created_at:string;
 };
-type Draft=Omit<RecordRow,'id'|'created_at'>;
+type Draft=Omit<RecordRow,'id'|'created_at'|'training_date'> & {training_date:string};
 const blank=():Draft=>({
  name:'',phone:'',city:'',photo_path:'',training_date:new Date().toISOString().slice(0,10),
  trainer:'',training_location:'',training_status:'completed',app_type:'driver',notes:''
@@ -89,7 +89,7 @@ export default function PrestoTrainingRecords({language,editable=true,drivers=[]
  const stats={total:items.length,completed:items.filter(x=>x.training_status==='completed').length,in_progress:items.filter(x=>x.training_status==='in_progress').length,needs_review:items.filter(x=>x.training_status==='needs_review').length,not_trained:items.filter(x=>x.training_status==='not_trained').length};
  const metrics:[string,number,typeof Users][]=[[L('إجمالي المسجلين','Inscrits'),stats.total,Users],[L('أكملوا التدريب','Formations terminées'),stats.completed,CheckCircle2],[L('قيد التدريب','En formation'),stats.in_progress,ClipboardList],[L('لم يقوموا بالتكوين','Non formés'),stats.not_trained,GraduationCap]];
  const edit=(row?:RecordRow,initialStatus?:Status)=>{
-  const values=row?{name:row.name,phone:row.phone,city:row.city,photo_path:row.photo_path,training_date:row.training_date,trainer:row.trainer,training_location:row.training_location,training_status:row.training_status,app_type:row.app_type,notes:row.notes}:{...blank(),training_status:initialStatus||'completed'};
+  const values=row?{name:row.name,phone:row.phone,city:row.city,photo_path:row.photo_path,training_date:row.training_date||'',trainer:row.trainer,training_location:row.training_location,training_status:row.training_status,app_type:row.app_type,notes:row.notes}:{...blank(),training_status:initialStatus||'completed'};
   const matches=drivers.filter(d=>phoneDigits(d.phone).length>=7&&phoneDigits(d.phone)===phoneDigits(values.phone));
   setLinkedDriverId(matches.length===1?matches[0].id:null);
   setSelectedId(row?.id??null);setDraft(values);setDriverSearch('');
@@ -178,7 +178,7 @@ export default function PrestoTrainingRecords({language,editable=true,drivers=[]
   <div className={styles.stats}>
    {metrics.map(([label,count,Icon],i)=><div className={styles.metric} key={i}><span>{label as string}</span><strong>{count as number}</strong>{<Icon size={19}/>}</div>)}
   </div>
-  <nav className="presto-training-tabs" aria-label={L('فئات التكوين','Catégories de formation')}><button type="button" aria-pressed={filter==='all'} onClick={()=>setFilter('all')}>{L('جميع المسجلين','Tous')} ({stats.total})</button><button type="button" aria-pressed={filter==='not_trained'} onClick={()=>setFilter('not_trained')}>{L('لم يقوموا بالتكوين','Non formés')} ({stats.not_trained})</button><button type="button" aria-pressed={filter==='completed'} onClick={()=>setFilter('completed')}>{L('أكملوا التكوين','Formés')} ({stats.completed})</button></nav>
+  <nav className={styles.rosterTabs} aria-label={L('فئات التكوين','Catégories de formation')}><button type="button" aria-pressed={filter==='all'} onClick={()=>setFilter('all')}>{L('جميع المسجلين','Tous')} ({stats.total})</button><button type="button" aria-pressed={filter==='not_trained'} onClick={()=>setFilter('not_trained')}>{L('لم يقوموا بالتكوين','Non formés')} ({stats.not_trained})</button><button type="button" aria-pressed={filter==='completed'} onClick={()=>setFilter('completed')}>{L('أكملوا التكوين','Formés')} ({stats.completed})</button></nav>
   <div className={styles.toolbar}><label className={styles.search}><Search size={18}/><input value={search} onChange={e=>setSearch(e.target.value)} placeholder={L('بحث بالاسم أو الهاتف أو المدينة...','Rechercher nom, téléphone, ville...')}/></label><select aria-label={L('تصفية حسب حالة التدريب','Filtrer par statut')} value={filter} onChange={e=>setFilter(e.target.value as typeof filter)}><option value="all">{L('جميع الحالات','Tous les statuts')}</option><option value="completed">{statusLabel('completed')}</option><option value="in_progress">{statusLabel('in_progress')}</option><option value="needs_review">{statusLabel('needs_review')}</option><option value="not_trained">{statusLabel('not_trained')}</option></select><span>{filtered.length} / {items.length}</span></div>
   {error&&<p role="alert" className={styles.error}>{error}</p>}
   {success&&<p role="status" className={styles.success}>{success}</p>}
