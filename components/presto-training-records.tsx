@@ -12,7 +12,7 @@ type RecordRow={
 };
 type Draft=Omit<RecordRow,'id'|'created_at'|'training_date'> & {training_date:string};
 const blank=():Draft=>({
- name:'',phone:'',city:'',photo_path:'',training_date:new Date().toISOString().slice(0,10),
+ name:'',phone:'',city:'',photo_path:'',training_date:new Date().toLocaleDateString('en-CA',{timeZone:'Africa/Nouakchott'}),
  trainer:'',training_location:'',training_status:'completed',app_type:'driver',notes:''
 });
 const isStatus=(value:string):value is Status=>['completed','in_progress','needs_review','not_trained'].includes(value);
@@ -24,6 +24,7 @@ export default function PrestoTrainingRecords({initialFilter,language,editable=t
  const L=(a:string,f:string)=>ar?a:f;
  const [items,setItems]=useState<RecordRow[]>([]);
  const [photos,setPhotos]=useState<Record<string,string>>({});
+ const photoFallback='/images/presto-uniform-rider.webp';
  const [loading,setLoading]=useState(true);
  const [saving,setSaving]=useState(false);
  const [error,setError]=useState('');
@@ -149,7 +150,7 @@ export default function PrestoTrainingRecords({initialFilter,language,editable=t
  };
  const markCompleted=async(row:RecordRow)=>{
   if(!prestoCloud||!editable||saving)return;
-  const date=new Date().toISOString().slice(0,10);
+  const date=new Date().toLocaleDateString('en-CA',{timeZone:'Africa/Nouakchott'});
   setSaving(true);setError('');
   try{
    const {error:upError}=await prestoCloud.from('presto_training_records').update({training_status:'completed',training_date:date}).eq('id',row.id);
@@ -271,7 +272,7 @@ export default function PrestoTrainingRecords({initialFilter,language,editable=t
   <div className={styles.toolbar}><label className={styles.search}><Search size={18}/><input value={search} onChange={e=>setSearch(e.target.value)} placeholder={L('بحث بالاسم أو الهاتف أو المدينة...','Rechercher nom, téléphone, ville...')}/></label><select aria-label={L('تصفية حسب حالة التدريب','Filtrer par statut')} value={filter} onChange={e=>setFilter(e.target.value as typeof filter)}><option value="all">{L('جميع الحالات','Tous les statuts')}</option><option value="completed">{statusLabel('completed')}</option><option value="in_progress">{statusLabel('in_progress')}</option><option value="needs_review">{statusLabel('needs_review')}</option><option value="not_trained">{statusLabel('not_trained')}</option></select><span>{filtered.length} / {items.length}</span></div>
   {error&&<p role="alert" className={styles.error}>{error}</p>}
   {success&&<p role="status" className={styles.success}>{success}</p>}
-  {loading?<p className={styles.empty}>{L('جار تحميل السجلات...','Chargement des fiches...')}</p>:!filtered.length?<div className={styles.empty}><ClipboardList size={35}/><strong>{L('لا توجد سجلات تدريب حتى الآن','Aucune fiche de formation')}</strong><span>{filter==='not_trained'?L('أضف الأشخاص الذين لم يقوموا بالتكوين بعد.','Ajoutez les personnes qui n’ont pas encore suivi la formation.'):L('أضف أول شخص إلى السجل.','Ajoutez votre première personne.')}</span></div>:<div className={styles.cards}>{filtered.map((row,i)=><article className={styles.card} key={row.id}><div className={styles.cardTop}><div className={styles.picture}><img src="/images/presto-uniform-rider.webp" alt={row.name}/></div><div className={styles.person}><small>#{String(filtered.length-i).padStart(3,'0')}</small><h3>{row.name}</h3><a href={'tel:'+row.phone}><Phone size={14}/><bdi>{row.phone}</bdi></a></div><span className={styles.status} data-status={isStatus(row.training_status)?row.training_status:'needs_review'}>{statusLabel(row.training_status)}</span></div>
+  {loading?<p className={styles.empty}>{L('جار تحميل السجلات...','Chargement des fiches...')}</p>:!filtered.length?<div className={styles.empty}><ClipboardList size={35}/><strong>{L('لا توجد سجلات تدريب حتى الآن','Aucune fiche de formation')}</strong><span>{filter==='not_trained'?L('أضف الأشخاص الذين لم يقوموا بالتكوين بعد.','Ajoutez les personnes qui n’ont pas encore suivi la formation.'):L('أضف أول شخص إلى السجل.','Ajoutez votre première personne.')}</span></div>:<div className={styles.cards}>{filtered.map((row,i)=><article className={styles.card} key={row.id}><div className={styles.cardTop}><div className={styles.picture}><img src={photos[row.photo_path]||photoFallback} alt={row.name} onError={e=>{e.currentTarget.src=photoFallback}}/></div><div className={styles.person}><small>#{String(filtered.length-i).padStart(3,'0')}</small><h3>{row.name}</h3><a href={'tel:'+row.phone}><Phone size={14}/><bdi>{row.phone}</bdi></a></div><span className={styles.status} data-status={isStatus(row.training_status)?row.training_status:'needs_review'}>{statusLabel(row.training_status)}</span></div>
     <dl className={styles.details}><div><dt><CalendarDays size={15}/>{L('تاريخ التدريب','Date')}</dt><dd>{row.training_status==='not_trained'?L('لم يتم بعد','Pas encore'):row.training_date||'—'}</dd></div><div><dt><MapPin size={15}/>{L('المدينة / المكان','Ville / lieu')}</dt><dd>{[row.city,row.training_location].filter(Boolean).join(' · ')||'—'}</dd></div><div><dt><ClipboardList size={15}/>{L('التطبيق','Application')}</dt><dd>{row.app_type==='driver'?L('تطبيق السائق','Livreur'):row.app_type==='customer'?L('تطبيق الزبون','Client'):L('التطبيقان','Les deux')}</dd></div></dl>
     {row.notes&&<p className={styles.notes}>{row.notes}</p>}
      {drivers.some(d=>phoneDigits(d.phone).length>=7&&phoneDigits(d.phone)===phoneDigits(row.phone))&&<span className={styles.linkTag}><CheckCircle2 size={15}/>{L('مرتبط بملف سائق PRESTO','Lié à un livreur PRESTO')}</span>}
