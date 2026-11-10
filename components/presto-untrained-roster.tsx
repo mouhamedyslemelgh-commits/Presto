@@ -1,6 +1,6 @@
 'use client';
 import {useCallback,useEffect,useMemo,useState} from 'react';
-import {Check,Download,FileText,GraduationCap,PackageCheck,Plus,RefreshCw,Save,Search,Shirt,Users} from 'lucide-react';
+import {Check,Download,FileText,GraduationCap,Plus,RefreshCw,Save,Search,Edit3,Trash2,CheckCircle2,X} from 'lucide-react';
 import {prestoCloud} from '../lib/presto-cloud';
 import styles from './presto-untrained-roster.module.css';
 
@@ -38,6 +38,9 @@ const source:Source[]=[
 ].map(([number,name,ref,phone,plate,date])=>({number:Number(number),name:String(name),ref:String(ref),phone:String(phone),plate:String(plate),date:String(date)}));
 const digits=(value:string)=>String(value||'').replace(/\D/g,'');
 const reasonOf=(notes:string)=>notes.match(/(?:^|\n)سبب:\s*([^\n]*)/)?.[1]||'';
+const META='PRESTO_ROSTER_META:';
+const metaOf=(notes:string):Partial<Source>&{deleted?:boolean}=>{try{const line=notes.split('\\n').find(x=>x.startsWith(META));return line?JSON.parse(line.slice(META.length)):{};}catch{return {};}};
+const setMeta=(notes:string,meta:Partial<Source>&{deleted?:boolean})=>[notes.split('\\n').filter(x=>!x.startsWith(META)).join('\\n').trim(),META+JSON.stringify(meta)].filter(Boolean).join('\\n');
 const notesWithReason=(notes:string,reason:string)=>[notes.replace(/(?:^|\n)سبب:[^\n]*/g,'').trim(),reason.trim()?'سبب: '+reason.trim():''].filter(Boolean).join('\n');
 export default function PrestoUntrainedRoster({language,editable,drivers,photos}:Props){
  const ar=language==='ar';const L=(a:string,f:string)=>ar?a:f;
@@ -45,6 +48,8 @@ export default function PrestoUntrainedRoster({language,editable,drivers,photos}
  const [loading,setLoading]=useState(true);const [busy,setBusy]=useState(false);
  const [search,setSearch]=useState('');const [error,setError]=useState('');const [success,setSuccess]=useState('');
  const [edited,setEdited]=useState<Record<string,string>>({});
+ const [selected,setSelected]=useState<Source|null>(null);const [draft,setDraft]=useState<Source|null>(null);
+ const [showCompleted,setShowCompleted]=useState(false);
  const reload=useCallback(async()=>{
   if(!prestoCloud){setLoading(false);setError(L('اتصال PRESTO بقاعدة البيانات غير متاح. يمكن عرض القائمة وتنزيلها.','Connexion PRESTO indisponible. Consultation et export restent possibles.'));return;}
   const {data,error:err}=await prestoCloud.from('presto_training_records').select('id,name,phone,training_status,notes,created_at').order('id',{ascending:false}).limit(2000);
@@ -55,18 +60,52 @@ export default function PrestoUntrainedRoster({language,editable,drivers,photos}
  const known=new Map<string,Training>();
  for(const item of records){const k=digits(item.phone);if(k.length>=7&&!known.has(k))known.set(k,item);}
  const driverFor=(entry:Source)=>drivers.find(d=>digits(d.pdf_source_phone||d.phone)===entry.phone||String(d.presto_reference||'').replace('#','')===entry.ref);
- const full=useMemo(()=>source.map(s=>({source:s,driver:driverFor(s),training:known.get(s.phone)})).filter(v=>v.training?.training_status!=='completed'&&v.driver?.training_completed!==true),[drivers,records]);
+ const full=useMemo(()=>source.map(base=>{const training=known.get(base.phone);const meta=metaOf(training?.notes||'');const item={...base,...meta,number:base.number,phone:meta.phone||base.phone};return {source:item,originalPhone:base.phone,driver:driverFor(base),training,deleted:meta.deleted===true};}).filter(v=>!v.deleted&&(showCompleted||(v.training?.training_status!=='completed'&&v.driver?.training_completed!==true))),[drivers,records,showCompleted]);
  const filtered=full.filter(v=>[v.source.name,v.source.phone,v.source.ref,v.source.plate,reasonOf(v.training?.notes||''),edited[v.source.phone]||''].join(' ').toLowerCase().includes(search.trim().toLowerCase()));
- const stat=[full.length,full.length,full.filter(v=>v.training?.training_status==='not_trained').length];
+ const stat=[full.length,full.filter(v=>v.driver?.training_completed!==false).length,full.filter(v=>v.training?.training_status==='not_trained').length];
  const saveOne=async(entry:Source)=>{
   if(!prestoCloud||!editable)return;setBusy(true);setError('');setSuccess('');
   try{
-   const existing=known.get(entry.phone);if(existing?.training_status==='completed')throw new Error(L('تم تكوين هذا السائق بالفعل.','Ce livreur est déjà formé.'));
+   const existing=known.get(source.find(x=>x.number===entry.number)?.phone||entry.phone);if(existing?.training_status==='completed')throw new Error(L('تم تكوين هذا السائق بالفعل.','Ce livreur est déjà formé.'));
    const notes=notesWithReason(existing?.notes||'',edited[entry.phone]??reasonOf(existing?.notes||''));
    const payload={name:entry.name,phone:entry.phone,training_status:'not_trained' as const,training_date:null,notes,app_type:'driver'};
    const result=existing?await prestoCloud.from('presto_training_records').update({notes}).eq('id',existing.id):await prestoCloud.from('presto_training_records').insert(payload);
    if(result.error)throw result.error;
    setSuccess(L('تم حفظ السائق والسبب بنجاح.','Livreur et motif enregistrés.'));await reload();
+  }catch(e){setError(e instanceof Error?e.message:String(e));}finally{setBusy(false);}
+ };
+ const updateStatus=async(entry:Source,completed:boolean)=>{
+  if(!editable||!prestoCloud||busy)return;
+  const original=source.find(x=>x.number===entry.number)!;const training=known.get(original.phone);setBusy(true);setError('');
+  try{
+   const status=completed?'completed':'not_trained';
+   const date=completed?new Date().toLocaleDateString('en-CA',{timeZone:'Africa/Nouakchott'}):null;
+   const result=training?await prestoCloud.from('presto_training_records').update({training_status:status,training_date:date}).eq('id',training.id):await prestoCloud.from('presto_training_records').insert({name:entry.name,phone:original.phone,training_status:status,training_date:date,app_type:'driver'});
+   if(result.error)throw result.error;
+   const driver=driverFor(original);if(driver){const {error:err}=await prestoCloud.from('presto_drivers').update({training_completed:completed}).eq('id',driver.id);if(err)throw err;}
+   await reload();setSuccess(completed?L('تم التكوين بنجاح.','Formation terminée.'):L('تم إرجاعه إلى لم يتم.','Formation annulée.'));
+  }catch(e){setError(e instanceof Error?e.message:String(e));}finally{setBusy(false);}
+ };
+ const saveDetails=async()=>{
+  if(!draft||!selected||!editable||!prestoCloud||busy)return;
+  const original=source.find(x=>x.number===selected.number)!;const training=known.get(original.phone);setBusy(true);setError('');
+  try{
+   if(!draft.name.trim()||digits(draft.phone).length<7)throw new Error(L('أدخل اسمًا ورقم هاتف صحيحين.','Nom et téléphone valides requis.'));
+   const meta={name:draft.name.trim(),phone:draft.phone.trim(),plate:draft.plate.trim(),date:draft.date};
+   const notes=setMeta(training?.notes||'',meta);
+   const result=training?await prestoCloud.from('presto_training_records').update({notes}).eq('id',training.id):await prestoCloud.from('presto_training_records').insert({name:original.name,phone:original.phone,training_status:'not_trained',training_date:null,app_type:'driver',notes});
+   if(result.error)throw result.error;
+   setSelected(null);setDraft(null);await reload();setSuccess(L('تم حفظ تعديلات البطاقة.','Fiche modifiée.'));
+  }catch(e){setError(e instanceof Error?e.message:String(e));}finally{setBusy(false);}
+ };
+ const deleteOne=async(entry:Source)=>{
+  if(!editable||!prestoCloud||busy||!window.confirm(L('هل تريد حذف البطاقة من هذه القائمة؟','Supprimer cette fiche de la liste ?')))return;
+  const original=source.find(x=>x.number===entry.number)!;const training=known.get(original.phone);setBusy(true);setError('');
+  try{
+   const notes=setMeta(training?.notes||'',{...metaOf(training?.notes||''),deleted:true});
+   const result=training?await prestoCloud.from('presto_training_records').update({notes}).eq('id',training.id):await prestoCloud.from('presto_training_records').insert({name:original.name,phone:original.phone,training_status:'not_trained',training_date:null,app_type:'driver',notes});
+   if(result.error)throw result.error;
+   await reload();setSuccess(L('تم حذف البطاقة من القائمة.','Fiche retirée de la liste.'));
   }catch(e){setError(e instanceof Error?e.message:String(e));}finally{setBusy(false);}
  };
  const importAll=async()=>{
@@ -93,7 +132,7 @@ export default function PrestoUntrainedRoster({language,editable,drivers,photos}
    const headings=['#',L('السائق','Livreur'),L('رقم PRESTO','Référence'),L('الهاتف','Téléphone'),L('اللوحة','Plaque'),L('الحقيبة','Sac'),L('القميص','Chemise'),L('التكوين','Formation'),L('سبب','Motif'),L('سُلّم في','Remis le')];
    const head=sh.getRow(10);head.height=39;head.eachCell(()=>{});
    headings.forEach((h,i)=>{const c=head.getCell(i+1);c.value=h;c.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF202F34'}};c.font={name:'Arial',size:11,bold:true,color:{argb:'FFFFFFFF'}};c.alignment={vertical:'middle',horizontal:'center',wrapText:true};});
-   filtered.forEach((v,i)=>{const s=v.source;const reason=edited[s.phone]??reasonOf(v.training?.notes||'');const vals=[s.number,s.name,'#'+s.ref,s.phone,s.plate||'—','✓','✓',L('لم يتم','Non formé'),reason||'—',s.date];const row=sh.getRow(i+11);row.height=38;vals.forEach((val,j)=>{const c=row.getCell(j+1);c.value=val;c.font={name:'Arial',size:11,bold:j===1,color:{argb:j===5||j===6?'FF169B65':'FF26343A'}};c.fill={type:'pattern',pattern:'solid',fgColor:{argb:i%2?'FFFFF5F1':'FFFFFFFF'}};c.alignment={horizontal:j===1||j===8?(ar?'right':'left'):'center',vertical:'middle',wrapText:true};c.border={bottom:{style:'hair',color:{argb:'FFE9DDD7'}}};});row.getCell(4).numFmt='@';});
+   filtered.forEach((v,i)=>{const s=v.source;const reason=edited[s.phone]??reasonOf(v.training?.notes||'');const vals=[s.number,s.name,'#'+s.ref,s.phone,s.plate||'—','✓','✓',v.training?.training_status==='completed'?L('تم','Formé'):L('لم يتم','Non formé'),reason||'—',s.date];const row=sh.getRow(i+11);row.height=38;vals.forEach((val,j)=>{const c=row.getCell(j+1);c.value=val;c.font={name:'Arial',size:11,bold:j===1,color:{argb:j===5||j===6?'FF169B65':'FF26343A'}};c.fill={type:'pattern',pattern:'solid',fgColor:{argb:i%2?'FFFFF5F1':'FFFFFFFF'}};c.alignment={horizontal:j===1||j===8?(ar?'right':'left'):'center',vertical:'middle',wrapText:true};c.border={bottom:{style:'hair',color:{argb:'FFE9DDD7'}}};});row.getCell(4).numFmt='@';});
    sh.autoFilter={from:'A10',to:'J'+(filtered.length+10)};sh.pageSetup.printArea='A1:J'+(filtered.length+10);
    const buf=await wb.xlsx.writeBuffer();const url=URL.createObjectURL(new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}));const anchor=document.createElement('a');anchor.href=url;anchor.download='PRESTO-non-formes-2026-11-10.xlsx';anchor.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
   }catch(e){setError(e instanceof Error?e.message:String(e));}finally{setBusy(false);}
@@ -101,9 +140,10 @@ export default function PrestoUntrainedRoster({language,editable,drivers,photos}
  return <section className={styles.root} dir={ar?'rtl':'ltr'}>
   <div className={styles.hero}><div className={styles.brand}><img src="/logos/presto.webp" alt="PRESTO" width={130} height={70}/><span>{L('بريستو موريتانيا · إدارة العمليات','PRESTO Mauritanie · Opérations')}<small>10 / 11 / 2026</small></span></div><div className={styles.heroBody}><span className={styles.eyebrow}>PRESTO · {L('سجل السائقين','REGISTRE DES LIVREURS')}</span><h2>{L('السائقون — لم يتم تكوينهم بعد','Livreurs — Formation non effectuée')}</h2><p>{L('استلموا الحقيبة والقميص · قائمة مرجعية مطابقة لتقرير 10 نوفمبر 2026','Sac et chemise remis · Selon le rapport du 10 novembre 2026')}</p></div></div>
   <div className={styles.metrics}><div><span>{L('في القائمة','Dans la liste')}</span><strong>{stat[0]}</strong><small>{L('سائقون','Livreurs')}</small></div><div><span>{L('الحقيبة والقميص','Sac + chemise')}</span><strong className={styles.green}>{stat[1]}</strong><small>{L('مستلمة','Reçus')}</small></div><div><span>{L('موجودون في سجل التكوين','Dans le registre')}</span><strong>{stat[2]}</strong><small>{L('حالة: غير مكوّن','Non formés')}</small></div><div><span>{L('التكوين','Formation')}</span><strong className={styles.orange}>0</strong><small>{L('منجز من هذه القائمة','Terminés sur la liste')}</small></div></div>
-  <div className={styles.toolbar}><label><Search size={17}/><input value={search} onChange={e=>setSearch(e.target.value)} placeholder={L('ابحث بالاسم، الهاتف، اللوحة أو السبب','Recherche nom, téléphone, plaque ou motif')}/></label><div><button type="button" onClick={()=>void reload()} disabled={busy}><RefreshCw size={16}/>{L('تحديث','Actualiser')}</button>{editable&&<button type="button" onClick={()=>void importAll()} disabled={busy||loading}><Plus size={16}/>{L('مزامنة الـ26 مع قاعدة البيانات','Synchroniser les 26')}</button>}<button type="button" className={styles.download} onClick={()=>void exportExcel()} disabled={busy}><Download size={17}/>{L('تنزيل Excel بنفس التصميم','Exporter Excel')}</button></div></div>
+  <div className={styles.toolbar}><label><Search size={17}/><input value={search} onChange={e=>setSearch(e.target.value)} placeholder={L('ابحث بالاسم، الهاتف، اللوحة أو السبب','Recherche nom, téléphone, plaque ou motif')}/></label><div><button type="button" onClick={()=>void reload()} disabled={busy}><RefreshCw size={16}/>{L('تحديث','Actualiser')}</button><button type="button" onClick={()=>setShowCompleted(v=>!v)}>{showCompleted?L('إخفاء المكتملين','Masquer les formés'):L('عرض المكتملين','Afficher les formés')}</button>{editable&&<button type="button" onClick={()=>void importAll()} disabled={busy||loading}><Plus size={16}/>{L('مزامنة الـ26 مع قاعدة البيانات','Synchroniser les 26')}</button>}<button type="button" className={styles.download} onClick={()=>void exportExcel()} disabled={busy}><Download size={17}/>{L('تنزيل Excel بنفس التصميم','Exporter Excel')}</button></div></div>
   {error&&<p className={styles.error} role="alert">{error}</p>}{success&&<p className={styles.success} role="status">{success}</p>}
-  <div className={styles.tablewrap}><table className={styles.table}><thead><tr>{['#',L('السائق','Livreur'),L('الهاتف','Téléphone'),L('اللوحة','Plaque'),L('الحقيبة','Sac'),L('القميص','Chemise'),L('التكوين','Formation'),L('سبب','Motif'),L('سُلّم في','Remis le')].map(x=><th key={x}>{x}</th>)}</tr></thead><tbody>{filtered.map(v=>{const s=v.source;const d=v.driver;const photo=d?.driver_photo_path?photos[d.driver_photo_path]:null;return <tr key={s.phone}><td className={styles.number}>{s.number}</td><td><div className={styles.person}><img src={photo||'/images/presto-uniform-rider.webp'} alt="" width={37} height={37}/><span><strong>{s.name}</strong><small>#{s.ref}</small></span></div></td><td dir="ltr">{s.phone}</td><td>{s.plate?<span className={styles.plate}>{s.plate}</span>:'—'}</td><td><Check className={styles.tick} size={18}/></td><td><Check className={styles.tick} size={18}/></td><td><span className={styles.notTrained}>{L('لم يتم','Non formé')}</span></td><td className={styles.reason}>{editable?<div className={styles.reasonInput}><input aria-label={L('سبب عدم التكوين لـ ','Motif pour ')+s.name} maxLength={350} value={edited[s.phone]??reasonOf(v.training?.notes||'')} onChange={e=>setEdited(old=>({...old,[s.phone]:e.target.value}))} placeholder={L('أضف سبب عدم التكوين','Ajouter le motif')}/><button type="button" title={L('حفظ السبب','Enregistrer le motif')} disabled={busy} onClick={()=>void saveOne(s)}><Save size={15}/></button></div>:<span>{reasonOf(v.training?.notes||'')||'—'}</span>}</td><td dir="ltr">{s.date}</td></tr>;})}</tbody></table></div>
+  <div className={styles.tablewrap}><table className={styles.table}><thead><tr>{['#',L('السائق','Livreur'),L('الهاتف','Téléphone'),L('اللوحة','Plaque'),L('الحقيبة','Sac'),L('القميص','Chemise'),L('التكوين','Formation'),L('سبب','Motif'),L('سُلّم في','Remis le'),L('إجراءات','Actions')].map(x=><th key={x}>{x}</th>)}</tr></thead><tbody>{filtered.map(v=>{const s=v.source;const d=v.driver;const photo=d?.driver_photo_path?photos[d.driver_photo_path]:null;return <tr key={s.phone}><td className={styles.number}>{s.number}</td><td><div className={styles.person}><img src={photo||'/images/presto-uniform-rider.webp'} alt="" width={37} height={37}/><span><strong>{s.name}</strong><small>#{s.ref}</small></span></div></td><td dir="ltr">{s.phone}</td><td>{s.plate?<span className={styles.plate}>{s.plate}</span>:'—'}</td><td><Check className={styles.tick} size={18}/></td><td><Check className={styles.tick} size={18}/></td><td><button type="button" className={styles.notTrained} disabled={!editable||busy} onClick={()=>void updateStatus(s,v.training?.training_status!=='completed')}>{v.training?.training_status==='completed'?L('تم ✓','Formé ✓'):L('لم يتم · اضغط للإتمام','Non formé · Valider')}</button></td><td className={styles.reason}>{editable?<div className={styles.reasonInput}><input aria-label={L('سبب عدم التكوين لـ ','Motif pour ')+s.name} maxLength={350} value={edited[s.phone]??reasonOf(v.training?.notes||'')} onChange={e=>setEdited(old=>({...old,[s.phone]:e.target.value}))} placeholder={L('أضف سبب عدم التكوين','Ajouter le motif')}/><button type="button" title={L('حفظ السبب','Enregistrer le motif')} disabled={busy} onClick={()=>void saveOne(s)}><Save size={15}/></button></div>:<span>{reasonOf(v.training?.notes||'')||'—'}</span>}</td><td dir="ltr">{s.date}</td><td>{editable&&<div className={styles.rowActions}><button type="button" disabled={busy} onClick={()=>{setSelected(s);setDraft({...s});}} title={L('تعديل البطاقة','Modifier')}><Edit3 size={16}/></button><button type="button" disabled={busy} onClick={()=>void deleteOne(s)} title={L('حذف البطاقة','Supprimer')}><Trash2 size={16}/></button></div>}</td></tr>;})}</tbody></table></div>
+  {selected&&draft&&<div className={styles.overlay}><div className={styles.dialog} role="dialog" aria-modal="true"><div className={styles.dialogTop}><h3>{L('تعديل بطاقة السائق','Modifier la fiche')}</h3><button type="button" onClick={()=>setSelected(null)}><X size={19}/></button></div>{([['name',L('اسم السائق','Nom')],['phone',L('رقم الهاتف','Téléphone')],['plate',L('لوحة المركبة','Plaque')],['date',L('تاريخ التسليم','Date de remise')]] as const).map(([key,label])=><label key={key}>{label}<input value={draft[key]} onChange={e=>setDraft({...draft,[key]:e.target.value})}/></label>)}<div className={styles.dialogActions}><button type="button" onClick={()=>setSelected(null)}>{L('إلغاء','Annuler')}</button><button type="button" disabled={busy} onClick={()=>void saveDetails()}><Save size={16}/>{L('حفظ التعديلات','Enregistrer')}</button></div></div></div>}
   <footer className={styles.footer}><span>{L('بريستو موريتانيا — للاستخدام الداخلي · إدارة العمليات','PRESTO Mauritanie — Usage interne · Opérations')}</span><span>{L('المصدر: تقرير السائقين 10 نوفمبر 2026','Source : rapport des livreurs du 10 novembre 2026')}</span></footer>
   <div className={styles.hint}><FileText size={18}/><span>{L('تظهر البيانات الأصلية مباشرة. لحفظها في سجل التكوين المشترك اضغط «مزامنة الـ26 مع قاعدة البيانات». لا تتكرر السجلات المسجلة بالفعل.','Les 26 données source sont affichées. Synchronisez-les pour les enregistrer sans doublons.')}</span><GraduationCap size={19}/></div>
  </section>;
