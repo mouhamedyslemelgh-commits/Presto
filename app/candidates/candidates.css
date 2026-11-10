@@ -1,0 +1,66 @@
+/* PRESTO Candidates · premium 2026 workflow */
+.candidatePage{--c-ink:#142b39;--c-muted:#68808b;--c-orange:#e96131;--c-line:#e5ebed;max-width:1450px;margin:auto;padding:clamp(14px,3vw,36px);min-height:100dvh;color:var(--c-ink);background:radial-gradient(circle at 95% 0%,#ffe8d9 0,transparent 34%),#f6f8fa;font-family:inherit}
+.candidatePage *{box-sizing:border-box}
+.candidateHero{position:relative;overflow:hidden;padding:clamp(20px,3vw,36px);border-radius:26px;background:linear-gradient(112deg,#112e3a,#174857 65%,#1b5662);color:white;box-shadow:0 22px 45px #122f3b24}
+.candidateHero::after{content:"";position:absolute;inset:auto -130px -180px auto;width:420px;height:420px;border:58px solid #ffffff0c;border-radius:50%;pointer-events:none}
+.candidateHeroTop{display:flex;align-items:center;justify-content:space-between;gap:16px;position:relative;z-index:1}
+.candidateBack{display:inline-flex;align-items:center;gap:8px;color:#d4e6e9;text-decoration:none;font-size:13px;font-weight:700}
+.candidateBrand{font-weight:950;letter-spacing:.08em;font-size:19px}.candidateBrand span{display:block;font-size:8px;letter-spacing:.27em;color:#ffc1a6}
+.candidateHeroBody{display:flex;align-items:end;justify-content:space-between;gap:25px;position:relative;z-index:1;margin-top:36px}
+.candidateEyebrow{display:inline-block;font-size:11px;font-weight:850;letter-spacing:.03em;color:#db713f;margin-bottom:7px}
+.candidateHero .candidateEyebrow{color:#ffc7ac}
+.candidateHero h1{font-size:clamp(25px,3.2vw,39px);line-height:1.3;margin:0 0 10px;letter-spacing:-.035em}
+.candidateHero p{max-width:670px;line-height:1.85;font-size:13px;color:#c8dade;margin:0}
+.candidatePrimary,.candidateExport{display:inline-flex;align-items:center;justify-content:center;gap:9px;min-height:47px;padding:12px 18px;border:0;border-radius:13px;white-space:nowrap;font-weight:850;font-family:inherit;font-size:13px;cursor:pointer}
+.candidatePrimary{color:#fff;background:linear-gradient(115deg,#f58247,#e65a2b);box-shadow:0 9px 20px #aa4d2935}
+.candidatePrimary:hover{filter:brightness(1.06);transform:translateY(-1px)}
+.candidateStats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:15px;margin:22px 0}
+.candidateStat{background:white;border:1px solid var(--c-line);border-radius:18px;padding:20px;box-shadow:0 6px 23px #173a4808}
+.candidateStat>span{font-size:12px;color:#617785;font-weight:700}.candidateStat>div{display:flex;align-items:center;justify-content:space-between;margin:11px 0 7px}.candidateStat strong{font-size:clamp(27px,2.5vw,36px);font-weight:900;font-variant-numeric:tabular-nums}
+.candidateStatIcon{display:grid;place-items:center;width:45px;height:45px;border-radius:14px;background:#fff0e8;color:#e36c38}
+.candidateStatIcon.icon1{background:#fff5e5;color:#c78720}.candidateStatIcon.icon2{background:#eaf4fc;color:#286da7}.candidateStatIcon.icon3{background:#e8f6ee;color:#16805e}
+.candidateStat small{font-size:11px;color:#98a5ae}
+.candidateFormPanel,.candidateListPanel{background:white;border:1px solid var(--c-line);border-radius:23px;padding:clamp(18px,2.5vw,28px);box-shadow:0 10px 32px #142d3b0b;margin:20px 0}
+.candidateFormHead,.candidateSectionHeading{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:22px}
+.candidateFormHead h2,.candidateSectionHeading h2{font-size:clamp(20px,2.3vw,26px);margin:0 0 6px;font-weight:900}
+.candidateFormHead p,.candidateSectionHeading p{font-size:12px;color:var(--c-muted);line-height:1.75;margin:0}
+.candidateTextButton{display:inline-flex;align-items:center;gap:7px;border:1px solid #e0e6e9;border-radius:11px;padding:11px 14px;background:#fff;color:#415a65;font-size:12px;font-weight:800;cursor:pointer}
+.candidatePhotoGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px;margin-bottom:24px}
+.candidatePhotoTile{display:flex;align-items:center;gap:17px;padding:15px;border:1px dashed #e8c3b2;border-radius:17px;background:linear-gradient(125deg,#fff8f4,#fff)}
+.candidatePhotoFrame{width:108px;height:115px;display:grid;place-items:center;flex-shrink:0;border-radius:14px;overflow:hidden;background:#ffece2;color:#bc886f}
+.candidatePhotoFrame img,.candidateAvatar img,.candidateVehicleImage img{width:100%;height:100%;object-fit:cover}
+.candidatePhotoTile strong{font-size:14px}.candidatePhotoTile p{font-size:11px;color:#8d8684;margin:6px 0 12px}
+.candidateUpload{display:inline-flex;align-items:center;gap:7px;background:#fff;color:#ca5d34;border:1px solid #edc6b4;border-radius:9px;padding:9px 12px;font-size:12px;font-weight:800;cursor:pointer}
+.candidateUpload input{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+.candidateImageLink{background:none;border:0;color:#43738d;font-size:11px;font-weight:700;cursor:pointer;padding:6px}
+.candidateFormGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.candidateFormGrid label{min-width:0;display:flex;flex-direction:column;gap:7px}.candidateFormGrid label>span{font-weight:800;font-size:12px;color:#526774}
+.candidateFormGrid input,.candidateFormGrid select,.candidateFormGrid textarea{font-family:inherit;font-size:13px;outline:none}
+.candidateFormGrid textarea{resize:vertical}
+.candidateFormGrid label:has(textarea){grid-column:span 2}
+.candidateFormFooter{display:flex;align-items:center;gap:12px;margin-top:24px;padding-top:20px;border-top:1px solid #edf0f1}
+.candidateExport{background:#eaf6ef;color:#176b4d;border:1px solid #c7e7d3;box-shadow:none}
+.candidateExport:hover{background:#d9f0e3}
+.candidateFilters{display:flex;align-items:center;gap:11px;flex-wrap:wrap;margin-bottom:18px}
+.candidateSearch{display:flex;align-items:center;gap:11px;min-width:220px;flex:1;padding:0 14px;background:#f9fbfc;border:1px solid #dee6e9;border-radius:12px;color:#7b909a}
+.candidateSearch input{padding:13px 0;min-height:44px;background:none;outline:none;border:none;width:100%;font-size:13px;color:#213f4b}
+.candidateFilters select{min-height:46px;border:1px solid #dee6e9;background:#fff;color:#375261;border-radius:12px;padding:9px 13px;font-size:12px}
+.candidateCount{font-size:12px;font-weight:850;color:#65808a}
+.candidateCards{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,340px),1fr));gap:16px}
+.candidateCard{border:1px solid #e6ecee;border-radius:18px;padding:17px;min-width:0;background:#fff;box-shadow:0 4px 14px #14374608;transition:transform .2s,border-color .2s,box-shadow .2s}
+.candidateCard:hover{transform:translateY(-3px);border-color:#efb99e;box-shadow:0 14px 30px #14374613}
+.candidateCardTop{display:flex;align-items:center;gap:11px}
+.candidateAvatar{width:56px;height:56px;border-radius:15px;display:grid;place-items:center;overflow:hidden;background:#fce7dc;color:#cb7145;flex-shrink:0}
+.candidateCardName{flex:1;min-width:0}.candidateCardName small{font-size:10px;color:#82949c}.candidateCardName h3{font-size:15px;font-weight:900;margin:4px 0 6px;overflow-wrap:anywhere}.candidateCardName a{display:inline-flex;align-items:center;gap:5px;color:#376e83;text-decoration:none;font-size:12px}
+.candidateStatus{padding:6px 9px;border-radius:999px;font-size:10px;font-weight:850;background:#fff1df;color:#a16b1e;max-width:110px;text-align:center}
+.candidateStatus.status-registered{background:#e1f5e9;color:#13724a}.candidateStatus.status-interested{background:#e6f3fe;color:#276f9d}
+.candidateCardDetails{display:grid;gap:10px;padding:16px 0;margin:14px 0;border-top:1px solid #f0f2f3;border-bottom:1px solid #f0f2f3}
+.candidateCardDetails span{display:flex;align-items:flex-start;gap:8px;font-size:12px;line-height:1.5;color:#627784}.candidateCardDetails svg{color:#dc784e;flex-shrink:0}
+.candidateVehicleImage{height:135px;overflow:hidden;border-radius:12px;margin-bottom:14px;background:#f6f8f9}
+.candidateCardActions{display:flex;gap:9px}.candidateCardActions button{border:0;cursor:pointer;border-radius:10px;min-height:42px;padding:10px;font-size:12px;font-weight:850;background:#fff0e8;color:#c35630;flex:1}.candidateCardActions .candidateDelete{flex:0 0 45px;color:#a65254;background:#fff0f0}
+.candidateEmpty{display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;padding:70px 15px;color:#93a4ab}.candidateEmpty strong{font-size:17px;color:#3c5864}.candidateEmpty p{font-size:12px}
+.candidateNotice{background:#eaf4f8;border:1px solid #cce3ed;color:#27596b;padding:15px 18px;border-radius:13px;margin:15px 0;font-size:13px}
+@media(max-width:1000px){.candidateStats{grid-template-columns:repeat(2,minmax(0,1fr))}.candidateFormGrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:700px){.candidatePage{padding:12px}.candidateHero{border-radius:18px;padding:20px}.candidateHeroBody{align-items:stretch;flex-direction:column;margin-top:23px}.candidateHeroBody .candidatePrimary{width:100%}.candidatePhotoGrid{grid-template-columns:1fr}.candidateFormHead,.candidateSectionHeading{align-items:flex-start;flex-direction:column}.candidateSectionHeading .candidateExport{width:100%}.candidateFormGrid{grid-template-columns:1fr}.candidateFormGrid label:has(textarea){grid-column:auto}.candidateFilters>*{width:100%}.candidateFilters select{width:100%}.candidateCard{padding:15px}}
+@media(max-width:390px){.candidateStats{grid-template-columns:1fr}.candidateCardTop{flex-wrap:wrap}.candidatePhotoFrame{width:90px}}
+@media(prefers-reduced-motion:reduce){.candidateCard,.candidatePrimary{transition:none!important;transform:none!important}}
