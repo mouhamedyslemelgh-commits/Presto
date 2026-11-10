@@ -26,6 +26,9 @@ export default function PrestoAppGuide({language='ar'}:{language?:string}){
  const player=useRef<HTMLVideoElement>(null);
  const [selected,setSelected]=useState(0);
  const [failed,setFailed]=useState(false);
+ const [speed,setSpeed]=useState(1);
+ const fullscreen=()=>{const video=player.current;if(!video)return; if(video.requestFullscreen)void video.requestFullscreen().catch(()=>{});};
+ const cycleSpeed=()=>{const next=speed===1?1.25:speed===1.25?1.5:1;setSpeed(next);if(player.current)player.current.playbackRate=next;};
  const ar=language==='ar';
  const seek=(index:number)=>{setSelected(index);if(player.current){player.current.currentTime=steps[index].time;void player.current.play().catch(()=>{});}};
  return <section className="prestoGuide" dir={ar?'rtl':'ltr'}>
@@ -37,7 +40,7 @@ export default function PrestoAppGuide({language='ar'}:{language?:string}){
   <div className="prestoGuideLayout">
    <div className="prestoGuideCinema"><div className="prestoGuidePlayer">
     <video ref={player} controls playsInline preload="metadata" poster="/images/presto-uniform-rider.webp" onError={()=>setFailed(true)} aria-label={ar?'فيديو شرح تطبيق بريستو للسائق':'Vidéo de formation PRESTO'}><source src="/training/prestoman-driver-guide.mp4" type="video/mp4"/>{ar?'المتصفح لا يدعم تشغيل الفيديو':'Vidéo non prise en charge'}</video>
-   </div><p className="prestoGuideNote">{ar?'اضغط على أي فصل للانتقال إلى اللحظة المناسبة في الفيديو. يمكنك استخدام زر ملء الشاشة لمشاهدته على الكمبيوتر.':'Cliquez sur un chapitre pour avancer dans la vidéo ; vous pouvez activer le plein écran.'}</p>
+   </div><div className="prestoGuideToolbar"><button type="button" onClick={fullscreen}>{ar?"⛶ ملء الشاشة":"⛶ Plein écran"}</button><button type="button" onClick={cycleSpeed}>{ar?"سرعة العرض":"Vitesse"} · {speed}×</button><button type="button" onClick={()=>{if(player.current){player.current.currentTime=0;void player.current.play().catch(()=>{});}}}>{ar?"↺ من البداية":"↺ Recommencer"}</button></div><p className="prestoGuideNote">{ar?'اضغط على أي فصل للانتقال إلى اللحظة المناسبة في الفيديو. يمكنك استخدام زر ملء الشاشة لمشاهدته على الكمبيوتر.':'Cliquez sur un chapitre pour avancer dans la vidéo ; vous pouvez activer le plein écran.'}</p>
    {failed&&<p className="prestoGuideWarning" role="status">{ar?'ملف الفيديو غير متاح حاليًا على خادم الموقع. يجب رفع الملف باسم public/training/prestoman-driver-guide.mp4 أو ربطه بمصدر تخزين آمن. الشرح النصي متاح أدناه.':'La vidéo doit être publiée sous public/training/prestoman-driver-guide.mp4 ou liée à un hébergement vidéo sécurisé.'}</p>}
    </div>
    <div className="prestoGuideChapters"><h3>{ar?'فصول الفيديو':'Chapitres de la vidéo'}</h3>{steps.map((s,i)=><button type="button" key={s.time} className={'prestoGuideChapter '+(selected===i?'isActive':'')} onClick={()=>seek(i)}><span className="prestoGuideTime">{String(Math.floor(s.time/60)).padStart(2,'0')}:{String(s.time%60).padStart(2,'0')}</span><span><strong>{s.title}</strong><small>{s.detail}</small></span><PlayCircle size={18}/></button>)}</div>
