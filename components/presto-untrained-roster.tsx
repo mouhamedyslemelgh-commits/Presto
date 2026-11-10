@@ -32,7 +32,7 @@ const source:Source[]=[
 [21,'محمد تابا كمر','6230','41969809','','22/10/2026'],
 [22,'سري بيرو','6222','33827614','','31/10/2026'],
 [23,'البخاري الميمون','6128','27686102','6035 BC 00','20/10/2026'],
-[24,'الحسن الحسين البوث','5934','34946412','2038 BE 00','01/11/2026'],
+[24,'الحسن الحسين البلوث','5934','34946412','2038 BE 00','01/11/2026'],
 [25,'محمد مختار','5931','48683896','','20/10/2026'],
 [26,'ابوه محمد بابتي','5763','43132193','','21/09/2026']
 ].map(([number,name,ref,phone,plate,date])=>({number:Number(number),name:String(name),ref:String(ref),phone:String(phone),plate:String(plate),date:String(date)}));
@@ -57,7 +57,7 @@ export default function PrestoUntrainedRoster({language,editable,drivers,photos}
  const driverFor=(entry:Source)=>drivers.find(d=>digits(d.pdf_source_phone||d.phone)===entry.phone||String(d.presto_reference||'').replace('#','')===entry.ref);
  const full=useMemo(()=>source.map(s=>({source:s,driver:driverFor(s),training:known.get(s.phone)})).filter(v=>v.training?.training_status!=='completed'&&v.driver?.training_completed!==true),[drivers,records]);
  const filtered=full.filter(v=>[v.source.name,v.source.phone,v.source.ref,v.source.plate,reasonOf(v.training?.notes||''),edited[v.source.phone]||''].join(' ').toLowerCase().includes(search.trim().toLowerCase()));
- const stat=[full.length,full.filter(v=>(v.driver?.training_completed!==true)).length,full.filter(v=>v.training?.training_status==='not_trained').length];
+ const stat=[full.length,full.length,full.filter(v=>v.training?.training_status==='not_trained').length];
  const saveOne=async(entry:Source)=>{
   if(!prestoCloud||!editable)return;setBusy(true);setError('');setSuccess('');
   try{
