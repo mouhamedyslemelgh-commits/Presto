@@ -1,0 +1,51 @@
+/* PRESTO · Premium unified visual system · responsive and RTL-aware */
+:root{--presto-accent:#e96739;--presto-focus:#e97745;--presto-radius:20px}
+body{background:#f6f8fa}
+.shell .workspace{background:radial-gradient(ellipse 700px 390px at 90% 0%,rgba(239,120,65,.085),transparent 75%),#f6f8fa}
+.shell .topbar{border-bottom:1px solid #e5ecef;box-shadow:0 3px 20px rgba(17,47,59,.035)}
+.shell .sidebar{background:linear-gradient(158deg,#102d38 0%,#163e48 56%,#0c222c 100%);box-shadow:10px 0 45px rgba(13,40,51,.09)}
+.shell .sidebar nav button{border-radius:13px}
+.shell .sidebar nav button.selected{background:linear-gradient(105deg,rgba(249,133,80,.25),rgba(236,101,56,.07));border-color:rgba(250,173,133,.24)}
+.shell .pageHead{border-radius:24px;border:1px solid #e6edf0;background:linear-gradient(120deg,#fff,#fffaf5 90%);box-shadow:0 12px 32px #17394c0a}
+.shell .pageHead h1{font-weight:900;letter-spacing:-.025em}
+.shell .dashboardWelcome{border-radius:24px;background:linear-gradient(118deg,#12313d,#1a4b54 70%,#235a60);border:1px solid #244f59;box-shadow:0 18px 35px #163f4b25}
+.shell .dashboardWelcome h2{letter-spacing:-.025em}
+.shell .stat,.shell .payment,.shell .panel,.shell .opsPanel,.shell .driverRegisterPanel,.shell .settingsCard{border:1px solid #e4ebee;border-radius:21px;box-shadow:0 7px 27px #14374609;background-color:#fff}
+.shell .stat{position:relative;overflow:hidden}
+.shell .stat::before{content:"";position:absolute;inset:0 auto 0 0;width:4px;background:linear-gradient(#f68b51,#e25a32);opacity:.85}
+.shell[dir=rtl] .stat::before{left:auto;right:0}
+.shell .stat:hover,.shell .payment:hover,.shell .dashboardQuickLinks button:hover{box-shadow:0 17px 36px #14374615;transform:translateY(-2px)}
+.shell .dashboardQuickLinks button{border:1px solid #e3eaed;border-radius:16px;background:#fff;box-shadow:0 5px 19px #17394c08}
+.shell .opsPanelHeader{border-radius:19px;background:linear-gradient(105deg,#fff7f1,#fff 60%,#f7fbfb);padding:20px;border:1px solid #f1e4dc}
+.shell .opsEyebrow{font-weight:900;letter-spacing:.09em}
+.shell .opsHeaderIcon{background:linear-gradient(135deg,#ffe8d9,#fff1e7);color:#d65b2b;border-radius:15px}
+.shell .opsTotal{background:#fff;border:1px solid #f0d9ce;border-radius:14px}
+.shell .opsMetrics{gap:15px}
+.shell .opsMetric{border-radius:18px;background:#fff;border:1px solid #e7ecee;padding:19px;box-shadow:0 6px 21px #14374608}
+.shell .opsMetricIcon{background:#fdf0e7;border-radius:13px;color:#de6537}
+.shell .opsMetric strong{font-size:clamp(23px,2.3vw,31px);font-weight:900}
+.shell .opsSectionTop{padding-block:13px}
+.shell .opsSectionTop h3{font-weight:900}
+.shell .opsSearch{border-radius:13px;border:1px solid #dce6ea;background:#fbfcfd;min-height:46px}
+.shell .opsFilterChips{gap:9px}
+.shell .opsFilterChips button{min-height:40px;border-radius:999px;font-weight:800}
+.shell .opsFilterChips button.active{background:#17424c;border-color:#17424c;color:#fff}
+.shell .opsDriverCards{gap:16px}
+.shell .opsDriverCard{border:1px solid #e4eaed;border-radius:19px;background:#fff;padding:18px;box-shadow:0 7px 22px #1437460a;transition:transform .2s,box-shadow .2s,border-color .2s}
+.shell .opsDriverCard:hover{border-color:#ecc5af;transform:translateY(-2px);box-shadow:0 16px 31px #14374615}
+.shell .opsDriverAvatar{border-radius:14px;background:#fce9dd;border:2px solid #ffe7da}
+.shell .opsIdentityText strong{font-weight:850;color:#183e4b}
+.shell .opsCardFlags{gap:8px}
+.shell .opsFlag{border:1px solid #e9ecef;border-radius:11px;background:#f9fafb;padding:12px}
+.shell .opsFlag.isOn{background:#eaf6ee;border-color:#c6e7d2}
+.shell .opsFlag input{accent-color:#218763;width:20px;height:20px}
+.shell .opsCardFooter{border-top:1px solid #edf0f1;margin-top:14px;padding-top:14px}
+.shell .opsCardFooter button{border-radius:10px;font-weight:800}
+.shell .tableOverflow{border-radius:15px;overflow:auto;border:1px solid #e5eaee}
+.shell table thead{background:#f2f7f8}
+.shell table th{font-size:12px;color:#385463;font-weight:850}
+.shell table td{border-bottom:1px solid #edf1f2}
+.shell :is(.primary,.excelQuickDownload){border-radius:12px;font-weight:850}
+.shell :is(input,select,textarea):not([type=checkbox]):focus{border-color:#ed895e;box-shadow:0 0 0 3px #ee80552b}
+@media(max-width:750px){.shell .opsPanelHeader{padding:15px}.shell .opsMetric{padding:15px}.shell .opsDriverCard{padding:15px}.shell .pageHead{border-radius:18px}.shell .stat,.shell .payment,.shell .panel,.shell .opsPanel{border-radius:16px}}
+@media(prefers-reduced-motion:reduce){.shell .opsDriverCard,.shell .dashboardQuickLinks button,.shell .stat,.shell .payment{transition:none!important;transform:none!important}}
